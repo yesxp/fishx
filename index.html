@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FishX — 智能钓鱼助手</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--blue:#2196F3;--teal:#00BCD4;--bg:#F8FAFE;--card:#FFF;--text:#1A2B4A;--sub:#6B7A99;--r:20px}
+    body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+    /* Hero */
+    .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;overflow:hidden}
+    .hero::before{content:'';position:absolute;top:-30%;left:-20%;width:140%;height:140%;background:radial-gradient(ellipse at 30% 20%,rgba(33,150,243,.06)0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(0,188,212,.05)0%,transparent 60%);z-index:0}
+    .hero>*{position:relative;z-index:1}
+
+    /* Waves */
+    .waves{position:absolute;bottom:0;left:0;width:100%;height:120px;z-index:0}
+    .waves svg{position:absolute;bottom:0;width:200%;height:100%}
+    .w1{animation:wave 8s ease-in-out infinite;opacity:.6}
+    .w2{animation:wave 6s ease-in-out infinite reverse;opacity:.4}
+    .w3{animation:wave 10s ease-in-out infinite;opacity:.2}
+    @keyframes wave{0%,100%{transform:translateX(0)}50%{transform:translateX(-25%)}}
+
+    /* Logo */
+    .logo{width:100px;height:100px;border-radius:28px;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;margin-bottom:32px;box-shadow:0 8px 32px rgba(33,150,243,.25);animation:float 3s ease-in-out infinite}
+    .logo svg{width:56px;height:56px}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+    /* Badge */
+    .badge{display:inline-flex;align-items:center;gap:6px;background:#E3F2FD;color:#1565C0;font-size:13px;font-weight:600;padding:6px 16px;border-radius:100px;margin-bottom:24px}
+    .dot{width:6px;height:6px;border-radius:50%;background:#FF9800;animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+
+    h1{font-size:clamp(2.5rem,6vw,4rem);font-weight:800;line-height:1.1;margin-bottom:16px;letter-spacing:-1px}
+    h1 .g{background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .sub{font-size:clamp(1rem,2.5vw,1.25rem);color:var(--sub);max-width:500px;line-height:1.6;margin-bottom:40px}
+
+    /* Buttons */
+    .btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:14px;font-size:15px;font-weight:600;text-decoration:none;transition:all .25s;cursor:pointer;border:none}
+    .btn-p{background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;box-shadow:0 4px 16px rgba(33,150,243,.3)}
+    .btn-p:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(33,150,243,.4)}
+    .btn-g{background:var(--card);color:var(--text);border:1.5px solid #E8EDF5}
+    .btn-g:hover{border-color:var(--blue);color:var(--blue)}
+
+    /* Features */
+    .features{max-width:960px;margin:0 auto;padding:80px 20px}
+    .s-label{text-align:center;font-size:13px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}
+    .s-title{text-align:center;font-size:clamp(1.5rem,4vw,2.2rem);font-weight:700;margin-bottom:48px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+    .card{background:var(--card);border-radius:var(--r);padding:32px 28px;box-shadow:0 4px 24px rgba(33,150,243,.08);transition:all .3s;border:1px solid rgba(33,150,243,.06)}
+    .card:hover{transform:translateY(-4px);box-shadow:0 8px 40px rgba(33,150,243,.15)}
+    .icon{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px}
+    .i-b{background:#E3F2FD}.i-t{background:#E0F7FA}.i-o{background:#FFF3E0}.i-g{background:#E8F5E9}
+    .card h3{font-size:1.1rem;font-weight:600;margin-bottom:8px}
+    .card p{font-size:.9rem;color:var(--sub);line-height:1.6}
+
+    /* Footer */
+    footer{text-align:center;padding:40px 20px;color:var(--sub);font-size:.85rem;border-top:1px solid #EEF2F8;margin-top:40px}
+
+    /* Fish deco */
+    .fish{position:absolute;opacity:.06;z-index:0}
+    .f1{top:15%;left:8%;width:80px;animation:swim 12s ease-in-out infinite}
+    .f2{top:60%;right:10%;width:60px;animation:swim 9s ease-in-out infinite reverse}
+    .f3{bottom:20%;left:15%;width:50px;animation:swim 15s ease-in-out infinite}
+    @keyframes swim{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(20px,-10px) rotate(3deg)}50%{transform:translate(0,-20px) rotate(0)}75%{transform:translate(-20px,-10px) rotate(-3deg)}}
+
+    @media(max-width:768px){.features{padding:60px 16px}.btns{flex-direction:column;align-items:center}.btn{width:100%;max-width:280px;justify-content:center}}
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <svg class="fish f1" viewBox="0 0 100 60" fill="#2196F3"><path d="M80 30c0-12-15-22-35-22S10 18 10 30s15 22 35 22 35-10 35-22zM95 30l-10-8v16z"/></svg>
+    <svg class="fish f2" viewBox="0 0 100 60" fill="#00BCD4"><path d="M80 30c0-12-15-22-35-22S10 18 10 30s15 22 35 22 35-10 35-22zM95 30l-10-8v16z"/></svg>
+    <svg class="fish f3" viewBox="0 0 100 60" fill="#2196F3"><path d="M80 30c0-12-15-22-35-22S10 18 10 30s15 22 35 22 35-10 35-22zM95 30l-10-8v16z"/></svg>
+
+    <div class="waves">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path class="w1" fill="rgba(33,150,243,.08)" d="M0,60 C360,120 720,0 1080,60 C1260,90 1440,30 1440,60 L1440,120 L0,120 Z"/>
+        <path class="w2" fill="rgba(0,188,212,.06)" d="M0,80 C240,20 480,100 720,60 C960,20 1200,100 1440,80 L1440,120 L0,120 Z"/>
+        <path class="w3" fill="rgba(33,150,243,.04)" d="M0,40 C180,100 360,20 540,60 C720,100 900,20 1080,60 C1260,100 1440,40 1440,60 L1440,120 L0,120 Z"/>
+      </svg>
+    </div>
+
+    <div class="logo">
+      <svg viewBox="0 0 56 56" fill="none">
+        <path d="M44 28c0-8-10-15-24-15S-4 20-4 28s10 15 24 15 24-7 24-15z" fill="rgba(255,255,255,.3)"/>
+        <path d="M48 28l-8-6v12z" fill="rgba(255,255,255,.5)"/>
+        <circle cx="18" cy="26" r="2.5" fill="#fff"/>
+      </svg>
+    </div>
+
+    <div class="badge"><span class="dot"></span>建设中</div>
+    <h1><span class="g">FishX</span><br>智能钓鱼助手</h1>
+    <p class="sub">钓点发现、渔获记录、钓鱼技巧分享，让每一次出钓都满载而归。</p>
+
+    <div class="btns">
+      <a class="btn btn-p" href="#features">了解更多</a>
+      <a class="btn btn-g" href="#notify">上线提醒</a>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="s-label">核心功能</div>
+    <h2 class="s-title">FishX 能帮你做什么</h2>
+    <div class="grid">
+      <div class="card"><div class="icon i-b">📍</div><h3>钓点发现</h3><p>海量钓点数据，按鱼种、距离、评分筛选，一键导航直达钓位。</p></div>
+      <div class="card"><div class="icon i-t">🐟</div><h3>渔获记录</h3><p>拍照记录每一次渔获，生成精美战报，分享给钓友圈。</p></div>
+      <div class="card"><div class="icon i-o">🎣</div><h3>钓鱼技巧</h3><p>从新手入门到进阶攻略，饵料搭配、线组调校、季节技巧全覆盖。</p></div>
+      <div class="card"><div class="icon i-g">🌤️</div><h3>天气分析</h3><p>气压、风速、月相综合分析，告诉你今天适不适合出钓。</p></div>
+      <div class="card"><div class="icon i-b">👥</div><h3>钓友社区</h3><p>加入附近钓友圈子，约钓拼车，结识志同道合的朋友。</p></div>
+      <div class="card"><div class="icon i-t">📊</div><h3>数据统计</h3><p>分析上鱼时段和成功率，持续提升你的钓鱼技术。</p></div>
+    </div>
+  </section>
+
+  <section id="notify" style="text-align:center;padding:60px 20px 80px">
+    <div style="background:var(--card);border-radius:var(--r);padding:48px 32px;max-width:480px;margin:0 auto;box-shadow:0 4px 24px rgba(33,150,243,.08)">
+      <div style="font-size:2.5rem;margin-bottom:16px">🔔</div>
+      <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:8px">上线通知</h3>
+      <p style="color:var(--sub);font-size:.9rem;margin-bottom:24px">留下邮箱，FishX 上线第一时间通知你</p>
+      <div style="display:flex;gap:8px;max-width:360px;margin:0 auto">
+        <input type="email" placeholder="your@email.com" style="flex:1;padding:12px 16px;border-radius:12px;border:1.5px solid #E8EDF5;font-size:14px;outline:none;font-family:inherit" onfocus="this.style.borderColor='#2196F3'" onblur="this.style.borderColor='#E8EDF5'">
+        <button onclick="this.textContent='已订阅 ✓';this.style.background='#4CAF50';this.style.color='#fff';this.style.borderColor='#4CAF50'" style="padding:12px 20px;border-radius:12px;border:1.5px solid var(--blue);background:var(--card);color:var(--blue);font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;white-space:nowrap">通知我</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 FishX · 让每一次出钓都满载而归</p>
+    <p style="margin-top:8px">Coming Soon</p>
+  </footer>
+
+  <script>
+    var co=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting&&!x.target.dataset.a){x.target.dataset.a='1';ac(x.target)}})},{threshold:.5});
+    document.querySelectorAll('[data-c]').forEach(function(e){co.observe(e)});
+    function ac(el){var t=+el.dataset.c,s=performance.now();(function step(n){var p=Math.min((n-s)/1800,1),v=1-Math.pow(1-p,3);el.textContent=Math.floor(v*t).toLocaleString()+'+';if(p<1)requestAnimationFrame(step);else el.textContent=t.toLocaleString()+'+'})(s)}
+    var ro=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.style.opacity='1';x.target.style.transform='translateY(0)'}})},{threshold:.1});
+    document.querySelectorAll('.card').forEach(function(c){c.style.opacity='0';c.style.transform='translateY(24px)';c.style.transition='opacity .5s ease,transform .5s ease';ro.observe(c)});
+  </script>
+</body>
+</html>
