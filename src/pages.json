@@ -26,6 +26,12 @@
         "navigationBarTitleText": "我的",
         "navigationStyle": "custom"
       }
+    },
+    {
+      "path": "pages/login/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
     }
   ],
   "globalStyle": {
@@ -35,9 +41,9 @@
     "backgroundColor": "#f5f7fa"
   },
   "tabBar": {
-    "color": "#64748b",
-    "selectedColor": "#3B82F6",
-    "backgroundColor": "#ffffff",
+    "color": "#6B7A99",
+    "selectedColor": "#2196F3",
+    "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
     "list": [
       {
