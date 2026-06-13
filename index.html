@@ -2,141 +2,443 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FishX — 智能钓鱼助手</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>鱼渔娱</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    :root{--blue:#2196F3;--teal:#00BCD4;--bg:#F8FAFE;--card:#FFF;--text:#1A2B4A;--sub:#6B7A99;--r:20px}
-    body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+    :root{
+      --blue:#2196F3;--teal:#00BCD4;
+      --green:#4CAF50;--lime:#8BC34A;--yellow:#FFC107;--orange:#FF9800;--red:#F44336;
+      --bg:#F5F6FA;--card:#FFF;--text:#1A2B4A;--sub:#8E99B0;--border:#EEF1F8;
+      --r:16px;--r-sm:12px;--shadow:0 2px 12px rgba(26,43,74,.06);
+    }
+    html,body{height:100%;overflow:hidden}
+    body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
 
-    /* Hero */
-    .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;overflow:hidden}
-    .hero::before{content:'';position:absolute;top:-30%;left:-20%;width:140%;height:140%;background:radial-gradient(ellipse at 30% 20%,rgba(33,150,243,.06)0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(0,188,212,.05)0%,transparent 60%);z-index:0}
-    .hero>*{position:relative;z-index:1}
+    /* ===== App Shell ===== */
+    .app{max-width:430px;height:100vh;margin:0 auto;position:relative;display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
+    .pages{flex:1;overflow:hidden;position:relative}
+    .page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;pointer-events:none;transition:opacity .25s;padding-bottom:90px}
+    .page.active{opacity:1;pointer-events:auto}
+    .page::-webkit-scrollbar{display:none}
 
-    /* Waves */
-    .waves{position:absolute;bottom:0;left:0;width:100%;height:120px;z-index:0}
-    .waves svg{position:absolute;bottom:0;width:200%;height:100%}
-    .w1{animation:wave 8s ease-in-out infinite;opacity:.6}
-    .w2{animation:wave 6s ease-in-out infinite reverse;opacity:.4}
-    .w3{animation:wave 10s ease-in-out infinite;opacity:.2}
-    @keyframes wave{0%,100%{transform:translateX(0)}50%{transform:translateX(-25%)}}
+    /* ===== TabBar ===== */
+    .tabbar{position:absolute;bottom:0;left:0;right:0;height:84px;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;align-items:flex-start;padding-top:8px;z-index:100}
+    .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--sub);cursor:pointer;transition:color .2s;padding:4px 0}
+    .tab.active{color:var(--blue)}
+    .tab svg{width:24px;height:24px;transition:all .2s}
+    .tab.active svg{transform:scale(1.08)}
+    .tab-center{flex:1;display:flex;justify-content:center;margin-top:-20px}
+    .tab-center-btn{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(33,150,243,.35);cursor:pointer;transition:transform .2s}
+    .tab-center-btn:active{transform:scale(.92)}
+    .tab-center-btn svg{width:26px;height:26px}
 
-    /* Logo */
-    .logo{width:100px;height:100px;border-radius:28px;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;margin-bottom:32px;box-shadow:0 8px 32px rgba(33,150,243,.25);animation:float 3s ease-in-out infinite}
-    .logo svg{width:56px;height:56px}
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    /* ===== Page 1: 首页 ===== */
+    .home-header{padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between}
+    .home-header h2{font-size:20px;font-weight:700}
+    .location{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--sub)}
+    .index-card{margin:16px 20px;background:linear-gradient(135deg,#E3F2FD,#E0F7FA);border-radius:var(--r);padding:20px 24px;display:flex;align-items:center;gap:20px;cursor:pointer}
+    .index-num{font-size:56px;font-weight:800;line-height:1;background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .index-info{flex:1}
+    .index-label{font-size:13px;color:var(--sub);margin-bottom:4px}
+    .index-text{font-size:15px;font-weight:600;color:var(--text)}
+    .index-tag{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;background:rgba(76,175,80,.12);color:var(--green)}
+    .index-mini{display:flex;gap:12px;margin:0 20px 16px}
+    .index-mini-item{flex:1;background:var(--card);border-radius:var(--r-sm);padding:12px;text-align:center;box-shadow:var(--shadow)}
+    .index-mini-val{font-size:17px;font-weight:700;margin-bottom:2px}
+    .index-mini-label{font-size:11px;color:var(--sub)}
+    .section-header{display:flex;align-items:center;justify-content:space-between;padding:0 20px;margin:20px 0 12px}
+    .section-header h3{font-size:16px;font-weight:700}
+    .section-header span{font-size:13px;color:var(--blue);cursor:pointer}
 
-    /* Badge */
-    .badge{display:inline-flex;align-items:center;gap:6px;background:#E3F2FD;color:#1565C0;font-size:13px;font-weight:600;padding:6px 16px;border-radius:100px;margin-bottom:24px}
-    .dot{width:6px;height:6px;border-radius:50%;background:#FF9800;animation:pulse 2s ease-in-out infinite}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+    /* Masonry Grid */
+    .masonry{columns:2;column-gap:10px;padding:0 16px}
+    .catch-card{break-inside:avoid;margin-bottom:10px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s}
+    .catch-card:active{transform:scale(.97)}
+    .catch-photo{width:100%;display:block;object-fit:cover;background:#E8EDF5}
+    .catch-body{padding:10px 12px}
+    .catch-fish{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:600;background:rgba(33,150,243,.08);color:var(--blue);margin-bottom:6px}
+    .catch-meta{font-size:11px;color:var(--sub);line-height:1.5}
+    .catch-actions{display:flex;align-items:center;gap:12px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+    .catch-action{display:flex;align-items:center;gap:3px;font-size:12px;color:var(--sub)}
+    .catch-action svg{width:14px;height:14px}
 
-    h1{font-size:clamp(2.5rem,6vw,4rem);font-weight:800;line-height:1.1;margin-bottom:16px;letter-spacing:-1px}
-    h1 .g{background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .sub{font-size:clamp(1rem,2.5vw,1.25rem);color:var(--sub);max-width:500px;line-height:1.6;margin-bottom:40px}
+    /* ===== Page 2: 天时 ===== */
+    .weather-hero{padding:20px;text-align:center}
+    .weather-index{font-size:72px;font-weight:800;line-height:1;margin-bottom:4px}
+    .weather-index.green{color:var(--green)}
+    .weather-label{font-size:15px;color:var(--sub);margin-bottom:16px}
+    .weather-suggest{display:inline-block;padding:6px 16px;border-radius:100px;font-size:14px;font-weight:600;margin-bottom:20px}
+    .weather-suggest.good{background:rgba(76,175,80,.1);color:var(--green)}
+    .weather-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 20px}
+    .weather-item{background:var(--card);border-radius:var(--r-sm);padding:14px 8px;text-align:center;box-shadow:var(--shadow)}
+    .weather-item-val{font-size:20px;font-weight:700;margin-bottom:2px}
+    .weather-item-label{font-size:11px;color:var(--sub)}
+    .pressure-chart{margin:20px;background:var(--card);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+    .pressure-title{font-size:14px;font-weight:600;margin-bottom:12px}
+    .chart-bars{display:flex;align-items:flex-end;gap:4px;height:80px}
+    .chart-bar{flex:1;border-radius:3px 3px 0 0;transition:height .5s ease}
+    .time-slots{margin:16px 20px}
+    .time-slots h4{font-size:14px;font-weight:600;margin-bottom:12px}
+    .slot{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border-radius:var(--r-sm);margin-bottom:8px;box-shadow:var(--shadow)}
+    .slot-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .slot-dot.best{background:var(--green)}
+    .slot-dot.ok{background:var(--yellow)}
+    .slot-dot.bad{background:var(--red)}
+    .slot-time{font-size:14px;font-weight:600;flex:1}
+    .slot-desc{font-size:12px;color:var(--sub)}
 
-    /* Buttons */
-    .btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:14px;font-size:15px;font-weight:600;text-decoration:none;transition:all .25s;cursor:pointer;border:none}
-    .btn-p{background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;box-shadow:0 4px 16px rgba(33,150,243,.3)}
-    .btn-p:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(33,150,243,.4)}
-    .btn-g{background:var(--card);color:var(--text);border:1.5px solid #E8EDF5}
-    .btn-g:hover{border-color:var(--blue);color:var(--blue)}
+    /* ===== Page 3: 钓点 ===== */
+    .map-container{height:100%;background:#D4E6F1;position:relative}
+    .map-placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#B3D4E8 0%,#8FBFD4 100%);position:relative;overflow:hidden}
+    .map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.15) 1px,transparent 1px);background-size:40px 40px}
+    .map-center-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10}
+    .map-center-pin .pin{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(33,150,243,.4);animation:pulse2 2s infinite}
+    .map-center-pin .pin-ring{position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(33,150,243,.2);animation:pulse2 2s infinite .5s}
+    @keyframes pulse2{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.7}}
+    .map-bubble{position:absolute;cursor:pointer;transition:transform .2s}
+    .map-bubble:active{transform:scale(.9)}
+    .map-bubble-img{width:48px;height:48px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 12px rgba(0,0,0,.15);object-fit:cover;background:#ccc}
+    .map-bubble-name{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:10px;white-space:nowrap;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);font-weight:600}
+    .map-spot-card{position:absolute;bottom:100px;left:16px;right:16px;background:var(--card);border-radius:var(--r);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:20;display:none}
+    .map-spot-card.show{display:block;animation:slideUp .3s ease}
+    @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .spot-card-top{display:flex;gap:12px;margin-bottom:12px}
+    .spot-card-photo{width:64px;height:64px;border-radius:var(--r-sm);object-fit:cover;background:#E8EDF5}
+    .spot-card-info{flex:1}
+    .spot-card-name{font-size:16px;font-weight:700;margin-bottom:4px}
+    .spot-card-type{font-size:12px;color:var(--sub);margin-bottom:6px}
+    .spot-card-rating{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--orange)}
+    .spot-card-stats{display:flex;gap:16px;margin-bottom:12px}
+    .spot-stat{text-align:center}
+    .spot-stat-val{font-size:18px;font-weight:700;color:var(--blue)}
+    .spot-stat-label{font-size:11px;color:var(--sub)}
+    .spot-card-btns{display:flex;gap:8px}
+    .spot-btn{flex:1;padding:10px;border-radius:var(--r-sm);border:none;font-size:13px;font-weight:600;cursor:pointer;text-align:center}
+    .spot-btn-primary{background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff}
+    .spot-btn-secondary{background:var(--bg);color:var(--text)}
+    .map-toolbar{position:absolute;top:16px;left:16px;right:16px;display:flex;gap:8px;z-index:10}
+    .map-search{flex:1;background:rgba(255,255,255,.95);border-radius:var(--r-sm);padding:10px 16px;font-size:14px;border:none;box-shadow:0 2px 12px rgba(0,0,0,.08);outline:none}
+    .map-layer-btn{width:40px;height:40px;background:rgba(255,255,255,.95);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.08);cursor:pointer;border:none;font-size:18px}
 
-    /* Features */
-    .features{max-width:960px;margin:0 auto;padding:80px 20px}
-    .s-label{text-align:center;font-size:13px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}
-    .s-title{text-align:center;font-size:clamp(1.5rem,4vw,2.2rem);font-weight:700;margin-bottom:48px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
-    .card{background:var(--card);border-radius:var(--r);padding:32px 28px;box-shadow:0 4px 24px rgba(33,150,243,.08);transition:all .3s;border:1px solid rgba(33,150,243,.06)}
-    .card:hover{transform:translateY(-4px);box-shadow:0 8px 40px rgba(33,150,243,.15)}
-    .icon{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px}
-    .i-b{background:#E3F2FD}.i-t{background:#E0F7FA}.i-o{background:#FFF3E0}.i-g{background:#E8F5E9}
-    .card h3{font-size:1.1rem;font-weight:600;margin-bottom:8px}
-    .card p{font-size:.9rem;color:var(--sub);line-height:1.6}
+    /* ===== Page 4: 我的 ===== */
+    .mine-header{padding:20px;text-align:center;background:linear-gradient(135deg,#E3F2FD,#E0F7FA);margin:16px;border-radius:var(--r)}
+    .mine-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--teal));margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff}
+    .mine-name{font-size:18px;font-weight:700;margin-bottom:4px}
+    .mine-id{font-size:12px;color:var(--sub)}
+    .mine-stats{display:flex;gap:1px;margin:16px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+    .mine-stat{flex:1;text-align:center;padding:16px 8px}
+    .mine-stat-val{font-size:22px;font-weight:700;color:var(--blue)}
+    .mine-stat-label{font-size:11px;color:var(--sub);margin-top:4px}
+    .mine-section{margin:16px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+    .mine-item{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer}
+    .mine-item:last-child{border-bottom:none}
+    .mine-item-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-right:12px}
+    .mine-item-text{flex:1;font-size:14px}
+    .mine-item-arrow{color:var(--sub);font-size:14px}
 
-    /* Footer */
-    footer{text-align:center;padding:40px 20px;color:var(--sub);font-size:.85rem;border-top:1px solid #EEF2F8;margin-top:40px}
+    /* ===== Animations ===== */
+    .fade-in{animation:fadeIn .5s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-    /* Fish deco */
-    .fish{position:absolute;opacity:.06;z-index:0}
-    .f1{top:15%;left:8%;width:80px;animation:swim 12s ease-in-out infinite}
-    .f2{top:60%;right:10%;width:60px;animation:swim 9s ease-in-out infinite reverse}
-    .f3{bottom:20%;left:15%;width:50px;animation:swim 15s ease-in-out infinite}
-    @keyframes swim{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(20px,-10px) rotate(3deg)}50%{transform:translate(0,-20px) rotate(0)}75%{transform:translate(-20px,-10px) rotate(-3deg)}}
-
-    @media(max-width:768px){.features{padding:60px 16px}.btns{flex-direction:column;align-items:center}.btn{width:100%;max-width:280px;justify-content:center}}
+    /* ===== Responsive ===== */
+    @media(min-width:431px){
+      .app{border-left:1px solid var(--border);border-right:1px solid var(--border)}
+    }
   </style>
 </head>
 <body>
-  <section class="hero">
-    <svg class="fish f1" viewBox="0 0 100 60" fill="#2196F3"><path d="M80 30c0-12-15-22-35-22S10 18 10 30s15 22 35 22 35-10 35-22zM95 30l-10-8v16z"/></svg>
-    <svg class="fish f2" viewBox="0 0 100 60" fill="#00BCD4"><path d="M80 30c0-12-15-22-35-22S10 18 10 30s15 22 35 22 35-10 35-22zM95 30l-10-8v16z"/></svg>
-    <svg class="fish f3" viewBox="0 0 100 60" fill="#2196F3"><path d="M80 30c0-12-15-22-35-22S10 18 10 30s15 22 35 22 35-10 35-22zM95 30l-10-8v16z"/></svg>
 
-    <div class="waves">
-      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-        <path class="w1" fill="rgba(33,150,243,.08)" d="M0,60 C360,120 720,0 1080,60 C1260,90 1440,30 1440,60 L1440,120 L0,120 Z"/>
-        <path class="w2" fill="rgba(0,188,212,.06)" d="M0,80 C240,20 480,100 720,60 C960,20 1200,100 1440,80 L1440,120 L0,120 Z"/>
-        <path class="w3" fill="rgba(33,150,243,.04)" d="M0,40 C180,100 360,20 540,60 C720,100 900,20 1080,60 C1260,100 1440,40 1440,60 L1440,120 L0,120 Z"/>
-      </svg>
+<div class="app">
+  <div class="pages">
+
+    <!-- ===== 首页 ===== -->
+    <div class="page active" id="page-home">
+      <div class="home-header">
+        <h2>首页</h2>
+        <div class="location">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          上海市
+        </div>
+      </div>
+
+      <div class="index-card" onclick="switchTab(1)">
+        <div class="index-num">72</div>
+        <div class="index-info">
+          <div class="index-label">今日钓鱼指数</div>
+          <div class="index-text">气压稳定，适合出钓</div>
+          <div class="index-tag">✓ 适合出门</div>
+        </div>
+      </div>
+
+      <div class="index-mini">
+        <div class="index-mini-item"><div class="index-mini-val">26°</div><div class="index-mini-label">气温</div></div>
+        <div class="index-mini-item"><div class="index-mini-val">1009</div><div class="index-mini-label">气压 hPa</div></div>
+        <div class="index-mini-item"><div class="index-mini-val">2级</div><div class="index-mini-label">南风</div></div>
+      </div>
+
+      <div class="section-header">
+        <h3>附近渔获</h3>
+        <span onclick="switchTab(2)">查看全部 →</span>
+      </div>
+
+      <div class="masonry" id="catch-feed"></div>
     </div>
 
-    <div class="logo">
-      <svg viewBox="0 0 56 56" fill="none">
-        <path d="M44 28c0-8-10-15-24-15S-4 20-4 28s10 15 24 15 24-7 24-15z" fill="rgba(255,255,255,.3)"/>
-        <path d="M48 28l-8-6v12z" fill="rgba(255,255,255,.5)"/>
-        <circle cx="18" cy="26" r="2.5" fill="#fff"/>
-      </svg>
+    <!-- ===== 天时 ===== -->
+    <div class="page" id="page-weather">
+      <div class="weather-hero fade-in">
+        <div class="weather-index green">72</div>
+        <div class="weather-label">今日钓鱼指数 · 上海</div>
+        <div class="weather-suggest good">🎣 气压稳定，适合出钓</div>
+      </div>
+
+      <div class="weather-grid">
+        <div class="weather-item"><div class="weather-item-val">26°</div><div class="weather-item-label">气温</div></div>
+        <div class="weather-item"><div class="weather-item-val">24°</div><div class="weather-item-label">水温</div></div>
+        <div class="weather-item"><div class="weather-item-val">1009</div><div class="weather-item-label">气压 hPa</div></div>
+        <div class="weather-item"><div class="weather-item-val">2级</div><div class="weather-item-label">南风</div></div>
+        <div class="weather-item"><div class="weather-item-val">65%</div><div class="weather-item-label">湿度</div></div>
+        <div class="weather-item"><div class="weather-item-val">多云</div><div class="weather-item-label">天气</div></div>
+      </div>
+
+      <div class="pressure-chart">
+        <div class="pressure-title">📊 气压趋势（24h）</div>
+        <div class="chart-bars" id="pressure-chart"></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--sub)">
+          <span>12h前</span><span>现在</span><span>12h后</span>
+        </div>
+      </div>
+
+      <div class="time-slots">
+        <h4>⏰ 最佳出钓时段</h4>
+        <div class="slot"><div class="slot-dot best"></div><div class="slot-time">16:00 - 19:00</div><div class="slot-desc">傍晚黄金期</div></div>
+        <div class="slot"><div class="slot-dot ok"></div><div class="slot-time">06:00 - 08:00</div><div class="slot-desc">早晨次佳</div></div>
+        <div class="slot"><div class="slot-dot bad"></div><div class="slot-time">12:00 - 14:00</div><div class="slot-desc">午间不宜</div></div>
+      </div>
+
+      <div class="section-header">
+        <h3>这个天气下的渔获</h3>
+      </div>
+      <div class="masonry" id="weather-catches" style="padding-bottom:20px"></div>
     </div>
 
-    <div class="badge"><span class="dot"></span>建设中</div>
-    <h1><span class="g">FishX</span><br>智能钓鱼助手</h1>
-    <p class="sub">钓点发现、渔获记录、钓鱼技巧分享，让每一次出钓都满载而归。</p>
+    <!-- ===== 钓点 ===== -->
+    <div class="page" id="page-map">
+      <div class="map-container">
+        <div class="map-toolbar">
+          <input class="map-search" placeholder="🔍 搜索钓点..." readonly>
+          <button class="map-layer-btn">🗺️</button>
+        </div>
+        <div class="map-placeholder">
+          <div class="map-grid"></div>
+          <div class="map-center-pin">
+            <div class="pin-ring"></div>
+            <div class="pin">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg>
+            </div>
+          </div>
+          <!-- Fishing spot bubbles -->
+          <div class="map-bubble" style="top:28%;left:22%" onclick="showSpotCard(this)" data-name="崇明东滩" data-type="野钓" data-rating="4.8" data-catches="128">
+            <div class="map-bubble-img" style="background:linear-gradient(135deg,#81D4FA,#4FC3F7)"></div>
+            <div class="map-bubble-name">崇明东滩</div>
+          </div>
+          <div class="map-bubble" style="top:35%;left:65%" onclick="showSpotCard(this)" data-name="淀山湖" data-type="湖泊" data-rating="4.6" data-catches="89">
+            <div class="map-bubble-img" style="background:linear-gradient(135deg,#80CBC4,#4DB6AC)"></div>
+            <div class="map-bubble-name">淀山湖</div>
+          </div>
+          <div class="map-bubble" style="top:60%;left:30%" onclick="showSpotCard(this)" data-name="松江鲈鱼湾" data-type="黑坑" data-rating="4.3" data-catches="56">
+            <div class="map-bubble-img" style="background:linear-gradient(135deg,#FFCC80,#FFA726)"></div>
+            <div class="map-bubble-name">鲈鱼湾</div>
+          </div>
+          <div class="map-bubble" style="top:55%;left:72%" onclick="showSpotCard(this)" data-name="青浦野河浜" data-type="河流" data-rating="4.5" data-catches="203">
+            <div class="map-bubble-img" style="background:linear-gradient(135deg,#A5D6A7,#66BB6A)"></div>
+            <div class="map-bubble-name">野河浜</div>
+          </div>
+          <div class="map-bubble" style="top:20%;left:50%" onclick="showSpotCard(this)" data-name="宝山滨江" data-type="海钓" data-rating="4.1" data-catches="34">
+            <div class="map-bubble-img" style="background:linear-gradient(135deg,#90CAF9,#42A5F5)"></div>
+            <div class="map-bubble-name">宝山滨江</div>
+          </div>
 
-    <div class="btns">
-      <a class="btn btn-p" href="#features">了解更多</a>
-      <a class="btn btn-g" href="#notify">上线提醒</a>
-    </div>
-  </section>
-
-  <section class="features" id="features">
-    <div class="s-label">核心功能</div>
-    <h2 class="s-title">FishX 能帮你做什么</h2>
-    <div class="grid">
-      <div class="card"><div class="icon i-b">📍</div><h3>钓点发现</h3><p>海量钓点数据，按鱼种、距离、评分筛选，一键导航直达钓位。</p></div>
-      <div class="card"><div class="icon i-t">🐟</div><h3>渔获记录</h3><p>拍照记录每一次渔获，生成精美战报，分享给钓友圈。</p></div>
-      <div class="card"><div class="icon i-o">🎣</div><h3>钓鱼技巧</h3><p>从新手入门到进阶攻略，饵料搭配、线组调校、季节技巧全覆盖。</p></div>
-      <div class="card"><div class="icon i-g">🌤️</div><h3>天气分析</h3><p>气压、风速、月相综合分析，告诉你今天适不适合出钓。</p></div>
-      <div class="card"><div class="icon i-b">👥</div><h3>钓友社区</h3><p>加入附近钓友圈子，约钓拼车，结识志同道合的朋友。</p></div>
-      <div class="card"><div class="icon i-t">📊</div><h3>数据统计</h3><p>分析上鱼时段和成功率，持续提升你的钓鱼技术。</p></div>
-    </div>
-  </section>
-
-  <section id="notify" style="text-align:center;padding:60px 20px 80px">
-    <div style="background:var(--card);border-radius:var(--r);padding:48px 32px;max-width:480px;margin:0 auto;box-shadow:0 4px 24px rgba(33,150,243,.08)">
-      <div style="font-size:2.5rem;margin-bottom:16px">🔔</div>
-      <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:8px">上线通知</h3>
-      <p style="color:var(--sub);font-size:.9rem;margin-bottom:24px">留下邮箱，FishX 上线第一时间通知你</p>
-      <div style="display:flex;gap:8px;max-width:360px;margin:0 auto">
-        <input type="email" placeholder="your@email.com" style="flex:1;padding:12px 16px;border-radius:12px;border:1.5px solid #E8EDF5;font-size:14px;outline:none;font-family:inherit" onfocus="this.style.borderColor='#2196F3'" onblur="this.style.borderColor='#E8EDF5'">
-        <button onclick="this.textContent='已订阅 ✓';this.style.background='#4CAF50';this.style.color='#fff';this.style.borderColor='#4CAF50'" style="padding:12px 20px;border-radius:12px;border:1.5px solid var(--blue);background:var(--card);color:var(--blue);font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;white-space:nowrap">通知我</button>
+          <!-- Spot detail card -->
+          <div class="map-spot-card" id="spot-card">
+            <div class="spot-card-top">
+              <div class="spot-card-photo" id="spot-photo" style="background:linear-gradient(135deg,#81D4FA,#4FC3F7)"></div>
+              <div class="spot-card-info">
+                <div class="spot-card-name" id="spot-name">崇明东滩</div>
+                <div class="spot-card-type" id="spot-type">野钓 · 3.2km</div>
+                <div class="spot-card-rating">⭐ <span id="spot-rating">4.8</span> · <span id="spot-catches">128</span> 条渔获</div>
+              </div>
+            </div>
+            <div class="spot-card-stats">
+              <div class="spot-stat"><div class="spot-stat-val" id="spot-stat-catches">128</div><div class="spot-stat-label">渔获</div></div>
+              <div class="spot-stat"><div class="spot-stat-val" id="spot-stat-rating">4.8</div><div class="spot-stat-label">评分</div></div>
+              <div class="spot-stat"><div class="spot-stat-val" id="spot-stat-fish">鲫鱼</div><div class="spot-stat-label">热门鱼种</div></div>
+            </div>
+            <div class="spot-card-btns">
+              <button class="spot-btn spot-btn-secondary" onclick="hideSpotCard()">关闭</button>
+              <button class="spot-btn spot-btn-primary">🧭 导航</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </section>
 
-  <footer>
-    <p>© 2025 FishX · 让每一次出钓都满载而归</p>
-    <p style="margin-top:8px">Coming Soon</p>
-  </footer>
+    <!-- ===== 我的 ===== -->
+    <div class="page" id="page-mine">
+      <div class="mine-header fade-in">
+        <div class="mine-avatar">🎣</div>
+        <div class="mine-name">钓鱼人小陈</div>
+        <div class="mine-id">ID: fishx_2026</div>
+      </div>
 
-  <script>
-    var co=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting&&!x.target.dataset.a){x.target.dataset.a='1';ac(x.target)}})},{threshold:.5});
-    document.querySelectorAll('[data-c]').forEach(function(e){co.observe(e)});
-    function ac(el){var t=+el.dataset.c,s=performance.now();(function step(n){var p=Math.min((n-s)/1800,1),v=1-Math.pow(1-p,3);el.textContent=Math.floor(v*t).toLocaleString()+'+';if(p<1)requestAnimationFrame(step);else el.textContent=t.toLocaleString()+'+'})(s)}
-    var ro=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.style.opacity='1';x.target.style.transform='translateY(0)'}})},{threshold:.1});
-    document.querySelectorAll('.card').forEach(function(c){c.style.opacity='0';c.style.transform='translateY(24px)';c.style.transition='opacity .5s ease,transform .5s ease';ro.observe(c)});
-  </script>
+      <div class="mine-stats">
+        <div class="mine-stat"><div class="mine-stat-val">42</div><div class="mine-stat-label">总渔获</div></div>
+        <div class="mine-stat"><div class="mine-stat-val">8</div><div class="mine-stat-label">钓点</div></div>
+        <div class="mine-stat"><div class="mine-stat-val">鲫鱼</div><div class="mine-stat-label">最常钓</div></div>
+      </div>
+
+      <div class="mine-section">
+        <div class="mine-item"><div class="mine-item-icon" style="background:#E3F2FD">🐟</div><div class="mine-item-text">我的渔获</div><div class="mine-item-arrow">›</div></div>
+        <div class="mine-item"><div class="mine-item-icon" style="background:#E0F7FA">📍</div><div class="mine-item-text">我的钓点</div><div class="mine-item-arrow">›</div></div>
+        <div class="mine-item"><div class="mine-item-icon" style="background:#FFF3E0">⭐</div><div class="mine-item-text">收藏</div><div class="mine-item-arrow">›</div></div>
+      </div>
+
+      <div class="mine-section">
+        <div class="mine-item"><div class="mine-item-icon" style="background:#F3E5F5">🔔</div><div class="mine-item-text">通知设置</div><div class="mine-item-arrow">›</div></div>
+        <div class="mine-item"><div class="mine-item-icon" style="background:#E8F5E9">📍</div><div class="mine-item-text">定位授权</div><div class="mine-item-arrow">›</div></div>
+        <div class="mine-item"><div class="mine-item-icon" style="background:#FBE9E7">🗑️</div><div class="mine-item-text">清除缓存</div><div class="mine-item-arrow">›</div></div>
+        <div class="mine-item"><div class="mine-item-icon" style="background:#ECEFF1">ℹ️</div><div class="mine-item-text">关于鱼渔娱</div><div class="mine-item-arrow">›</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== TabBar ===== -->
+  <div class="tabbar">
+    <div class="tab active" onclick="switchTab(0)" data-tab="0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>首页</span>
+    </div>
+    <div class="tab" onclick="switchTab(1)" data-tab="1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <span>天时</span>
+    </div>
+    <div class="tab-center" onclick="switchTab(3)">
+      <div class="tab-center-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </div>
+    </div>
+    <div class="tab" onclick="switchTab(2)" data-tab="2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      <span>钓点</span>
+    </div>
+    <div class="tab" onclick="switchTab(3)" data-tab="3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>我的</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// Mock data
+const fishTypes = ['鲫鱼','鲤鱼','鲈鱼','草鱼','翘嘴','黑鱼','鲢鱼','鳙鱼'];
+const spots = ['崇明东滩','淀山湖','鲈鱼湾','野河浜','宝山滨江'];
+const times = ['刚刚','5分钟前','半小时前','1小时前','2小时前','今天上午','昨天'];
+const fishColors = ['#E3F2FD','#E0F7FA','#FFF3E0','#E8F5E9','#F3E5F5','#FBE9E7','#ECEFF1','#E8EAF6'];
+const fishEmojis = ['🐟','🐠','🐡','🎣'];
+
+// Generate catch cards
+function generateCards(container, count) {
+  const heights = [140, 120, 160, 130, 150, 110, 145, 125];
+  for (let i = 0; i < count; i++) {
+    const fish = fishTypes[i % fishTypes.length];
+    const spot = spots[i % spots.length];
+    const time = times[i % times.length];
+    const likes = Math.floor(Math.random() * 80) + 5;
+    const comments = Math.floor(Math.random() * 20);
+    const h = heights[i % heights.length];
+    const bgColor = fishColors[i % fishColors.length];
+    const emoji = fishEmojis[i % fishEmojis.length];
+    
+    const card = document.createElement('div');
+    card.className = 'catch-card fade-in';
+    card.style.animationDelay = (i * 0.08) + 's';
+    card.innerHTML = `
+      <div class="catch-photo" style="height:${h}px;background:${bgColor};display:flex;align-items:center;justify-content:center;font-size:40px">${emoji}</div>
+      <div class="catch-body">
+        <div class="catch-fish">${fish}</div>
+        <div class="catch-meta">${spot} · ${time}</div>
+        <div class="catch-meta" style="margin-top:2px">🌤️ 26°C 多云</div>
+        <div class="catch-actions">
+          <div class="catch-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${likes}</div>
+          <div class="catch-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${comments}</div>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  }
+}
+
+// Generate pressure chart
+function generatePressureChart() {
+  const chart = document.getElementById('pressure-chart');
+  const values = [65,70,68,72,75,78,80,82,79,76,73,70, 68,72,76,80,82,78,74,70,68,65,62,60];
+  values.forEach((v, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'chart-bar';
+    bar.style.height = v + '%';
+    bar.style.background = i === 12 ? 'var(--blue)' : (v > 75 ? 'rgba(76,175,80,.6)' : 'rgba(33,150,243,.2)');
+    chart.appendChild(bar);
+  });
+}
+
+// Init
+generateCards(document.getElementById('catch-feed'), 8);
+generateCards(document.getElementById('weather-catches'), 4);
+generatePressureChart();
+
+// Tab switching
+const pages = ['page-home','page-weather','page-map','page-mine'];
+const tabEls = document.querySelectorAll('.tab');
+
+function switchTab(idx) {
+  pages.forEach((p, i) => {
+    document.getElementById(p).classList.toggle('active', i === idx);
+  });
+  tabEls.forEach((t, i) => {
+    t.classList.toggle('active', i === idx);
+  });
+  // Scroll to top
+  document.getElementById(pages[idx]).scrollTop = 0;
+}
+
+// Spot card
+function showSpotCard(el) {
+  const card = document.getElementById('spot-card');
+  const name = el.dataset.name;
+  const type = el.dataset.type;
+  const rating = el.dataset.rating;
+  const catches = el.dataset.catches;
+  
+  document.getElementById('spot-name').textContent = name;
+  document.getElementById('spot-type').textContent = type + ' · ' + (Math.random() * 5 + 1).toFixed(1) + 'km';
+  document.getElementById('spot-rating').textContent = rating;
+  document.getElementById('spot-catches').textContent = catches;
+  document.getElementById('spot-stat-catches').textContent = catches;
+  document.getElementById('spot-stat-rating').textContent = rating;
+  document.getElementById('spot-stat-fish').textContent = fishTypes[Math.floor(Math.random() * fishTypes.length)];
+  
+  const colors = ['#81D4FA,#4FC3F7','#80CBC4,#4DB6AC','#FFCC80,#FFA726','#A5D6A7,#66BB6A','#90CAF9,#42A5F5'];
+  document.getElementById('spot-photo').style.background = 'linear-gradient(135deg,' + colors[Math.floor(Math.random() * colors.length)] + ')';
+  
+  card.classList.add('show');
+}
+
+function hideSpotCard() {
+  document.getElementById('spot-card').classList.remove('show');
+}
+</script>
+
 </body>
 </html>
