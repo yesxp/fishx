@@ -9,7 +9,7 @@
         </view>
       </view>
       <view class="header-right">
-        <button class="btn-camera">📷</button>
+        <button class="btn-camera" @click="goToCreate">📷</button>
       </view>
     </view>
     
@@ -42,9 +42,21 @@
       
       <view class="section">
         <text class="section-title">附近渔获</text>
-        <text class="section-more" @click="switchTab(2)">查看全部 →</text>
+        <text class="section-more">查看全部 →</text>
+      </view>
+      
+      <!-- 渔获列表（占位） -->
+      <view class="empty-list">
+        <text class="empty-icon">🎣</text>
+        <text class="empty-text">还没有渔获记录</text>
+        <button class="empty-btn" @click="goToCreate">去钓鱼吧！</button>
       </view>
     </scroll-view>
+    
+    <!-- 浮动拍照按钮 -->
+    <view class="fab" @click="goToCreate">
+      <text class="fab-icon">📷</text>
+    </view>
   </view>
 </template>
 
@@ -56,6 +68,10 @@ import WeatherMini from '@/components/WeatherMini.vue'
 const weatherStore = useWeatherStore()
 const { weatherNow, indexResult } = weatherStore
 
+function goToCreate() {
+  uni.navigateTo({ url: '/pages/catch/create' })
+}
+
 onMounted(() => {
   weatherStore.loadWeather()
 })
@@ -65,6 +81,7 @@ onMounted(() => {
 .container {
   min-height: 100vh;
   background-color: #F8FAFE;
+  position: relative;
 }
 
 .header {
@@ -172,6 +189,7 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 0 16rpx;
+  margin-bottom: 16rpx;
 }
 
 .section-title {
@@ -183,5 +201,52 @@ onMounted(() => {
 .section-more {
   font-size: 26rpx;
   color: #2196F3;
+}
+
+.empty-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 40rpx;
+}
+
+.empty-icon {
+  font-size: 64rpx;
+  margin-bottom: 16rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #6B7A99;
+  margin-bottom: 24rpx;
+}
+
+.empty-btn {
+  padding: 16rpx 40rpx;
+  border-radius: 100px;
+  background: linear-gradient(135deg, #2196F3, #00BCD4);
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: 600;
+  border: none;
+}
+
+.fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 200rpx;
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2196F3, #00BCD4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(33,150,243,.3);
+  z-index: 50;
+}
+
+.fab-icon {
+  font-size: 40rpx;
 }
 </style>
