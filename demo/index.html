@@ -12,11 +12,11 @@
       --bg:#F5F6FA;--card:#FFF;--text:#1A2B4A;--sub:#8E99B0;--border:#EEF1F8;
       --r:16px;--r-sm:12px;--shadow:0 2px 12px rgba(26,43,74,.06);
     }
-    html,body{height:100%;overflow:hidden}
+    html,body{height:100%;overflow:hidden;height:100vh;height:100dvh}
     body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
 
     /* ===== App Shell ===== */
-    .app{max-width:430px;height:100vh;margin:0 auto;position:relative;display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
+    .app{max-width:430px;height:100dvh;margin:0 auto;position:relative;display:flex;flex-direction:column;background:var(--bg);overflow:hidden;height:100vh;height:100dvh}
     .pages{flex:1;overflow:hidden;position:relative}
     .page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;pointer-events:none;transition:opacity .25s;padding-bottom:90px}
     .page.active{opacity:1;pointer-events:auto}
@@ -90,7 +90,7 @@
 
     /* ===== Page 3: 钓点 ===== */
     .map-container{height:100%;background:#D4E6F1;position:relative}
-    .map-placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#B3D4E8 0%,#8FBFD4 100%);position:relative;overflow:hidden}
+    .map-placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#B3D4E8 0%,#8FBFD4 100%);position:relative;overflow:hidden;height:100vh;height:100dvh}
     .map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.15) 1px,transparent 1px);background-size:40px 40px}
     .map-center-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10}
     .map-center-pin .pin{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(33,150,243,.4);animation:pulse2 2s infinite}
