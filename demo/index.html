@@ -320,6 +320,337 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       <span>天时</span>
     </div>
+    <div class="tab" onclick="switchTab(2)" data-tab="2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      <span>钓点</span>
+    </div>
+    <div class="tab" onclick="switchTab(3)" data-tab="3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>我的</span>
+    </div>
+  </div>
+</div>TYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>鱼渔娱</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --blue:#2196F3;--teal:#00BCD4;
+      --green:#4CAF50;--lime:#8BC34A;--yellow:#FFC107;--orange:#FF9800;--red:#F44336;
+      --bg:#F5F6FA;--card:#FFF;--text:#1A2B4A;--sub:#8E99B0;--border:#EEF1F8;
+      --r:16px;--r-sm:12px;--shadow:0 2px 12px rgba(26,43,74,.06);
+    }
+    html,body{height:100%;overflow:hidden;height:100vh;height:100dvh}
+    body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
+
+    /* ===== App Shell ===== */
+    .app{max-width:430px;height:100dvh;margin:0 auto;position:relative;display:flex;flex-direction:column;background:var(--bg);overflow:hidden;height:100vh;height:100dvh}
+    .pages{flex:1;overflow:hidden;position:relative}
+    .page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;pointer-events:none;transition:opacity .25s;padding-bottom:90px}
+    .page.active{opacity:1;pointer-events:auto}
+    .page::-webkit-scrollbar{display:none}
+
+    /* ===== TabBar ===== */
+    .tabbar{position:absolute;bottom:0;left:0;right:0;height:84px;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;align-items:flex-start;padding-top:8px;z-index:100}
+    .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--sub);cursor:pointer;transition:color .2s;padding:4px 0}
+    .tab.active{color:var(--blue)}
+    .tab svg{width:24px;height:24px;transition:all .2s}
+    .tab.active svg{transform:scale(1.08)}
+
+    /* ===== Page 1: 首页 ===== */
+    .home-header{padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between}
+    .home-header h2{font-size:20px;font-weight:700}
+    .location{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--sub)}
+    .index-card{margin:16px 20px;background:linear-gradient(135deg,#E3F2FD,#E0F7FA);border-radius:var(--r);padding:20px 24px;display:flex;align-items:center;gap:20px;cursor:pointer}
+    .index-num{font-size:56px;font-weight:800;line-height:1;background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .index-info{flex:1}
+    .index-label{font-size:13px;color:var(--sub);margin-bottom:4px}
+    .index-text{font-size:15px;font-weight:600;color:var(--text)}
+    .index-tag{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;background:rgba(76,175,80,.12);color:var(--green)}
+    .index-mini{display:flex;gap:12px;margin:0 20px 16px}
+    .index-mini-item{flex:1;background:var(--card);border-radius:var(--r-sm);padding:12px;text-align:center;box-shadow:var(--shadow)}
+    .index-mini-val{font-size:17px;font-weight:700;margin-bottom:2px}
+    .index-mini-label{font-size:11px;color:var(--sub)}
+    .section-header{display:flex;align-items:center;justify-content:space-between;padding:0 20px;margin:20px 0 12px}
+    .section-header h3{font-size:16px;font-weight:700}
+    .section-header span{font-size:13px;color:var(--blue);cursor:pointer}
+
+    /* Masonry Grid */
+    .masonry{columns:2;column-gap:10px;padding:0 16px}
+    .catch-card{break-inside:avoid;margin-bottom:10px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s}
+    .catch-card:active{transform:scale(.97)}
+    .catch-photo{width:100%;display:block;object-fit:cover;background:#E8EDF5}
+    .catch-body{padding:10px 12px}
+    .catch-fish{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:600;background:rgba(33,150,243,.08);color:var(--blue);margin-bottom:6px}
+    .catch-meta{font-size:11px;color:var(--sub);line-height:1.5}
+    .catch-actions{display:flex;align-items:center;gap:12px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+    .catch-action{display:flex;align-items:center;gap:3px;font-size:12px;color:var(--sub)}
+    .catch-action svg{width:14px;height:14px}
+
+    /* ===== Page 2: 天时 ===== */
+    .weather-hero{padding:20px;text-align:center}
+    .weather-index{font-size:72px;font-weight:800;line-height:1;margin-bottom:4px}
+    .weather-index.green{color:var(--green)}
+    .weather-label{font-size:15px;color:var(--sub);margin-bottom:16px}
+    .weather-suggest{display:inline-block;padding:6px 16px;border-radius:100px;font-size:14px;font-weight:600;margin-bottom:20px}
+    .weather-suggest.good{background:rgba(76,175,80,.1);color:var(--green)}
+    .weather-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 20px}
+    .weather-item{background:var(--card);border-radius:var(--r-sm);padding:14px 8px;text-align:center;box-shadow:var(--shadow)}
+    .weather-item-val{font-size:20px;font-weight:700;margin-bottom:2px}
+    .weather-item-label{font-size:11px;color:var(--sub)}
+    .pressure-chart{margin:20px;background:var(--card);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+    .pressure-title{font-size:14px;font-weight:600;margin-bottom:12px}
+    .chart-bars{display:flex;align-items:flex-end;gap:4px;height:80px}
+    .chart-bar{flex:1;border-radius:3px 3px 0 0;transition:height .5s ease}
+    .time-slots{margin:16px 20px}
+    .time-slots h4{font-size:14px;font-weight:600;margin-bottom:12px}
+    .slot{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card);border-radius:var(--r-sm);margin-bottom:8px;box-shadow:var(--shadow)}
+    .slot-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .slot-dot.best{background:var(--green)}
+    .slot-dot.ok{background:var(--yellow)}
+    .slot-dot.bad{background:var(--red)}
+    .slot-time{font-size:14px;font-weight:600;flex:1}
+    .slot-desc{font-size:12px;color:var(--sub)}
+
+    /* ===== Page 3: 钓点 ===== */
+    .map-container{height:100%;background:#D4E6F1;position:relative}
+    .map-placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#B3D4E8 0%,#8FBFD4 100%);position:relative;overflow:hidden;height:100vh;height:100dvh}
+    .map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.15) 1px,transparent 1px);background-size:40px 40px}
+    .map-center-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10}
+    .map-center-pin .pin{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(33,150,243,.4);animation:pulse2 2s infinite}
+    .map-center-pin .pin-ring{position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(33,150,243,.2);animation:pulse2 2s infinite .5s}
+    @keyframes pulse2{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.7}}
+    .map-bubble{position:absolute;cursor:pointer;transition:transform .2s}
+    .map-bubble:active{transform:scale(.9)}
+    .map-bubble-img{width:48px;height:48px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 12px rgba(0,0,0,.15);object-fit:cover;background:#ccc}
+    .map-bubble-name{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:10px;white-space:nowrap;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);font-weight:600}
+    .map-spot-card{position:absolute;bottom:100px;left:16px;right:16px;background:var(--card);border-radius:var(--r);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:20;display:none}
+    .map-spot-card.show{display:block;animation:slideUp .3s ease}
+    @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .spot-card-top{display:flex;gap:12px;margin-bottom:12px}
+    .spot-card-photo{width:64px;height:64px;border-radius:var(--r-sm);object-fit:cover;background:#E8EDF5}
+    .spot-card-info{flex:1}
+    .spot-card-name{font-size:16px;font-weight:700;margin-bottom:4px}
+    .spot-card-type{font-size:12px;color:var(--sub);margin-bottom:6px}
+    .spot-card-rating{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--orange)}
+    .spot-card-stats{display:flex;gap:16px;margin-bottom:12px}
+    .spot-stat{text-align:center}
+    .spot-stat-val{font-size:18px;font-weight:700;color:var(--blue)}
+    .spot-stat-label{font-size:11px;color:var(--sub)}
+    .spot-card-btns{display:flex;gap:8px}
+    .spot-btn{flex:1;padding:10px;border-radius:var(--r-sm);border:none;font-size:13px;font-weight:600;cursor:pointer;text-align:center}
+    .spot-btn-primary{background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff}
+    .spot-btn-secondary{background:var(--bg);color:var(--text)}
+    .map-toolbar{position:absolute;top:16px;left:16px;right:16px;display:flex;gap:8px;z-index:10}
+    .map-search{flex:1;background:rgba(255,255,255,.95);border-radius:var(--r-sm);padding:10px 16px;font-size:14px;border:none;box-shadow:0 2px 12px rgba(0,0,0,.08);outline:none}
+    .map-layer-btn{width:40px;height:40px;background:rgba(255,255,255,.95);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.08);cursor:pointer;border:none;font-size:18px}
+
+    /* ===== Page 4: 我的 ===== */
+    .mine-header{padding:20px;text-align:center;background:linear-gradient(135deg,#E3F2FD,#E0F7FA);margin:16px;border-radius:var(--r)}
+    .mine-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--teal));margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff}
+    .mine-name{font-size:18px;font-weight:700;margin-bottom:4px}
+    .mine-id{font-size:12px;color:var(--sub)}
+    .mine-stats{display:flex;gap:1px;margin:16px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+    .mine-stat{flex:1;text-align:center;padding:16px 8px}
+    .mine-stat-val{font-size:22px;font-weight:700;color:var(--blue)}
+    .mine-stat-label{font-size:11px;color:var(--sub);margin-top:4px}
+    .mine-section{margin:16px;background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+    .mine-item{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer}
+    .mine-item:last-child{border-bottom:none}
+    .mine-item-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-right:12px}
+    .mine-item-text{flex:1;font-size:14px}
+    .mine-item-arrow{color:var(--sub);font-size:14px}
+
+    /* ===== Animations ===== */
+    .fade-in{animation:fadeIn .5s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ===== Responsive ===== */
+    @media(min-width:431px){
+      .app{border-left:1px solid var(--border);border-right:1px solid var(--border)}
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <div class="pages">
+
+    <!-- ===== 首页 ===== -->
+    <div class="page active" id="page-home">
+      <div class="home-header">
+        <h2>首页</h2>
+        <div class="location">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          上海市
+        </div>
+      </div>
+
+      <div class="index-card" onclick="switchTab(1)">
+        <div class="index-num">72</div>
+        <div class="index-info">
+          <div class="index-label">今日钓鱼指数</div>
+          <div class="index-text">气压稳定，适合出钓</div>
+          <div class="index-tag">✓ 适合出门</div>
+        </div>
+      </div>
+
+      <div class="index-mini">
+        <div class="index-mini-item"><div class="index-mini-val">26°</div><div class="index-mini-label">气温</div></div>
+        <div class="index-mini-item"><div class="index-mini-val">1009</div><div class="index-mini-label">气压 hPa</div></div>
+        <div class="index-mini-item"><div class="index-mini-val">2级</div><div class="index-mini-label">南风</div></div>
+      </div>
+
+      <div class="section-header">
+        <h3>附近渔获</h3>
+        <span onclick="switchTab(2)">查看全部 →</span>
+      </div>
+
+      <div class="masonry" id="catch-feed"></div>
+    </div>
+
+    <!-- ===== 天时 ===== -->
+    <div class="page" id="page-weather">
+      <div class="weather-hero fade-in">
+        <div class="weather-index green">72</div>
+        <div class="weather-label">今日钓鱼指数 · 上海</div>
+        <div class="weather-suggest good">🎣 气压稳定，适合出钓</div>
+      </div>
+
+      <div class="weather-grid">
+        <div class="weather-item"><div class="weather-item-val">26°</div><div class="weather-item-label">气温</div></div>
+        <div class="weather-item"><div class="weather-item-val">24°</div><div class="weather-item-label">水温</div></div>
+        <div class="weather-item"><div class="weather-item-val">1009</div><div class="weather-item-label">气压 hPa</div></div>
+        <div class="weather-item"><div class="weather-item-val">2级</div><div class="weather-item-label">南风</div></div>
+        <div class="weather-item"><div class="weather-item-val">65%</div><div class="weather-item-label">湿度</div></div>
+        <div class="weather-item"><div class="weather-item-val">多云</div><div class="weather-item-label">天气</div></div>
+      </div>
+
+      <div class="pressure-chart">
+        <div class="pressure-title">📊 气压趋势（24h）</div>
+        <div class="chart-bars" id="pressure-chart"></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--sub)">
+          <span>12h前</span><span>现在</span><span>12h后</span>
+        </div>
+      </div>
+
+      <div class="time-slots">
+        <h4>⏰ 最佳出钓时段</h4>
+        <div class="slot"><div class="slot-dot best"></div><div class="slot-time">16:00 - 19:00</div><div class="slot-desc">傍晚黄金期</div></div>
+        <div class="slot"><div class="slot-dot ok"></div><div class="slot-time">06:00 - 08:00</div><div class="slot-desc">早晨次佳</div></div>
+        <div class="slot"><div class="slot-dot bad"></div><div class="slot-time">12:00 - 14:00</div><div class="slot-desc">午间不宜</div></div>
+      </div>
+
+      <div class="section-header">
+        <h3>这个天气下的渔获</h3>
+      </div>
+      <div class="masonry" id="weather-catches" style="padding-bottom:20px"></div>
+    </div>
+
+    <!-- ===== 钓点 ===== -->
+    <div class="page" id="page-map">
+      <div class="map-container">
+        <div class="map-toolbar">
+          <input class="map-search" placeholder="🔍 搜索钓点..." readonly>
+          <button class="map-layer-btn">🗺️</button>
+        </div>
+        <div class="map-placeholder">
+          <div class="map-grid"></div>
+          <div class="map-center-pin">
+            <div class="pin-ring"></div>
+            <div class="pin">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg>
+            </div>
+          </div>
+          <!-- Fishing spot bubbles -->
+          <div class="map-bubble" style="top:28%;left:22%" onclick="showSpotCard(this)" data-name="崇明东滩" data-type="野钓" data-rating="4.8" data-catches="128">
+            <div class="map-bubble-img" style="background:linear-gradient(135deg,#81D4FA,#4FC3F7)"></div>
+            <div class="map-bubble-name">崇明东滩</div>
+          </div>
+          <div class="map-bubble" style="top:35%;left:65%" onclick="showSpotCard(this)" data-name="淀山湖" data-type="湖泊" data-rating="4.6" data-catches="89">
+            <div class="map-bubble-img" style="background:linear-gradient(135deg,#80CBC4,#4DB6AC)"></div>
+            <div class="map-bubble-name">淀山湖</div>
+          </div>
+          <div class="map-bubble" style="top:60%;left:30%" onclick="showSpotCard(this)" data-name="松江鲈鱼湾" data-type="黑坑" data-rating="4.3" data-catches="56">
+            <div class="map-bubble-img" style="background:linear-gradient(135deg,#FFCC80,#FFA726)"></div>
+            <div class="map-bubble-name">鲈鱼湾</div>
+          </div>
+          <div class="map-bubble" style="top:55%;left:72%" onclick="showSpotCard(this)" data-name="青浦野河浜" data-type="河流" data-rating="4.5" data-catches="203">
+            <div class="map-bubble-img" style="background:linear-gradient(135deg,#A5D6A7,#66BB6A)"></div>
+            <div class="map-bubble-name">野河浜</div>
+          </div>
+          <div class="map-bubble" style="top:20%;left:50%" onclick="showSpotCard(this)" data-name="宝山滨江" data-type="海钓" data-rating="4.1" data-catches="34">
+            <div class="map-bubble-img" style="background:linear-gradient(135deg,#90CAF9,#42A5F5)"></div>
+            <div class="map-bubble-name">宝山滨江</div>
+          </div>
+
+          <!-- Spot detail card -->
+          <div class="map-spot-card" id="spot-card">
+            <div class="spot-card-top">
+              <div class="spot-card-photo" id="spot-photo" style="background:linear-gradient(135deg,#81D4FA,#4FC3F7)"></div>
+              <div class="spot-card-info">
+                <div class="spot-card-name" id="spot-name">崇明东滩</div>
+                <div class="spot-card-type" id="spot-type">野钓 · 3.2km</div>
+                <div class="spot-card-rating">⭐ <span id="spot-rating">4.8</span> · <span id="spot-catches">128</span> 条渔获</div>
+              </div>
+            </div>
+            <div class="spot-card-stats">
+              <div class="spot-stat"><div class="spot-stat-val" id="spot-stat-catches">128</div><div class="spot-stat-label">渔获</div></div>
+              <div class="spot-stat"><div class="spot-stat-val" id="spot-stat-rating">4.8</div><div class="spot-stat-label">评分</div></div>
+              <div class="spot-stat"><div class="spot-stat-val" id="spot-stat-fish">鲫鱼</div><div class="spot-stat-label">热门鱼种</div></div>
+            </div>
+            <div class="spot-card-btns">
+              <button class="spot-btn spot-btn-secondary" onclick="hideSpotCard()">关闭</button>
+              <button class="spot-btn spot-btn-primary">🧭 导航</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 我的 ===== -->
+    <div class="page" id="page-mine">
+      <div class="mine-header fade-in">
+        <div class="mine-avatar">🎣</div>
+        <div class="mine-name">钓鱼人小陈</div>
+        <div class="mine-id">ID: fishx_2026</div>
+      </div>
+
+      <div class="mine-stats">
+        <div class="mine-stat"><div class="mine-stat-val">42</div><div class="mine-stat-label">总渔获</div></div>
+        <div class="mine-stat"><div class="mine-stat-val">8</div><div class="mine-stat-label">钓点</div></div>
+        <div class="mine-stat"><div class="mine-stat-val">鲫鱼</div><div class="mine-stat-label">最常钓</div></div>
+      </div>
+
+      <div class="mine-section">
+        <div class="mine-item"><div class="mine-item-icon" style="background:#E3F2FD">🐟</div><div class="mine-item-text">我的渔获</div><div class="mine-item-arrow">›</div></div>
+        <div class="mine-item"><div class="mine-item-icon" style="background:#E0F7FA">📍</div><div class="mine-item-text">我的钓点</div><div class="mine-item-arrow">›</div></div>
+        <div class="mine-item"><div class="mine-item-icon" style="background:#FFF3E0">⭐</div><div class="mine-item-text">收藏</div><div class="mine-item-arrow">›</div></div>
+      </div>
+
+      <div class="mine-section">
+        <div class="mine-item"><div class="mine-item-icon" style="background:#F3E5F5">🔔</div><div class="mine-item-text">通知设置</div><div class="mine-item-arrow">›</div></div>
+        <div class="mine-item"><div class="mine-item-icon" style="background:#E8F5E9">📍</div><div class="mine-item-text">定位授权</div><div class="mine-item-arrow">›</div></div>
+        <div class="mine-item"><div class="mine-item-icon" style="background:#FBE9E7">🗑️</div><div class="mine-item-text">清除缓存</div><div class="mine-item-arrow">›</div></div>
+        <div class="mine-item"><div class="mine-item-icon" style="background:#ECEFF1">ℹ️</div><div class="mine-item-text">关于鱼渔娱</div><div class="mine-item-arrow">›</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== TabBar ===== -->
+  <div class="tabbar">
+    <div class="tab active" onclick="switchTab(0)" data-tab="0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>首页</span>
+    </div>
+    <div class="tab" onclick="switchTab(1)" data-tab="1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <span>天时</span>
+    </div>
     </div>
     <div class="tab" onclick="switchTab(2)" data-tab="2">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
