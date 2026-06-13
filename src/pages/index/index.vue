@@ -13,7 +13,7 @@
       </view>
     </view>
     
-    <scroll-view scroll-y class="content">
+    <scroll-view scroll-y class="content" @scrolltolower="loadMore">
       <!-- 天气指数条 -->
       <WeatherMini 
         :score="indexResult.score"
@@ -22,6 +22,7 @@
         :text="indexResult.suggestion"
       />
       
+      <!-- 核心数据 -->
       <view class="stats-grid">
         <view class="stat-card">
           <text class="stat-icon">🌡️</text>
@@ -40,16 +41,60 @@
         </view>
       </view>
       
+      <!-- 标签筛选 -->
+      <scroll-view scroll-x class="tags-scroll">
+        <view class="tag" 
+          v-for="tag in tags" 
+          :key="tag.id"
+          :class="{ active: selectedTag === tag.id }"
+          @click="selectedTag = tag.id"
+        >
+          {{ tag.icon }} {{ tag.name }}
+        </view>
+      </scroll-view>
+      
+      <!-- 渔获瀑布流 -->
       <view class="section">
         <text class="section-title">附近渔获</text>
         <text class="section-more">查看全部 →</text>
       </view>
       
-      <!-- 渔获列表（占位） -->
-      <view class="empty-list">
-        <text class="empty-icon">🎣</text>
-        <text class="empty-text">还没有渔获记录</text>
-        <button class="empty-btn" @click="goToCreate">去钓鱼吧！</button>
+      <view class="masonry" v-if="catchList.length > 0">
+        <view class="masonry-col">
+          <CatchCard 
+            v-for="item in catchList" 
+            :key="item.id"
+            v-if="getIndex(item) % 2 === 0"
+            v-bind="item"
+          />
+        </view>
+        <view class="masonry-col">
+          <CatchCard 
+            v-for="item in catchList" 
+            :key="item.id"
+            v-if="getIndex(item) % 2 === 1"
+            v-bind="item"
+          />
+        </view>
+      </view>
+      
+      <!-- 空态 -->
+      <EmptyState 
+        v-else
+        icon="🎣"
+        title="还没有渔获记录"
+        desc="快去钓鱼吧！记录你的每一次收获"
+        btnText="去钓鱼吧！"
+        @action="goToCreate"
+      />
+      
+      <!-- 加载更多 -->
+      <view class="loading-more" v-if="loading">
+        <LoadingSpinner text="加载中..." />
+      </view>
+      
+      <view class="no-more" v-if="noMore && catchList.length > 0">
+        <text class="no-more-text">—— 没有更多了 ——</text>
       </view>
     </scroll-view>
     
@@ -61,19 +106,51 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useWeatherStore } from '@/stores/weather'
+import { useCatchStore } from '@/stores/catch'
 import WeatherMini from '@/components/WeatherMini.vue'
+import CatchCard from '@/components/CatchCard.vue'
+import EmptyState from '@/components/EmptyState.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const weatherStore = useWeatherStore()
+const catchStore = useCatchStore()
+
 const { weatherNow, indexResult } = weatherStore
+const { catchList, loading, total } = catchStore
+
+const selectedTag = ref('all')
+const noMore = ref(false)
+
+const tags = [
+  { id: 'all', name: '全部', icon: '' },
+  { id: 'crucian', name: '鲫鱼', icon: '🐟' },
+  { id: 'carp', name: '鲤鱼', icon: '🐠' },
+  { id: 'grass', name: '草鱼', icon: '🐡' },
+  { id: 'bass', name: '鲈鱼', icon: '🎣' },
+]
+
+function getIndex(item: any) {
+  return catchList.indexOf(item)
+}
 
 function goToCreate() {
   uni.navigateTo({ url: '/pages/catch/create' })
 }
 
+async function loadMore() {
+  if (loading.value || noMore.value) return
+  const prevTotal = total.value
+  await catchStore.loadList()
+  if (total.value === prevTotal) {
+    noMore.value = true
+  }
+}
+
 onMounted(() => {
   weatherStore.loadWeather()
+  catchStore.loadList(true)
 })
 </script>
 
@@ -157,7 +234,7 @@ onMounted(() => {
   grid-template-columns: repeat(3, 1fr);
   gap: 12rpx;
   padding: 0 16rpx;
-  margin-bottom: 24rpx;
+  margin-bottom: 20rpx;
 }
 
 .stat-card {
@@ -184,6 +261,30 @@ onMounted(() => {
   color: #6B7A99;
 }
 
+.tags-scroll {
+  white-space: nowrap;
+  padding: 0 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4rpx;
+  padding: 12rpx 24rpx;
+  border-radius: 100px;
+  background: #FFFFFF;
+  color: #6B7A99;
+  font-size: 24rpx;
+  margin-right: 12rpx;
+  box-shadow: 0 2px 8px rgba(26,43,74,.04);
+}
+
+.tag.active {
+  background: linear-gradient(135deg, #2196F3, #00BCD4);
+  color: #FFFFFF;
+}
+
 .section {
   display: flex;
   align-items: center;
@@ -203,32 +304,30 @@ onMounted(() => {
   color: #2196F3;
 }
 
-.empty-list {
+.masonry {
+  display: flex;
+  gap: 12rpx;
+  padding: 0 16rpx;
+}
+
+.masonry-col {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 80rpx 40rpx;
 }
 
-.empty-icon {
-  font-size: 64rpx;
-  margin-bottom: 16rpx;
+.loading-more {
+  padding: 40rpx 0;
 }
 
-.empty-text {
-  font-size: 28rpx;
-  color: #6B7A99;
-  margin-bottom: 24rpx;
+.no-more {
+  padding: 40rpx 0;
+  text-align: center;
 }
 
-.empty-btn {
-  padding: 16rpx 40rpx;
-  border-radius: 100px;
-  background: linear-gradient(135deg, #2196F3, #00BCD4);
-  color: #fff;
-  font-size: 28rpx;
-  font-weight: 600;
-  border: none;
+.no-more-text {
+  font-size: 24rpx;
+  color: #94A3B8;
 }
 
 .fab {
