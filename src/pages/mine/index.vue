@@ -62,7 +62,7 @@
 <style scoped>
 .container {
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: #F8FAFE;
 }
 
 .header {
@@ -87,7 +87,7 @@
   width: 68rpx;
   height: 68rpx;
   border-radius: 20rpx;
-  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+  background: linear-gradient(135deg, #2196F3, #00BCD4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,11 +103,12 @@
 .title {
   font-size: 34rpx;
   font-weight: 700;
+  color: #1A2B4A;
 }
 
 .subtitle {
   font-size: 22rpx;
-  color: #64748B;
+  color: #6B7A99;
 }
 
 .header-right {
@@ -119,7 +120,7 @@
   width: 68rpx;
   height: 68rpx;
   border-radius: 20rpx;
-  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+  background: linear-gradient(135deg, #2196F3, #00BCD4);
   color: #fff;
   font-size: 28rpx;
   display: flex;
@@ -133,7 +134,7 @@
 }
 
 .profile-card {
-  background: linear-gradient(135deg, #DBEAFE, #CFFAFE);
+  background: linear-gradient(135deg, #E3F2FD, #E0F7FA);
   border-radius: 32rpx;
   padding: 48rpx;
   text-align: center;
@@ -144,7 +145,7 @@
   width: 140rpx;
   height: 140rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+  background: linear-gradient(135deg, #2196F3, #00BCD4);
   margin: 0 auto 24rpx;
   display: flex;
   align-items: center;
@@ -155,21 +156,22 @@
 .name {
   font-size: 40rpx;
   font-weight: 700;
+  color: #1A2B4A;
   margin-bottom: 8rpx;
 }
 
 .id {
   font-size: 24rpx;
-  color: #64748B;
+  color: #6B7A99;
 }
 
 .stats-row {
   display: flex;
-  background: #fff;
+  background: #FFFFFF;
   border-radius: 24rpx;
   overflow: hidden;
   margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 16rpx rgba(26,43,74,.06);
+  box-shadow: 0 2px 12px rgba(26,43,74,.06);
 }
 
 .stat-item {
@@ -181,27 +183,27 @@
 .stat-num {
   font-size: 44rpx;
   font-weight: 700;
-  color: #3B82F6;
+  color: #2196F3;
 }
 
 .stat-text {
   font-size: 22rpx;
-  color: #64748B;
+  color: #6B7A99;
   margin-top: 8rpx;
 }
 
 .menu-section {
-  background: #fff;
+  background: #FFFFFF;
   border-radius: 24rpx;
   overflow: hidden;
-  box-shadow: 0 2rpx 16rpx rgba(26,43,74,.06);
+  box-shadow: 0 2px 12px rgba(26,43,74,.06);
 }
 
 .menu-item {
   display: flex;
   align-items: center;
   padding: 28rpx 32rpx;
-  border-bottom: 1rpx solid #E2E8F0;
+  border-bottom: 1rpx solid #E8ECF2;
 }
 
 .menu-item:last-child {
@@ -211,8 +213,8 @@
 .menu-icon {
   width: 64rpx;
   height: 64rpx;
-  border-radius: 16rpx;
-  background: #DBEAFE;
+  border-radius: 16px;
+  background: #E3F2FD;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -224,10 +226,11 @@
   flex: 1;
   font-size: 30rpx;
   font-weight: 500;
+  color: #1A2B4A;
 }
 
 .menu-arrow {
-  color: #64748B;
+  color: #6B7A99;
   font-size: 32rpx;
 }
 </style>

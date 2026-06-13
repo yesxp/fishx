@@ -28,7 +28,7 @@
 <style scoped>
 .container {
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: #F8FAFE;
 }
 
 .header {
@@ -53,7 +53,7 @@
   width: 68rpx;
   height: 68rpx;
   border-radius: 20rpx;
-  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+  background: linear-gradient(135deg, #2196F3, #00BCD4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,11 +69,12 @@
 .title {
   font-size: 34rpx;
   font-weight: 700;
+  color: #1A2B4A;
 }
 
 .subtitle {
   font-size: 22rpx;
-  color: #64748B;
+  color: #6B7A99;
 }
 
 .header-right {
@@ -86,7 +87,7 @@
   width: 68rpx;
   height: 68rpx;
   border-radius: 20rpx;
-  background: rgba(59,130,246,.08);
+  background: rgba(33,150,243,.08);
   font-size: 28rpx;
   display: flex;
   align-items: center;
@@ -95,7 +96,7 @@
 }
 
 .btn-camera {
-  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+  background: linear-gradient(135deg, #2196F3, #00BCD4);
   color: #fff;
 }
 
@@ -105,7 +106,7 @@
 
 .map-placeholder {
   height: 100%;
-  background: linear-gradient(180deg, #E0F2FE, #BAE6FD);
+  background: linear-gradient(180deg, #E3F2FD, #B3E5FC);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,6 +114,6 @@
 
 .map-text {
   font-size: 32rpx;
-  color: #64748B;
+  color: #6B7A99;
 }
 </style>

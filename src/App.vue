@@ -16,7 +16,7 @@ onHide(() => {
 
 <style>
 page {
-  background-color: #f5f7fa;
+  background-color: #F8FAFE;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', sans-serif;
 }
 </style>

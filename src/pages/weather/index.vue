@@ -47,7 +47,7 @@
 <style scoped>
 .container {
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: #F8FAFE;
 }
 
 .header {
@@ -72,7 +72,7 @@
   width: 68rpx;
   height: 68rpx;
   border-radius: 20rpx;
-  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+  background: linear-gradient(135deg, #2196F3, #00BCD4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,11 +88,12 @@
 .title {
   font-size: 34rpx;
   font-weight: 700;
+  color: #1A2B4A;
 }
 
 .subtitle {
   font-size: 22rpx;
-  color: #64748B;
+  color: #6B7A99;
 }
 
 .header-right {
@@ -104,7 +105,7 @@
   width: 68rpx;
   height: 68rpx;
   border-radius: 20rpx;
-  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+  background: linear-gradient(135deg, #2196F3, #00BCD4);
   color: #fff;
   font-size: 28rpx;
   display: flex;
@@ -119,31 +120,30 @@
 
 .weather-hero {
   text-align: center;
-  padding: 40rpx 0;
+  padding: 48rpx 0;
 }
 
 .weather-num {
   font-size: 160rpx;
   font-weight: 800;
   line-height: 1;
-  background: linear-gradient(135deg, #3B82F6, #10B981);
+  background: linear-gradient(135deg, #2196F3, #4CAF50);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .weather-label {
   font-size: 26rpx;
-  color: #64748B;
+  color: #6B7A99;
   margin: 16rpx 0;
 }
 
 .weather-badge {
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
   padding: 16rpx 40rpx;
-  border-radius: 100rpx;
-  background: rgba(16,185,129,.1);
-  color: #10B981;
+  border-radius: 100px;
+  background: rgba(76,175,80,.1);
+  color: #4CAF50;
   font-size: 28rpx;
   font-weight: 600;
 }
@@ -155,11 +155,11 @@
 }
 
 .weather-card {
-  background: #fff;
-  border-radius: 20rpx;
+  background: #FFFFFF;
+  border-radius: 16px;
   padding: 24rpx 16rpx;
   text-align: center;
-  box-shadow: 0 2rpx 16rpx rgba(26,43,74,.06);
+  box-shadow: 0 2px 12px rgba(26,43,74,.06);
 }
 
 .weather-icon {
@@ -170,10 +170,11 @@
 .weather-val {
   font-size: 36rpx;
   font-weight: 700;
+  color: #1A2B4A;
 }
 
 .weather-lbl {
   font-size: 20rpx;
-  color: #64748B;
+  color: #6B7A99;
 }
 </style>

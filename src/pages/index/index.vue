@@ -19,6 +19,7 @@
         <view class="hero-info">
           <text class="hero-label">今日钓鱼指数</text>
           <text class="hero-text">气压稳定，适合出钓</text>
+          <text class="hero-tag">✓ 适合出门</text>
         </view>
       </view>
       
@@ -49,13 +50,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 </script>
 
 <style scoped>
 .container {
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: #F8FAFE;
 }
 
 .header {
@@ -80,7 +80,7 @@ import { ref } from 'vue'
   width: 68rpx;
   height: 68rpx;
   border-radius: 20rpx;
-  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+  background: linear-gradient(135deg, #2196F3, #00BCD4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -96,11 +96,12 @@ import { ref } from 'vue'
 .title {
   font-size: 34rpx;
   font-weight: 700;
+  color: #1A2B4A;
 }
 
 .subtitle {
   font-size: 22rpx;
-  color: #64748B;
+  color: #6B7A99;
 }
 
 .header-right {
@@ -112,7 +113,7 @@ import { ref } from 'vue'
   width: 68rpx;
   height: 68rpx;
   border-radius: 20rpx;
-  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+  background: linear-gradient(135deg, #2196F3, #00BCD4);
   color: #fff;
   font-size: 28rpx;
   display: flex;
@@ -126,8 +127,8 @@ import { ref } from 'vue'
 }
 
 .hero-card {
-  background: linear-gradient(135deg, #3B82F6, #06B6D4, #10B981);
-  border-radius: 32rpx;
+  background: linear-gradient(135deg, #2196F3, #00BCD4, #4CAF50);
+  border-radius: 24rpx;
   padding: 40rpx;
   color: #fff;
   display: flex;
@@ -159,6 +160,16 @@ import { ref } from 'vue'
   margin-top: 8rpx;
 }
 
+.hero-tag {
+  display: inline-block;
+  margin-top: 12rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 100px;
+  background: rgba(255,255,255,.2);
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -167,11 +178,11 @@ import { ref } from 'vue'
 }
 
 .stat-card {
-  background: #fff;
-  border-radius: 20rpx;
+  background: #FFFFFF;
+  border-radius: 16px;
   padding: 24rpx 16rpx;
   text-align: center;
-  box-shadow: 0 2rpx 16rpx rgba(26,43,74,.06);
+  box-shadow: 0 2px 12px rgba(26,43,74,.06);
 }
 
 .stat-icon {
@@ -182,11 +193,12 @@ import { ref } from 'vue'
 .stat-val {
   font-size: 36rpx;
   font-weight: 700;
+  color: #1A2B4A;
 }
 
 .stat-label {
   font-size: 20rpx;
-  color: #64748B;
+  color: #6B7A99;
 }
 
 .section {
@@ -198,10 +210,11 @@ import { ref } from 'vue'
 .section-title {
   font-size: 30rpx;
   font-weight: 700;
+  color: #1A2B4A;
 }
 
 .section-more {
   font-size: 26rpx;
-  color: #3B82F6;
+  color: #2196F3;
 }
 </style>
