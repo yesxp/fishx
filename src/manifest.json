@@ -1,0 +1,30 @@
+{
+  "name": "鱼渔娱",
+  "appid": "__UNI__FISHX",
+  "description": "钓鱼人的一站式轻量工具",
+  "versionName": "0.1.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "h5": {
+    "title": "鱼渔娱",
+    "router": {
+      "mode": "hash"
+    },
+    "devServer": {
+      "port": 5173,
+      "proxy": {}
+    },
+    "optimization": {
+      "treeShaking": {
+        "enable": true
+      }
+    }
+  },
+  "mp-weixin": {
+    "appid": "",
+    "setting": {
+      "urlCheck": false
+    },
+    "usingComponents": true
+  }
+}
