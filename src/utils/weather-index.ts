@@ -1,7 +1,7 @@
 // 钓鱼指数算法
 // 基于：气压、温度、风力、天气、湿度等多因素加权评分
 
-interface WeatherData {
+export interface WeatherData {
   temp: number       // 气温 °C
   humidity: number   // 湿度 %
   pressure: number   // 气压 hPa
@@ -10,7 +10,7 @@ interface WeatherData {
   waterTemp?: number // 水温 °C（可选）
 }
 
-interface IndexResult {
+export interface IndexResult {
   score: number      // 0-100
   level: string      // 极佳/良好/一般/较差/不宜
   levelColor: string
