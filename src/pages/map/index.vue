@@ -68,11 +68,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useSpotStore } from '@/stores/spot'
 import SpotCard from '@/components/SpotCard.vue'
 
 const spotStore = useSpotStore()
-const { spotList } = spotStore
+const { spotList } = storeToRefs(spotStore)
 
 const keyword = ref('')
 const selectedSpot = ref<any>(null)

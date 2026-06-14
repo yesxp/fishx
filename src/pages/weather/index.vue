@@ -143,11 +143,12 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useWeatherStore } from '@/stores/weather'
 
 const weatherStore = useWeatherStore()
 
-const { weatherNow, indexResult, hourly, bestTimes } = weatherStore
+const { weatherNow, indexResult, hourly, bestTimes } = storeToRefs(weatherStore)
 
 // 生成模拟气压数据
 const pressureData = computed(() => {
