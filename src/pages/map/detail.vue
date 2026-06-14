@@ -3,7 +3,7 @@
     <view class="header">
       <view class="header-left">
         <button class="btn-back" @click="goBack">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#313338" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#060607" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
       </view>
       <text class="title">{{ spot?.name || 'Spot Detail' }}</text>
@@ -51,7 +51,7 @@
           <text class="btn-label">Navigate</text>
         </button>
         <button class="action-btn secondary" @click="handleCheckIn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#5C5E66" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#4E5058" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           <text class="btn-label">Check In</text>
         </button>
       </view>
@@ -143,7 +143,7 @@ onMounted(async () => {
   justify-content: space-between;
   padding: 16rpx 16rpx;
   background: #FFFFFF;
-  border-bottom: 2rpx solid rgba(79,84,92,0.12);
+  border-bottom: 1rpx solid #E3E5E8;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -174,9 +174,9 @@ onMounted(async () => {
 }
 
 .title {
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 700;
-  color: #313338;
+  color: #060607;
   max-width: 400rpx;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -189,15 +189,15 @@ onMounted(async () => {
 }
 
 .btn-share {
-  padding: 8rpx 20rpx;
-  border-radius: 20rpx;
+  padding: 10rpx 24rpx;
+  border-radius: 9999px;
   background: transparent;
   color: #5865F2;
   font-size: 26rpx;
-  font-weight: 500;
+  font-weight: 600;
   border: none;
   height: auto;
-  line-height: 1;
+  line-height: 1.4;
   transition: background 0.15s;
 }
 .btn-share:active {
@@ -207,20 +207,20 @@ onMounted(async () => {
 /* ===== Scroll ===== */
 .scroll-content {
   flex: 1;
+  padding: 20rpx 20rpx 40rpx;
 }
 
 /* ===== Discord Card ===== */
 .dc-card {
   background: #FFFFFF;
-  border-radius: 8rpx;
-  margin: 12rpx 20rpx;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  border-radius: 16rpx;
+  margin-bottom: 12rpx;
 }
 
 /* ===== Hero ===== */
 .spot-hero {
   text-align: center;
-  padding: 40rpx 20rpx;
+  padding: 48rpx 24rpx;
 }
 
 .hero-icon {
@@ -232,13 +232,13 @@ onMounted(async () => {
 .hero-name {
   font-size: 36rpx;
   font-weight: 700;
-  color: #313338;
+  color: #060607;
   display: block;
 }
 
 .hero-type {
   font-size: 24rpx;
-  color: #5C5E66;
+  color: #4E5058;
   margin-top: 4rpx;
   display: block;
 }
@@ -248,9 +248,9 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   gap: 24rpx;
-  margin-top: 24rpx;
-  padding-top: 20rpx;
-  border-top: 2rpx solid rgba(79,84,92,0.08);
+  margin-top: 28rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid #E3E5E8;
 }
 
 .stat-col {
@@ -266,21 +266,22 @@ onMounted(async () => {
 }
 
 .stat-label {
-  font-size: 20rpx;
+  font-size: 22rpx;
   color: #80848E;
-  margin-top: 2rpx;
+  margin-top: 4rpx;
   display: block;
+  font-weight: 500;
 }
 
 /* ===== Section card ===== */
 .section-card {
-  padding: 20rpx;
+  padding: 24rpx;
 }
 
 .card-title {
   font-size: 26rpx;
   font-weight: 600;
-  color: #313338;
+  color: #060607;
   margin-bottom: 16rpx;
   display: block;
 }
@@ -292,8 +293,8 @@ onMounted(async () => {
 }
 
 .fish-tag {
-  padding: 4rpx 14rpx;
-  border-radius: 20rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 9999px;
   background: rgba(88,101,242,0.08);
 }
 
@@ -307,13 +308,13 @@ onMounted(async () => {
 .action-section {
   display: flex;
   gap: 12rpx;
-  margin: 12rpx 20rpx;
+  margin-bottom: 20rpx;
 }
 
 .action-btn {
   flex: 1;
   height: 80rpx;
-  border-radius: 8rpx;
+  border-radius: 9999px;
   border: none;
   display: flex;
   align-items: center;
@@ -333,12 +334,12 @@ onMounted(async () => {
 }
 
 .action-btn.secondary {
-  background: #F2F3F5;
-  color: #313338;
+  background: #E3E5E8;
+  color: #060607;
   transition: background 0.15s;
 }
 .action-btn.secondary:active {
-  background: #E3E5E8;
+  background: #DCDDDE;
 }
 
 .btn-label {
@@ -348,13 +349,13 @@ onMounted(async () => {
 
 /* ===== Section header ===== */
 .section-header-wrap {
-  padding: 24rpx 20rpx 12rpx;
+  padding-bottom: 12rpx;
 }
 
 .section-title {
   font-size: 28rpx;
   font-weight: 700;
-  color: #313338;
+  color: #060607;
 }
 
 /* ===== Recent list ===== */
@@ -362,17 +363,15 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 8rpx;
-  padding: 0 20rpx 12rpx;
 }
 
 .recent-item {
   display: flex;
   align-items: center;
   gap: 16rpx;
-  padding: 12rpx;
+  padding: 16rpx;
   background: #FFFFFF;
-  border-radius: 8rpx;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  border-radius: 16rpx;
 }
 
 .recent-photo {
@@ -396,7 +395,7 @@ onMounted(async () => {
 .recent-fish {
   font-size: 28rpx;
   font-weight: 600;
-  color: #313338;
+  color: #060607;
 }
 
 .recent-time {

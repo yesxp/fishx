@@ -40,6 +40,6 @@ function handleToggle() {
 .like-count {
   font-size: 26rpx;
   font-weight: 600;
-  color: #5C5E66;
+  color: #4E5058;
 }
 </style>

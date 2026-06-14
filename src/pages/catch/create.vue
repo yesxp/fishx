@@ -145,10 +145,6 @@ async function chooseImage() {
       const results = await identifyFish(imagePath.value)
       identifyResults.value = results
       uni.hideLoading()
-      if (results.length > 0) {
-        const best = results.reduce((a, b) => a.confidence > b.confidence ? a : b)
-        selectFish(best)
-      }
     }
   })
 }
@@ -159,11 +155,14 @@ function selectFish(item: FishIdentifyResult) {
 }
 
 async function handleSave() {
+  if (!fishName.value) {
+    uni.showToast({ title: 'Enter species', icon: 'none' })
+    return
+  }
   saving.value = true
   const data = {
-    fishName: fishName.value || 'Unknown',
-    fishEmoji: identifyResults.value.find(f => f.name === fishName.value)?.emoji || '🐟',
-    imagePath: imagePath.value,
+    fishName: fishName.value || 'Crucian',
+    imagePath: imagePath.value || '',
     location: location.value || 'Unknown',
     weather: weather.value || 'Cloudy',
     temperature: temperature.value || '26°',
@@ -213,7 +212,7 @@ onMounted(() => {
   justify-content: space-between;
   padding: 16rpx 20rpx;
   background: #FFFFFF;
-  border-bottom: 2rpx solid rgba(79,84,92,0.12);
+  border-bottom: 1rpx solid #E3E5E8;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -225,9 +224,9 @@ onMounted(() => {
 }
 
 .btn-cancel {
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 500;
-  color: #5C5E66;
+  color: #4E5058;
   background: transparent;
   border: none;
   padding: 0;
@@ -235,13 +234,13 @@ onMounted(() => {
   line-height: 1;
 }
 .btn-cancel:active {
-  color: #313338;
+  color: #060607;
 }
 
 .title {
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 700;
-  color: #313338;
+  color: #060607;
 }
 
 .header-right {
@@ -250,15 +249,15 @@ onMounted(() => {
 }
 
 .btn-save {
-  padding: 8rpx 24rpx;
-  border-radius: 20rpx;
+  padding: 10rpx 32rpx;
+  border-radius: 9999px;
   background: #5865F2;
   color: #FFFFFF;
   font-size: 26rpx;
-  font-weight: 500;
+  font-weight: 600;
   border: none;
   height: auto;
-  line-height: 1;
+  line-height: 1.4;
   transition: background 0.15s;
 }
 .btn-save:active:not(:disabled) {
@@ -276,9 +275,8 @@ onMounted(() => {
 /* ===== Discord Card ===== */
 .dc-card {
   background: #FFFFFF;
-  border-radius: 8rpx;
+  border-radius: 16rpx;
   margin: 12rpx 20rpx;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
 /* ===== Photo ===== */
@@ -318,13 +316,13 @@ onMounted(() => {
 
 /* ===== AI section ===== */
 .identify-section {
-  padding: 20rpx;
+  padding: 24rpx;
 }
 
 .card-title {
   font-size: 26rpx;
   font-weight: 600;
-  color: #313338;
+  color: #060607;
   margin-bottom: 16rpx;
   display: block;
 }
@@ -364,7 +362,7 @@ onMounted(() => {
 .fish-name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #313338;
+  color: #060607;
 }
 
 .confidence-track {
@@ -398,7 +396,7 @@ onMounted(() => {
 
 /* ===== Form ===== */
 .form-section {
-  padding: 20rpx;
+  padding: 24rpx;
 }
 
 .form-group {
@@ -412,23 +410,23 @@ onMounted(() => {
   display: block;
   font-size: 24rpx;
   font-weight: 500;
-  color: #5C5E66;
+  color: #4E5058;
   margin-bottom: 8rpx;
 }
 
 .form-input {
   width: 100%;
   height: 72rpx;
-  background: #F2F3F5;
-  border: 2rpx solid transparent;
+  background: #E3E5E8;
+  border: none;
   border-radius: 8rpx;
   padding: 0 16rpx;
   font-size: 28rpx;
-  color: #313338;
-  transition: border-color 0.15s;
+  color: #060607;
 }
-.form-input:focus {
-  border-color: #5865F2;
+
+.form-input::placeholder {
+  color: #80848E;
 }
 
 .form-row {
@@ -458,7 +456,7 @@ onMounted(() => {
 .toggle-track {
   width: 80rpx;
   height: 44rpx;
-  border-radius: 22rpx;
+  border-radius: 9999px;
   background: #E3E5E8;
   position: relative;
   transition: background 0.2s;

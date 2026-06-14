@@ -9,7 +9,7 @@
     </view>
 
     <view class="auth-area">
-      <!-- Tab switcher: Discord pill style -->
+      <!-- Tab switcher: Discord segmented control -->
       <view class="auth-tabs">
         <view
           class="tab"
@@ -182,12 +182,11 @@ async function handlePhoneLogin() {
   width: 140rpx;
   height: 140rpx;
   border-radius: 50%;
-  background: #F2F3F5;
+  background: #E3E5E8;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 24rpx;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .logo-emoji {
@@ -197,13 +196,13 @@ async function handlePhoneLogin() {
 .logo-title {
   font-size: 40rpx;
   font-weight: 700;
-  color: #313338;
+  color: #060607;
   margin-bottom: 8rpx;
 }
 
 .logo-sub {
   font-size: 24rpx;
-  color: #5C5E66;
+  color: #4E5058;
 }
 
 /* ===== Auth ===== */
@@ -211,10 +210,10 @@ async function handlePhoneLogin() {
   flex: 1;
 }
 
-/* Tab switcher */
+/* Tab switcher: Discord segmented control */
 .auth-tabs {
   display: flex;
-  background: #F2F3F5;
+  background: #E3E5E8;
   border-radius: 8rpx;
   padding: 4rpx;
   margin-bottom: 48rpx;
@@ -227,6 +226,9 @@ async function handlePhoneLogin() {
   border-radius: 6rpx;
   transition: all 0.15s;
 }
+.tab:active {
+  background: rgba(0,0,0,0.04);
+}
 .tab.active {
   background: #FFFFFF;
   box-shadow: 0 1px 2px rgba(0,0,0,0.06);
@@ -235,10 +237,10 @@ async function handlePhoneLogin() {
 .tab-text {
   font-size: 26rpx;
   font-weight: 500;
-  color: #5C5E66;
+  color: #4E5058;
 }
 .tab.active .tab-text {
-  color: #313338;
+  color: #060607;
   font-weight: 600;
 }
 
@@ -255,10 +257,14 @@ async function handlePhoneLogin() {
   gap: 12rpx;
   width: 100%;
   height: 88rpx;
-  border-radius: 8rpx;
+  border-radius: 9999px;
   background: #23A55A;
   border: none;
   margin-bottom: 20rpx;
+  transition: background 0.15s;
+}
+.wx-btn:active {
+  background: #1d8a4c;
 }
 
 .wx-icon {
@@ -288,23 +294,23 @@ async function handlePhoneLogin() {
   display: block;
   font-size: 24rpx;
   font-weight: 500;
-  color: #313338;
+  color: #060607;
   margin-bottom: 10rpx;
 }
 
 .input-field {
   width: 100%;
   height: 80rpx;
-  background: #F2F3F5;
-  border: 2rpx solid transparent;
+  background: #E3E5E8;
+  border: none;
   border-radius: 8rpx;
   padding: 0 20rpx;
   font-size: 28rpx;
-  color: #313338;
-  transition: border-color 0.15s;
+  color: #060607;
 }
-.input-field:focus {
-  border-color: #5865F2;
+
+.input-field::placeholder {
+  color: #80848E;
 }
 
 .code-row {
@@ -319,8 +325,8 @@ async function handlePhoneLogin() {
 .code-btn {
   width: 200rpx;
   height: 80rpx;
-  background: rgba(88,101,242,0.08);
   border-radius: 8rpx;
+  background: rgba(88,101,242,0.08);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -334,7 +340,7 @@ async function handlePhoneLogin() {
   background: rgba(88,101,242,0.16);
 }
 .code-btn.disabled {
-  background: #F2F3F5;
+  background: #E3E5E8;
   color: #80848E;
 }
 
@@ -342,7 +348,7 @@ async function handlePhoneLogin() {
 .login-btn {
   width: 100%;
   height: 80rpx;
-  border-radius: 8rpx;
+  border-radius: 9999px;
   background: #5865F2;
   color: #FFFFFF;
   font-size: 28rpx;

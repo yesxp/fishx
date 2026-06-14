@@ -3,7 +3,7 @@
     <view class="header">
       <view class="header-left">
         <button class="btn-back" @click="goBack">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#313338" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#060607" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
       </view>
       <text class="title">Catch Detail</text>
@@ -147,7 +147,7 @@ onMounted(async () => {
   justify-content: space-between;
   padding: 16rpx 16rpx;
   background: #FFFFFF;
-  border-bottom: 2rpx solid rgba(79,84,92,0.12);
+  border-bottom: 1rpx solid #E3E5E8;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -178,9 +178,9 @@ onMounted(async () => {
 }
 
 .title {
-  font-size: 32rpx;
+  font-size: 30rpx;
   font-weight: 700;
-  color: #313338;
+  color: #060607;
 }
 
 .header-right {
@@ -189,15 +189,15 @@ onMounted(async () => {
 }
 
 .btn-share {
-  padding: 8rpx 20rpx;
-  border-radius: 20rpx;
+  padding: 10rpx 24rpx;
+  border-radius: 9999px;
   background: transparent;
   color: #5865F2;
   font-size: 26rpx;
-  font-weight: 500;
+  font-weight: 600;
   border: none;
   height: auto;
-  line-height: 1;
+  line-height: 1.4;
   transition: background 0.15s;
 }
 .btn-share:active {
@@ -212,9 +212,8 @@ onMounted(async () => {
 /* ===== Discord Card ===== */
 .dc-card {
   background: #FFFFFF;
-  border-radius: 8rpx;
+  border-radius: 16rpx;
   margin: 12rpx 20rpx;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
 /* ===== Hero Photo ===== */
@@ -232,22 +231,22 @@ onMounted(async () => {
 
 /* ===== Info ===== */
 .info-card {
-  padding: 20rpx;
+  padding: 24rpx;
 }
 
 .info-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16rpx;
+  margin-bottom: 20rpx;
 }
 
 .species-badge {
   display: flex;
   align-items: center;
   gap: 6rpx;
-  padding: 4rpx 12rpx;
-  border-radius: 20rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 9999px;
   background: rgba(88,101,242,0.08);
 }
 
@@ -269,7 +268,7 @@ onMounted(async () => {
 .info-grid {
   display: flex;
   flex-direction: column;
-  gap: 12rpx;
+  gap: 16rpx;
 }
 
 .info-row {
@@ -286,14 +285,14 @@ onMounted(async () => {
 
 .row-text {
   font-size: 26rpx;
-  color: #313338;
+  color: #060607;
 }
 
 /* ===== Actions ===== */
 .action-card {
   display: flex;
   align-items: center;
-  padding: 16rpx 20rpx;
+  padding: 16rpx 24rpx;
 }
 
 .action-item {
@@ -316,7 +315,7 @@ onMounted(async () => {
 .action-count {
   font-size: 26rpx;
   font-weight: 600;
-  color: #5C5E66;
+  color: #4E5058;
 }
 .action-count.liked {
   color: #F23F43;
@@ -325,12 +324,12 @@ onMounted(async () => {
 .action-sep {
   width: 1px;
   height: 28rpx;
-  background: rgba(79,84,92,0.12);
-  margin: 0 20rpx;
+  background: #E3E5E8;
+  margin: 0 24rpx;
 }
 
 .action-text {
   font-size: 26rpx;
-  color: #5C5E66;
+  color: #4E5058;
 }
 </style>

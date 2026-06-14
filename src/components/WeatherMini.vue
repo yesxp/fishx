@@ -32,12 +32,14 @@ function goToWeather() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx;
+  padding: 20rpx 24rpx;
   margin-bottom: 12rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
   transition: background 0.15s;
 }
 .weather-mini:active {
-  background: rgba(79,84,92,0.04);
+  background: rgba(79,84,92,0.03);
 }
 
 .mini-left {
@@ -60,8 +62,9 @@ function goToWeather() {
 }
 
 .mini-label {
-  font-size: 20rpx;
+  font-size: 22rpx;
   color: #80848E;
+  font-weight: 500;
 }
 
 .mini-level {
@@ -76,7 +79,7 @@ function goToWeather() {
 }
 
 .mini-text {
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #80848E;
   max-width: 200rpx;
 }

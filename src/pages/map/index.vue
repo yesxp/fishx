@@ -104,7 +104,7 @@ onMounted(() => { spotStore.loadList() })
 .topbar {
   background: #FFFFFF;
   padding: 16rpx 24rpx;
-  border-bottom: 2rpx solid rgba(79,84,92,0.12);
+  border-bottom: 1rpx solid #E3E5E8;
 }
 
 .topbar-inner {
@@ -116,7 +116,7 @@ onMounted(() => { spotStore.loadList() })
 .brand-name {
   font-size: 32rpx;
   font-weight: 700;
-  color: #313338;
+  color: #060607;
 }
 
 .topbar-status {
@@ -126,7 +126,7 @@ onMounted(() => { spotStore.loadList() })
 
 .status-sub {
   font-size: 22rpx;
-  color: #5C5E66;
+  color: #4E5058;
 }
 
 .icon-btn {
@@ -151,16 +151,16 @@ onMounted(() => { spotStore.loadList() })
 .search-bar {
   padding: 12rpx 20rpx;
   background: #FFFFFF;
-  border-bottom: 2rpx solid rgba(79,84,92,0.12);
+  border-bottom: 1rpx solid #E3E5E8;
 }
 
 .search-wrap {
   display: flex;
   align-items: center;
   gap: 10rpx;
-  background: #F2F3F5;
-  border-radius: 4rpx;
-  padding: 14rpx 16rpx;
+  background: #E3E5E8;
+  border-radius: 8rpx;
+  padding: 14rpx 20rpx;
 }
 
 .search-icon {
@@ -172,9 +172,13 @@ onMounted(() => { spotStore.loadList() })
 .search-input {
   flex: 1;
   font-size: 28rpx;
-  color: #313338;
+  color: #060607;
   background: transparent;
   border: none;
+}
+
+.search-input::placeholder {
+  color: #80848E;
 }
 
 /* ===== Map ===== */

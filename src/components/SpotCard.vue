@@ -40,19 +40,18 @@ function goToDetail() {
 <style scoped>
 .spot-card {
   background: #FFFFFF;
-  border-radius: 8rpx;
-  padding: 16rpx 20rpx;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
   transition: background 0.15s;
 }
 .spot-card:active {
-  background: rgba(79,84,92,0.04);
+  background: rgba(79,84,92,0.03);
 }
 
 .card-top {
   display: flex;
   gap: 14rpx;
-  margin-bottom: 12rpx;
+  margin-bottom: 14rpx;
 }
 
 .spot-avatar {
@@ -78,7 +77,7 @@ function goToDetail() {
 .spot-name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #313338;
+  color: #060607;
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -86,7 +85,7 @@ function goToDetail() {
 }
 
 .spot-type {
-  font-size: 22rpx;
+  font-size: 24rpx;
   color: #80848E;
   margin-top: 2rpx;
   display: block;
@@ -103,27 +102,27 @@ function goToDetail() {
 }
 
 .rating-num {
-  font-size: 22rpx;
+  font-size: 24rpx;
   font-weight: 600;
   color: #F0B232;
 }
 
 .rating-count {
-  font-size: 20rpx;
+  font-size: 22rpx;
   color: #80848E;
 }
 
 .card-tags {
   display: flex;
-  gap: 6rpx;
+  gap: 8rpx;
   flex-wrap: wrap;
 }
 
 .tag-item {
-  padding: 2rpx 12rpx;
-  border-radius: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 9999px;
   background: rgba(88,101,242,0.08);
-  font-size: 20rpx;
+  font-size: 22rpx;
   color: #5865F2;
   font-weight: 500;
 }

@@ -11,14 +11,18 @@
       <view class="dc-card profile-card">
         <view class="avatar" @click="handleAvatarClick">
           <text class="avatar-text">{{ userInfo?.nickname?.[0] || '?' }}</text>
+          <view class="avatar-status" :class="isLoggedIn ? 'online' : ''"></view>
         </view>
         <view class="profile-info">
           <text class="nickname">{{ userInfo?.nickname || 'Sign in' }}</text>
           <text class="user-id" v-if="userInfo?.id">ID: {{ userInfo.id }}</text>
         </view>
+        <view class="profile-edit" @click="handleAvatarClick" v-if="isLoggedIn">
+          <text class="edit-text">Edit</text>
+        </view>
       </view>
 
-      <!-- Stats: Discord inset list, no card bg -->
+      <!-- Stats: Discord inset list -->
       <view class="dc-card stats-list">
         <view class="list-row" @click="goToMyCatch">
           <text class="stat-value">{{ myCatchCount }}</text>
@@ -156,7 +160,7 @@ onMounted(() => {
 .topbar {
   background: #FFFFFF;
   padding: 16rpx 24rpx;
-  border-bottom: 2rpx solid rgba(79,84,92,0.12);
+  border-bottom: 1rpx solid #E3E5E8;
 }
 
 .topbar-inner {
@@ -167,19 +171,19 @@ onMounted(() => {
 .brand-name {
   font-size: 32rpx;
   font-weight: 700;
-  color: #313338;
+  color: #060607;
 }
 
 .scroll-content {
   flex: 1;
+  padding: 20rpx 20rpx 40rpx;
 }
 
 /* ===== Discord Card ===== */
 .dc-card {
   background: #FFFFFF;
-  border-radius: 8rpx;
-  margin: 12rpx 20rpx;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  border-radius: 16rpx;
+  margin-bottom: 12rpx;
 }
 
 /* ===== Profile ===== */
@@ -187,7 +191,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 16rpx;
-  padding: 20rpx;
+  padding: 24rpx 20rpx;
 }
 
 .avatar {
@@ -199,7 +203,21 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 0 0 2rpx rgba(88,101,242,0.2);
+  position: relative;
+}
+
+.avatar-status {
+  position: absolute;
+  bottom: -2rpx;
+  right: -2rpx;
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  background: #80848E;
+  border: 3rpx solid #FFFFFF;
+}
+.avatar-status.online {
+  background: #23A55A;
 }
 
 .avatar-text {
@@ -209,6 +227,7 @@ onMounted(() => {
 }
 
 .profile-info {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 2rpx;
@@ -217,12 +236,28 @@ onMounted(() => {
 .nickname {
   font-size: 32rpx;
   font-weight: 600;
-  color: #313338;
+  color: #060607;
 }
 
 .user-id {
   font-size: 22rpx;
   color: #80848E;
+}
+
+.profile-edit {
+  padding: 8rpx 24rpx;
+  border-radius: 9999px;
+  background: #5865F2;
+  transition: background 0.15s;
+}
+.profile-edit:active {
+  background: #4752C4;
+}
+
+.edit-text {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #FFFFFF;
 }
 
 /* ===== Stats ===== */
@@ -234,7 +269,7 @@ onMounted(() => {
 .stats-list .list-row {
   flex: 1;
   text-align: center;
-  padding: 20rpx 16rpx;
+  padding: 24rpx 16rpx;
 }
 
 .stat-value {
@@ -246,16 +281,17 @@ onMounted(() => {
 }
 
 .stat-label {
-  font-size: 20rpx;
+  font-size: 22rpx;
   color: #80848E;
-  margin-top: 2rpx;
+  margin-top: 4rpx;
   display: block;
+  font-weight: 500;
 }
 
 .stat-sep {
   width: 1px;
   height: 48rpx;
-  background: rgba(79,84,92,0.12);
+  background: #E3E5E8;
   align-self: center;
 }
 
@@ -269,16 +305,16 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16rpx 20rpx;
+  padding: 18rpx 24rpx;
   transition: background 0.15s;
 }
 .list-item:active {
-  background: rgba(79,84,92,0.06);
+  background: rgba(79,84,92,0.04);
 }
 
 .item-label {
-  font-size: 28rpx;
-  color: #313338;
+  font-size: 26rpx;
+  color: #060607;
   font-weight: 500;
 }
 
@@ -301,25 +337,25 @@ onMounted(() => {
 
 .list-sep {
   height: 1px;
-  background: rgba(79,84,92,0.08);
-  margin-left: 20rpx;
+  background: #E3E5E8;
+  margin-left: 24rpx;
 }
 
 /* ===== Danger zone ===== */
 .danger-zone {
-  margin: 12rpx 20rpx;
+  margin-top: 12rpx;
 }
 
 .danger-btn {
   width: 100%;
   height: 80rpx;
-  border-radius: 8rpx;
+  border-radius: 9999px;
   background: #FFFFFF;
   color: #F23F43;
-  font-size: 28rpx;
-  font-weight: 500;
+  font-size: 26rpx;
+  font-weight: 600;
   border: none;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  box-shadow: none;
   transition: background 0.15s;
 }
 .danger-btn:active {

@@ -31,7 +31,7 @@ defineEmits<{
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80rpx 40rpx;
+  padding: 100rpx 40rpx;
 }
 
 .empty-icon {
@@ -50,9 +50,9 @@ defineEmits<{
 }
 
 .empty-title {
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 600;
-  color: #313338;
+  color: #060607;
   margin-bottom: 8rpx;
 }
 
@@ -61,19 +61,19 @@ defineEmits<{
   color: #80848E;
   text-align: center;
   line-height: 1.5;
-  margin-bottom: 32rpx;
+  margin-bottom: 40rpx;
 }
 
 .empty-btn {
-  padding: 12rpx 40rpx;
-  border-radius: 20rpx;
+  padding: 12rpx 48rpx;
+  border-radius: 9999px;
   background: #5865F2;
-  color: #fff;
+  color: #FFFFFF;
   font-size: 26rpx;
-  font-weight: 500;
+  font-weight: 600;
   border: none;
   height: auto;
-  line-height: 1;
+  line-height: 1.4;
   transition: background 0.15s;
 }
 .empty-btn:active {

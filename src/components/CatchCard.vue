@@ -58,14 +58,13 @@ function goToDetail() {
 <style scoped>
 .catch-card {
   background: #FFFFFF;
-  border-radius: 8rpx;
+  border-radius: 16rpx;
   overflow: hidden;
   margin-bottom: 12rpx;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
   transition: background 0.15s;
 }
 .catch-card:active {
-  background: rgba(79,84,92,0.04);
+  background: rgba(79,84,92,0.03);
 }
 
 .card-photo {
@@ -81,13 +80,13 @@ function goToDetail() {
 }
 
 .card-body {
-  padding: 12rpx 16rpx 16rpx;
+  padding: 16rpx 20rpx;
 }
 
 .card-name {
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: 600;
-  color: #313338;
+  color: #060607;
   display: block;
   margin-bottom: 4rpx;
 }
@@ -99,40 +98,33 @@ function goToDetail() {
 }
 
 .meta-loc {
-  font-size: 22rpx;
-  color: #5C5E66;
+  font-size: 24rpx;
+  color: #4E5058;
 }
 
 .meta-time {
-  font-size: 20rpx;
+  font-size: 22rpx;
   color: #80848E;
 }
 
 .card-footer {
   display: flex;
   align-items: center;
-  gap: 20rpx;
+  gap: 24rpx;
   margin-top: 12rpx;
   padding-top: 12rpx;
-  border-top: 1rpx solid rgba(79,84,92,0.08);
+  border-top: 1rpx solid #E3E5E8;
 }
 
 .footer-stat {
   display: flex;
   align-items: center;
-  gap: 4rpx;
+  gap: 6rpx;
 }
 
 .footer-stat svg {
   width: 18rpx;
   height: 18rpx;
-}
-
-.footer-stat text,
-.footer-stat text {
-  font-size: 22rpx;
-  color: #80848E;
-  font-weight: 500;
 }
 
 .footer-stat text {

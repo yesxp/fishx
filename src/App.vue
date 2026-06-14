@@ -34,9 +34,19 @@ onHide(() => {
 <style>
 page {
   background-color: #F2F3F5;
-  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 28rpx;
-  color: #313338;
+  color: #060607;
+  line-height: 1.4;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button::after {
+  border: none;
+}
+
+button {
+  border-radius: 9999px;
 }
 </style>

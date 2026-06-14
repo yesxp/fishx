@@ -178,8 +178,8 @@ onMounted(() => {
 /* ===== Top Bar ===== */
 .topbar {
   background: #FFFFFF;
-  padding: 12rpx 24rpx 14rpx;
-  border-bottom: 2rpx solid rgba(79,84,92,0.12);
+  padding: 12rpx 24rpx 16rpx;
+  border-bottom: 1rpx solid #E3E5E8;
 }
 
 .topbar-inner {
@@ -205,7 +205,7 @@ onMounted(() => {
 .brand-name {
   font-size: 32rpx;
   font-weight: 700;
-  color: #313338;
+  color: #060607;
   letter-spacing: -0.5rpx;
 }
 
@@ -217,7 +217,7 @@ onMounted(() => {
 
 .status-location {
   font-size: 22rpx;
-  color: #5C5E66;
+  color: #4E5058;
   font-weight: 500;
 }
 
@@ -247,15 +247,14 @@ onMounted(() => {
 /* ===== Scroll Content ===== */
 .scroll-content {
   flex: 1;
-  padding: 16rpx 20rpx;
+  padding: 20rpx 20rpx 40rpx;
 }
 
 /* ===== Discord Card ===== */
 .dc-card {
   background: #FFFFFF;
-  border-radius: 8rpx;
+  border-radius: 16rpx;
   margin-bottom: 12rpx;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
 /* ===== Index Card ===== */
@@ -263,11 +262,11 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24rpx 20rpx;
+  padding: 28rpx 24rpx;
   transition: background 0.15s;
 }
 .index-card:active {
-  background: rgba(79,84,92,0.04);
+  background: rgba(79,84,92,0.03);
 }
 
 .index-main {
@@ -321,16 +320,16 @@ onMounted(() => {
 .list-row {
   display: flex;
   align-items: center;
-  padding: 14rpx 20rpx;
+  padding: 16rpx 24rpx;
 }
 
 .list-row.has-divider {
-  border-bottom: 1rpx solid rgba(79,84,92,0.08);
+  border-bottom: 1rpx solid #E3E5E8;
 }
 
 .list-dot {
-  width: 8rpx;
-  height: 8rpx;
+  width: 10rpx;
+  height: 10rpx;
   border-radius: 50%;
   margin-right: 16rpx;
   flex-shrink: 0;
@@ -338,13 +337,13 @@ onMounted(() => {
 
 .list-label {
   flex: 1;
-  font-size: 28rpx;
-  color: #313338;
+  font-size: 26rpx;
+  color: #060607;
   font-weight: 500;
 }
 
 .list-value {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #80848E;
   font-variant-numeric: tabular-nums;
   font-weight: 500;
@@ -352,7 +351,7 @@ onMounted(() => {
 
 /* ===== Tags ===== */
 .tags-bar {
-  margin-bottom: 16rpx;
+  margin-bottom: 20rpx;
 }
 
 .tags-wrap {
@@ -363,15 +362,15 @@ onMounted(() => {
 .tag {
   display: inline-flex;
   align-items: center;
-  height: 44rpx;
-  padding: 0 20rpx;
-  border-radius: 22rpx;
-  background: rgba(79,84,92,0.08);
+  height: 48rpx;
+  padding: 0 24rpx;
+  border-radius: 9999px;
+  background: #E3E5E8;
   transition: background 0.15s;
   flex-shrink: 0;
 }
 .tag:active {
-  background: rgba(79,84,92,0.16);
+  background: #DCDDDE;
 }
 .tag.active {
   background: #5865F2;
@@ -380,11 +379,12 @@ onMounted(() => {
 .tag-text {
   font-size: 24rpx;
   font-weight: 500;
-  color: #5C5E66;
+  color: #4E5058;
   white-space: nowrap;
 }
 .tag.active .tag-text {
   color: #FFFFFF;
+  font-weight: 600;
 }
 
 /* ===== Section Header ===== */
@@ -392,13 +392,13 @@ onMounted(() => {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 8rpx 0 12rpx;
+  padding: 8rpx 4rpx 16rpx;
 }
 
 .section-title {
   font-size: 28rpx;
   font-weight: 700;
-  color: #313338;
+  color: #060607;
 }
 
 .section-action {

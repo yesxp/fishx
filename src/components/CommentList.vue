@@ -72,13 +72,16 @@ function handleSubmit() {
 
 <style scoped>
 .comment-section {
-  padding: 20rpx;
+  padding: 20rpx 24rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  margin-bottom: 12rpx;
 }
 
 .comment-title {
   font-size: 26rpx;
   font-weight: 600;
-  color: #313338;
+  color: #060607;
   margin-bottom: 16rpx;
   display: block;
 }
@@ -91,7 +94,7 @@ function handleSubmit() {
   display: flex;
   gap: 12rpx;
   padding: 12rpx 0;
-  border-bottom: 1rpx solid rgba(79,84,92,0.08);
+  border-bottom: 1rpx solid #E3E5E8;
 }
 .comment-item:last-child {
   border-bottom: none;
@@ -101,7 +104,7 @@ function handleSubmit() {
   width: 52rpx;
   height: 52rpx;
   border-radius: 50%;
-  background: #F2F3F5;
+  background: #E3E5E8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -124,7 +127,7 @@ function handleSubmit() {
 .comment-name {
   font-size: 24rpx;
   font-weight: 600;
-  color: #313338;
+  color: #060607;
 }
 
 .comment-time {
@@ -134,7 +137,7 @@ function handleSubmit() {
 
 .comment-text {
   font-size: 26rpx;
-  color: #313338;
+  color: #060607;
   line-height: 1.4;
   word-break: break-word;
 }
@@ -152,25 +155,29 @@ function handleSubmit() {
 .comment-input-wrap {
   display: flex;
   gap: 10rpx;
-  padding-top: 12rpx;
-  border-top: 2rpx solid rgba(79,84,92,0.08);
+  padding-top: 16rpx;
+  border-top: 1rpx solid #E3E5E8;
 }
 
 .comment-input {
   flex: 1;
   height: 68rpx;
-  background: #F2F3F5;
+  background: #E3E5E8;
   border: none;
-  border-radius: 20rpx;
+  border-radius: 9999px;
   padding: 0 20rpx;
   font-size: 26rpx;
-  color: #313338;
+  color: #060607;
+}
+
+.comment-input::placeholder {
+  color: #80848E;
 }
 
 .send-btn {
-  padding: 0 20rpx;
+  padding: 0 24rpx;
   height: 68rpx;
-  border-radius: 20rpx;
+  border-radius: 9999px;
   background: transparent;
   display: flex;
   align-items: center;
@@ -179,6 +186,10 @@ function handleSubmit() {
   font-weight: 600;
   color: #80848E;
   transition: all 0.15s;
+}
+
+.send-btn:active {
+  background: rgba(88,101,242,0.08);
 }
 
 .send-btn.active {
