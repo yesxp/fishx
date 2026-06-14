@@ -204,7 +204,7 @@ $text-muted: #80848E;
 .profile-banner {
   height: 120px;
   background: linear-gradient(135deg, #5865F2 0%, #4752C4 50%, #3C45A5 100%);
-  border-radius: 0;
+  border-radius: 12px 12px 0 0;
   margin: 0 -16px;
 }
 
