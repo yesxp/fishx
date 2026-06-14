@@ -1,409 +1,280 @@
 <template>
-  <view class="page">
+  <view class="page-spot-detail">
+    <!-- Header -->
     <view class="header">
-      <view class="header-left">
-        <button class="btn-back" @click="goBack">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#060607" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-      </view>
-      <text class="title">{{ spot?.name || 'Spot Detail' }}</text>
-      <view class="header-right">
-        <button class="btn-share" @click="handleShare">Share</button>
+      <view class="header-top">
+        <view class="header-back" @tap="goBack">
+          <text class="back-icon">←</text>
+        </view>
+        <text class="header-title">钓点详情</text>
+        <view style="width: 36px;" />
       </view>
     </view>
 
-    <scroll-view scroll-y class="scroll-content">
-      <!-- Hero -->
-      <view class="dc-card spot-hero">
-        <text class="hero-icon">📍</text>
-        <text class="hero-name">{{ spot?.name }}</text>
-        <text class="hero-type">{{ spot?.type }}</text>
-        <view class="hero-stats">
-          <view class="stat-col">
-            <text class="stat-num">{{ spot?.rating }}</text>
-            <text class="stat-label">Rating</text>
+    <!-- Content -->
+    <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
+      <!-- Map Preview -->
+      <view class="map-preview">
+        <view class="map-inner">
+          <text class="map-pin">📍</text>
+          <text class="map-name">{{ spot?.name || '加载中...' }}</text>
+        </view>
+      </view>
+
+      <!-- Info -->
+      <view class="info-card" v-if="spot">
+        <text class="spot-name">{{ spot.name }}</text>
+        <text class="spot-type">{{ spot.type }}</text>
+        <view class="spot-stats">
+          <view class="spot-stat">
+            <text class="spot-stat-value">{{ spot.rating }}</text>
+            <text class="spot-stat-label">评分</text>
           </view>
-          <view class="stat-col">
-            <text class="stat-num">{{ spot?.catchCount }}</text>
-            <text class="stat-label">Catches</text>
+          <view class="spot-stat">
+            <text class="spot-stat-value">{{ spot.catchCount }}</text>
+            <text class="spot-stat-label">渔获数</text>
           </view>
-          <view class="stat-col">
-            <text class="stat-num">{{ spot?.distance || '--' }}</text>
-            <text class="stat-label">Distance</text>
+        </view>
+        <view class="spot-fish">
+          <text class="spot-fish-label">常见鱼种</text>
+          <view class="fish-tags">
+            <view v-for="f in spot.fishTypes" :key="f" class="fish-tag">
+              <text class="fish-tag-text">{{ f }}</text>
+            </view>
           </view>
         </view>
       </view>
 
-      <!-- Fish species -->
-      <view class="dc-card section-card">
-        <text class="card-title">Species Found</text>
-        <view class="fish-tags">
-          <view class="fish-tag" v-for="fish in spot?.fishTypes" :key="fish">
-            <text class="tag-name">{{ fish }}</text>
-          </view>
+      <!-- Action Buttons -->
+      <view class="actions">
+        <view class="action-btn action-btn--primary" @tap="onCheckIn">
+          <text class="action-btn-text">📍 打卡</text>
+        </view>
+        <view class="action-btn" @tap="onNavigate">
+          <text class="action-btn-text--outline">🧭 导航</text>
         </view>
       </view>
 
-      <!-- Actions -->
-      <view class="action-section">
-        <button class="action-btn primary" @click="handleNavigate">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-          <text class="btn-label">Navigate</text>
-        </button>
-        <button class="action-btn secondary" @click="handleCheckIn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#4E5058" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <text class="btn-label">Check In</text>
-        </button>
-      </view>
-
-      <!-- Nearby catches -->
-      <view class="section-header-wrap">
-        <text class="section-title">Catches Here</text>
-      </view>
-      <view class="recent-list">
-        <view class="recent-item" v-for="i in 4" :key="i">
-          <view class="recent-photo" :style="{ background: fishColors[i % 4] }">
-            <text class="recent-emoji">{{ fishEmojis[i % 4] }}</text>
-          </view>
-          <view class="recent-info">
-            <text class="recent-fish">{{ fishNames[i % 4] }}</text>
-            <text class="recent-time">{{ i }}h ago</text>
-          </view>
-        </view>
-      </view>
-
-      <view class="spacer"></view>
+      <view style="height: 120rpx;" />
     </scroll-view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
 import { useSpotStore } from '@/stores/spot'
-import { checkIn } from '@/api/spot'
 
 const spotStore = useSpotStore()
 const spot = ref<any>(null)
 
-const fishNames = ['Crucian', 'Carp', 'Bass', 'Grass Carp']
-const fishEmojis = ['🐟', '🐠', '🎣', '🐡']
-const fishColors = ['#F2F3F5', '#E8F5E9', '#FFF3E0', '#E3E5E8']
+onLoad((options) => {
+  const id = options?.id || '1'
+  loadDetail(id)
+})
 
-const pages = getCurrentPages()
-const currentPage = pages[pages.length - 1] as any
-const spotId = currentPage?.options?.id || '1'
+async function loadDetail(id: string) {
+  const data = await spotStore.loadDetail(id)
+  spot.value = data
+}
 
 function goBack() {
   uni.navigateBack()
 }
 
-function handleNavigate() {
-  if (spot.value) {
-    uni.openLocation({
-      latitude: spot.value.lat,
-      longitude: spot.value.lng,
-      name: spot.value.name,
-      address: spot.value.type
-    })
-  }
+function onCheckIn() {
+  uni.showToast({ title: '打卡成功', icon: 'success' })
 }
 
-async function handleCheckIn() {
-  const res = await checkIn(spotId)
-  if (res.code === 0) {
-    uni.showToast({ title: 'Checked in', icon: 'success' })
-  }
+function onNavigate() {
+  uni.showToast({ title: '导航功能开发中', icon: 'none' })
 }
-
-function handleShare() {
-  uni.setClipboardData({
-    data: window.location.href,
-    success: () => uni.showToast({ title: 'Copied', icon: 'success' })
-  })
-}
-
-onMounted(async () => {
-  const data = await spotStore.loadDetail(spotId)
-  spot.value = data
-})
 </script>
 
-<style scoped>
-.page {
+<style scoped lang="scss">
+$bg-page: #F2F3F5;
+$bg-card: #FFFFFF;
+$brand: #5865F2;
+$divider: #E3E5E8;
+$text-primary: #060607;
+$text-secondary: #4E5058;
+$text-muted: #80848E;
+$success: #23A559;
+
+.page-spot-detail {
   min-height: 100vh;
-  background: #F2F3F5;
-  display: flex;
-  flex-direction: column;
+  background: $bg-page;
 }
 
-/* ===== Header ===== */
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16rpx 16rpx;
-  background: #FFFFFF;
-  border-bottom: 1rpx solid #E3E5E8;
   position: sticky;
   top: 0;
   z-index: 100;
+  background: $bg-card;
+  border-bottom: 1px solid $divider;
+  padding: 12px 16px;
 }
 
-.header-left {
+.header-top {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
-.btn-back {
-  width: 52rpx;
-  height: 52rpx;
+.header-back {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: transparent;
-  border: none;
+  background: #F2F3F5;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
-}
-.btn-back:active {
-  background: rgba(79,84,92,0.08);
-}
-.btn-back svg {
-  width: 24rpx;
-  height: 24rpx;
+  cursor: pointer;
 }
 
-.title {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #060607;
-  max-width: 400rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.back-icon {
+  font-size: 20px;
+  color: $text-secondary;
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-}
-
-.btn-share {
-  padding: 10rpx 24rpx;
-  border-radius: 9999px;
-  background: transparent;
-  color: #5865F2;
-  font-size: 26rpx;
+.header-title {
+  font-size: 16px;
   font-weight: 600;
-  border: none;
-  height: auto;
-  line-height: 1.4;
-  transition: background 0.15s;
-}
-.btn-share:active {
-  background: rgba(88,101,242,0.08);
+  color: $text-primary;
 }
 
-/* ===== Scroll ===== */
-.scroll-content {
-  flex: 1;
-  padding: 20rpx 20rpx 40rpx;
+.content {
+  padding: 12px;
 }
 
-/* ===== Discord Card ===== */
-.dc-card {
-  background: #FFFFFF;
-  border-radius: 16rpx;
-  margin-bottom: 12rpx;
-}
-
-/* ===== Hero ===== */
-.spot-hero {
-  text-align: center;
-  padding: 48rpx 24rpx;
-}
-
-.hero-icon {
-  font-size: 56rpx;
-  display: block;
-  margin-bottom: 12rpx;
-}
-
-.hero-name {
-  font-size: 36rpx;
-  font-weight: 700;
-  color: #060607;
-  display: block;
-}
-
-.hero-type {
-  font-size: 24rpx;
-  color: #4E5058;
-  margin-top: 4rpx;
-  display: block;
-}
-
-.hero-stats {
+.map-preview {
+  height: 200px;
+  background: linear-gradient(135deg, #E3F2FD 0%, #B3E5FC 50%, #E8F5E9 100%);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24rpx;
-  margin-top: 28rpx;
-  padding-top: 24rpx;
-  border-top: 1rpx solid #E3E5E8;
+  margin-bottom: 12px;
+  border: 1px solid $divider;
 }
 
-.stat-col {
+.map-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-pin {
+  font-size: 40px;
+}
+
+.map-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-secondary;
+}
+
+.info-card {
+  background: $bg-card;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid $divider;
+  margin-bottom: 12px;
+}
+
+.spot-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: $text-primary;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.spot-type {
+  font-size: 13px;
+  color: $text-muted;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.spot-stats {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 16px;
+}
+
+.spot-stat {
   text-align: center;
 }
 
-.stat-num {
-  font-size: 32rpx;
+.spot-stat-value {
+  font-size: 20px;
   font-weight: 700;
-  color: #5865F2;
+  color: $text-primary;
   display: block;
-  font-variant-numeric: tabular-nums;
 }
 
-.stat-label {
-  font-size: 22rpx;
-  color: #80848E;
-  margin-top: 4rpx;
+.spot-stat-label {
+  font-size: 12px;
+  color: $text-muted;
   display: block;
-  font-weight: 500;
 }
 
-/* ===== Section card ===== */
-.section-card {
-  padding: 24rpx;
-}
-
-.card-title {
-  font-size: 26rpx;
+.spot-fish-label {
+  font-size: 13px;
   font-weight: 600;
-  color: #060607;
-  margin-bottom: 16rpx;
+  color: $text-primary;
   display: block;
+  margin-bottom: 8px;
 }
 
 .fish-tags {
   display: flex;
-  gap: 8rpx;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .fish-tag {
-  padding: 4rpx 16rpx;
-  border-radius: 9999px;
-  background: rgba(88,101,242,0.08);
+  padding: 4px 12px;
+  border-radius: 100px;
+  background: #F2F3F5;
 }
 
-.tag-name {
-  font-size: 24rpx;
-  color: #5865F2;
-  font-weight: 500;
+.fish-tag-text {
+  font-size: 13px;
+  color: $text-secondary;
 }
 
-/* ===== Actions ===== */
-.action-section {
+.actions {
   display: flex;
-  gap: 12rpx;
-  margin-bottom: 20rpx;
+  gap: 12px;
 }
 
 .action-btn {
   flex: 1;
-  height: 80rpx;
-  border-radius: 9999px;
-  border: none;
+  height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8rpx;
-  font-size: 26rpx;
+  cursor: pointer;
+  background: #F2F3F5;
+}
+
+.action-btn--primary {
+  background: $brand;
+}
+
+.action-btn-text {
+  font-size: 15px;
   font-weight: 600;
+  color: #fff;
 }
 
-.action-btn.primary {
-  background: #5865F2;
-  color: #FFFFFF;
-  transition: background 0.15s;
-}
-.action-btn.primary:active {
-  background: #4752C4;
-}
-
-.action-btn.secondary {
-  background: #E3E5E8;
-  color: #060607;
-  transition: background 0.15s;
-}
-.action-btn.secondary:active {
-  background: #DCDDDE;
-}
-
-.btn-label {
-  font-size: 26rpx;
+.action-btn-text--outline {
+  font-size: 15px;
   font-weight: 600;
-}
-
-/* ===== Section header ===== */
-.section-header-wrap {
-  padding-bottom: 12rpx;
-}
-
-.section-title {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #060607;
-}
-
-/* ===== Recent list ===== */
-.recent-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
-}
-
-.recent-item {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  padding: 16rpx;
-  background: #FFFFFF;
-  border-radius: 16rpx;
-}
-
-.recent-photo {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 8rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.recent-emoji {
-  font-size: 32rpx;
-}
-
-.recent-info {
-  flex: 1;
-}
-
-.recent-fish {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #060607;
-}
-
-.recent-time {
-  font-size: 22rpx;
-  color: #80848E;
-}
-
-.spacer {
-  height: 40rpx;
+  color: $text-primary;
 }
 </style>

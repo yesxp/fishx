@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>天时 - 天气·潮汐 重新设计</title>
+<style>
+:root{--bg:#F2F3F5;--card:#FFF;--text:#060607;--sub:#4E5058;--muted:#80848E;--brand:#5865F2;--div:#E3E5E8;--tag:#F2F3F5;--ok:#23A559;--warn:#F0B232;--err:#F23F43}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);max-width:430px;margin:0 auto;min-height:100vh}
+.header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--div);padding:12px 16px}
+.header-top{display:flex;align-items:center;justify-content:space-between}
+.header-logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:var(--brand);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;font-weight:700}
+.header-title{font-size:18px;font-weight:700;line-height:1.2}
+.header-subtitle{font-size:12px;color:var(--muted)}
+.header-actions{display:flex;gap:8px}
+.header-btn{width:36px;height:36px;border-radius:50%;background:var(--tag);border:none;display:flex;align-items:center;justify-content:center}
+.header-btn svg{width:18px;height:18px;stroke:var(--sub);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.content{padding:12px 12px 80px}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#5865F2,#7B68EE);border-radius:16px;padding:20px;margin-bottom:12px;color:#fff}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.hero-city{font-size:13px;opacity:.8}
+.hero-score{font-size:56px;font-weight:700;line-height:1}
+.hero-score small{font-size:20px;font-weight:400;opacity:.7}
+.hero-label{font-size:14px;opacity:.9;margin-top:2px}
+.hero-icon{font-size:44px}
+.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.hero-item{background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center}
+.hero-item-label{font-size:10px;opacity:.7}
+.hero-item-value{font-size:15px;font-weight:600;margin-top:1px}
+
+/* Card */
+.card{background:var(--card);border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid var(--div)}
+.card-title{font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.card-title .badge{font-size:11px;padding:2px 8px;border-radius:100px;font-weight:500}
+.badge-ok{background:rgba(35,165,89,.1);color:var(--ok)}
+.badge-warn{background:rgba(240,178,50,.1);color:var(--warn)}
+
+/* 24h scroll */
+.hourly{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.hourly::-webkit-scrollbar{display:none}
+.hour-item{flex-shrink:0;width:56px;text-align:center;padding:10px 0;background:var(--tag);border-radius:10px}
+.hour-item.now{background:var(--brand);color:#fff}
+.hour-time{font-size:11px;opacity:.7}
+.hour-icon{font-size:20px;margin:4px 0}
+.hour-temp{font-size:14px;font-weight:600}
+.hour-wind{font-size:10px;opacity:.6;margin-top:2px}
+.hour-rain{font-size:10px;color:#4DD0E1;margin-top:1px}
+.hour-item.now .hour-rain{color:rgba(255,255,255,.8)}
+
+/* Pressure bar */
+.pressure-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.pressure-row:last-child{margin-bottom:0}
+.pressure-label{font-size:12px;color:var(--sub);width:40px;flex-shrink:0}
+.pressure-bar{flex:1;height:6px;background:var(--div);border-radius:3px;overflow:hidden}
+.pressure-fill{height:100%;border-radius:3px}
+.pressure-val{font-size:12px;font-weight:600;width:36px;text-align:right}
+.pressure-hint{font-size:11px;color:var(--muted);margin-top:6px;padding-left:48px}
+
+/* 15 day */
+.forecast-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--div);gap:8px}
+.forecast-row:last-child{border-bottom:none}
+.forecast-day{font-size:13px;font-weight:500;width:36px;flex-shrink:0}
+.forecast-date{font-size:11px;color:var(--muted);width:36px;flex-shrink:0}
+.forecast-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0}
+.forecast-temp{font-size:13px;color:var(--sub);flex:1;text-align:center}
+.forecast-temp strong{color:var(--text);font-weight:600}
+.forecast-rain{font-size:11px;color:#4DD0E1;width:36px;text-align:right;flex-shrink:0}
+.forecast-score{width:28px;height:20px;border-radius:4px;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.forecast-score.s-high{background:var(--ok)}
+.forecast-score.s-mid{background:var(--brand)}
+.forecast-score.s-low{background:var(--muted)}
+
+/* Tide */
+.tide-chart{position:relative;height:160px;margin:12px 0 8px;background:linear-gradient(180deg,rgba(88,101,242,.03) 0%,rgba(88,101,242,.08) 100%);border-radius:10px;overflow:hidden}
+.tide-chart svg{width:100%;height:100%}
+.tide-info{display:flex;gap:8px;margin-bottom:10px}
+.tide-info-item{flex:1;background:var(--tag);border-radius:10px;padding:10px;text-align:center}
+.tide-info-label{font-size:10px;color:var(--muted);margin-bottom:3px}
+.tide-info-time{font-size:16px;font-weight:700}
+.tide-info-val{font-size:11px;color:var(--muted);margin-top:1px}
+.tide-phase{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tide-phase-tag{padding:4px 10px;border-radius:100px;font-size:12px;font-weight:500}
+.tide-phase-tag.spring{background:rgba(88,101,242,.1);color:var(--brand)}
+.tide-phase-tag.neap{background:rgba(128,132,142,.1);color:var(--muted)}
+.tide-phase-tag.rising{background:rgba(35,165,89,.1);color:var(--ok)}
+.tide-phase-tag.falling{background:rgba(240,178,50,.1);color:var(--warn)}
+.tide-phase-tag.flood{background:rgba(88,101,242,.1);color:var(--brand)}
+.tide-phase-tag.ebb{background:rgba(242,63,67,.1);color:var(--err)}
+.tide-lunar{display:flex;align-items:center;gap:8px;padding:10px;background:var(--tag);border-radius:10px;margin-bottom:10px}
+.tide-lunar-icon{font-size:28px}
+.tide-lunar-text{font-size:12px;color:var(--sub);line-height:1.5}
+.tide-lunar-text strong{color:var(--text)}
+
+/* Fish predict */
+.fish-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--div)}
+.fish-row:last-child{border-bottom:none}
+.fish-name{font-size:14px;font-weight:500;width:48px}
+.fish-badge{padding:3px 10px;border-radius:100px;font-size:12px;font-weight:500}
+.fish-badge.open{background:rgba(35,165,89,.1);color:var(--ok)}
+.fish-badge.normal{background:rgba(88,101,242,.1);color:var(--brand)}
+.fish-badge.slow{background:rgba(128,132,142,.1);color:var(--muted)}
+.fish-trend{margin-left:auto;font-size:16px;color:var(--muted)}
+
+/* Tips */
+.tip{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--div)}
+.tip:last-child{border-bottom:none}
+.tip-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.tip-icon.b{background:rgba(88,101,242,.1)}
+.tip-icon.g{background:rgba(35,165,89,.1)}
+.tip-icon.o{background:rgba(240,178,50,.1)}
+.tip-text{font-size:13px;color:var(--sub);line-height:1.5}
+
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--card);border-top:1px solid var(--div);display:flex;padding:8px 0;padding-bottom:max(8px,env(safe-area-inset-bottom));z-index:100}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;cursor:pointer}
+.tab svg{width:24px;height:24px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tab span{font-size:11px;font-weight:500;color:var(--muted)}
+.tab.active svg{stroke:var(--brand)}
+.tab.active span{color:var(--brand)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="header-logo"><div class="logo-icon">🌊</div><div><div class="header-title">天时</div><div class="header-subtitle">天气·潮汐</div></div></div>
+    <div class="header-actions"><button class="header-btn"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button><button class="header-btn"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button></div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-top">
+    <div><div class="hero-city">杭州 · 西湖区</div><div class="hero-score">82<small>分</small></div><div class="hero-label">适宜出钓</div></div>
+    <div class="hero-icon">🌤️</div>
+  </div>
+  <div class="hero-grid">
+    <div class="hero-item"><div class="hero-item-label">温度</div><div class="hero-item-value">26°</div></div>
+    <div class="hero-item"><div class="hero-item-label">体感</div><div class="hero-item-value">24°</div></div>
+    <div class="hero-item"><div class="hero-item-label">气压</div><div class="hero-item-value">1013</div></div>
+    <div class="hero-item"><div class="hero-item-label">风力</div><div class="hero-item-value">东风3</div></div>
+  </div>
+</div>
+
+<!-- 24小时 -->
+<div class="card">
+  <div class="card-title">24小时预报 <span class="badge badge-ok">鱼口活跃</span></div>
+  <div class="hourly">
+    <div class="hour-item now"><div class="hour-time">现在</div><div class="hour-icon">🌤️</div><div class="hour-temp">26°</div><div class="hour-wind">东风3</div><div class="hour-rain">0%</div></div>
+    <div class="hour-item"><div class="hour-time">14:00</div><div class="hour-icon">☀️</div><div class="hour-temp">27°</div><div class="hour-wind">东2</div><div class="hour-rain">0%</div></div>
+    <div class="hour-item"><div class="hour-time">15:00</div><div class="hour-icon">☀️</div><div class="hour-temp">27°</div><div class="hour-wind">东2</div><div class="hour-rain">0%</div></div>
+    <div class="hour-item"><div class="hour-time">16:00</div><div class="hour-icon">🌤️</div><div class="hour-temp">26°</div><div class="hour-wind">东3</div><div class="hour-rain">5%</div></div>
+    <div class="hour-item"><div class="hour-time">17:00</div><div class="hour-icon">⛅</div><div class="hour-temp">25°</div><div class="hour-wind">东2</div><div class="hour-rain">10%</div></div>
+    <div class="hour-item"><div class="hour-time">18:00</div><div class="hour-icon">🌥️</div><div class="hour-temp">23°</div><div class="hour-wind">东1</div><div class="hour-rain">15%</div></div>
+    <div class="hour-item"><div class="hour-time">19:00</div><div class="hour-icon">🌙</div><div class="hour-temp">22°</div><div class="hour-wind">东1</div><div class="hour-rain">10%</div></div>
+    <div class="hour-item"><div class="hour-time">20:00</div><div class="hour-icon">🌙</div><div class="hour-temp">21°</div><div class="hour-wind">微风</div><div class="hour-rain">5%</div></div>
+  </div>
+</div>
+
+<!-- 气压 -->
+<div class="card">
+  <div class="card-title">气压变化</div>
+  <div class="pressure-row"><span class="pressure-label">06时</span><div class="pressure-bar"><div class="pressure-fill" style="width:72%;background:var(--brand)"></div></div><span class="pressure-val">1010</span></div>
+  <div class="pressure-row"><span class="pressure-label">09时</span><div class="pressure-bar"><div class="pressure-fill" style="width:78%;background:var(--brand)"></div></div><span class="pressure-val">1011</span></div>
+  <div class="pressure-row"><span class="pressure-label">12时</span><div class="pressure-bar"><div class="pressure-fill" style="width:85%;background:var(--ok)"></div></div><span class="pressure-val">1013</span></div>
+  <div class="pressure-row"><span class="pressure-label">15时</span><div class="pressure-bar"><div class="pressure-fill" style="width:88%;background:var(--ok)"></div></div><span class="pressure-val">1015</span></div>
+  <div class="pressure-row"><span class="pressure-label">18时</span><div class="pressure-bar"><div class="pressure-fill" style="width:86%;background:var(--ok)"></div></div><span class="pressure-val">1014</span></div>
+  <div class="pressure-row"><span class="pressure-label">21时</span><div class="pressure-bar"><div class="pressure-fill" style="width:80%;background:var(--brand)"></div></div><span class="pressure-val">1012</span></div>
+  <div class="pressure-hint">📈 气压持续稳定偏高（1013±3），鱼类呼吸代谢活跃，开口积极</div>
+</div>
+
+<!-- 15天 -->
+<div class="card">
+  <div class="card-title">未来15天</div>
+  <div class="forecast-row"><span class="forecast-day">今天</span><span class="forecast-date">6/13</span><span class="forecast-icon">🌤️</span><span class="forecast-temp"><strong>27°</strong> / 20°</span><span class="forecast-rain">0%</span><span class="forecast-score s-high">82</span></div>
+  <div class="forecast-row"><span class="forecast-day">周六</span><span class="forecast-date">6/14</span><span class="forecast-icon">☀️</span><span class="forecast-temp"><strong>29°</strong> / 21°</span><span class="forecast-rain">0%</span><span class="forecast-score s-high">85</span></div>
+  <div class="forecast-row"><span class="forecast-day">周日</span><span class="forecast-date">6/15</span><span class="forecast-icon">⛅</span><span class="forecast-temp"><strong>28°</strong> / 22°</span><span class="forecast-rain">10%</span><span class="forecast-score s-high">78</span></div>
+  <div class="forecast-row"><span class="forecast-day">周一</span><span class="forecast-date">6/16</span><span class="forecast-icon">🌧️</span><span class="forecast-temp"><strong>24°</strong> / 19°</span><span class="forecast-rain">65%</span><span class="forecast-score s-low">45</span></div>
+  <div class="forecast-row"><span class="forecast-day">周二</span><span class="forecast-date">6/17</span><span class="forecast-icon">🌧️</span><span class="forecast-temp"><strong>22°</strong> / 18°</span><span class="forecast-rain">80%</span><span class="forecast-score s-low">38</span></div>
+  <div class="forecast-row"><span class="forecast-day">周三</span><span class="forecast-date">6/18</span><span class="forecast-icon">⛅</span><span class="forecast-temp"><strong>25°</strong> / 19°</span><span class="forecast-rain">20%</span><span class="forecast-score s-mid">68</span></div>
+  <div class="forecast-row"><span class="forecast-day">周四</span><span class="forecast-date">6/19</span><span class="forecast-icon">🌤️</span><span class="forecast-temp"><strong>27°</strong> / 20°</span><span class="forecast-rain">5%</span><span class="forecast-score s-high">80</span></div>
+  <div class="forecast-row"><span class="forecast-day">周五</span><span class="forecast-date">6/20</span><span class="forecast-icon">☀️</span><span class="forecast-temp"><strong>30°</strong> / 22°</span><span class="forecast-rain">0%</span><span class="forecast-score s-high">83</span></div>
+  <div class="forecast-row"><span class="forecast-day">周六</span><span class="forecast-date">6/21</span><span class="forecast-icon">🌤️</span><span class="forecast-temp"><strong>31°</strong> / 23°</span><span class="forecast-rain">5%</span><span class="forecast-score s-high">86</span></div>
+  <div class="forecast-row"><span class="forecast-day">周日</span><span class="forecast-date">6/22</span><span class="forecast-icon">⛅</span><span class="forecast-temp"><strong>29°</strong> / 22°</span><span class="forecast-rain">15%</span><span class="forecast-score s-high">75</span></div>
+  <div class="forecast-row"><span class="forecast-day">周一</span><span class="forecast-date">6/23</span><span class="forecast-icon">⛈️</span><span class="forecast-temp"><strong>23°</strong> / 18°</span><span class="forecast-rain">90%</span><span class="forecast-score s-low">25</span></div>
+  <div class="forecast-row"><span class="forecast-day">周二</span><span class="forecast-date">6/24</span><span class="forecast-icon">🌧️</span><span class="forecast-temp"><strong>21°</strong> / 17°</span><span class="forecast-rain">70%</span><span class="forecast-score s-low">40</span></div>
+  <div class="forecast-row"><span class="forecast-day">周三</span><span class="forecast-date">6/25</span><span class="forecast-icon">⛅</span><span class="forecast-temp"><strong>26°</strong> / 20°</span><span class="forecast-rain">15%</span><span class="forecast-score s-mid">72</span></div>
+  <div class="forecast-row"><span class="forecast-day">周四</span><span class="forecast-date">6/26</span><span class="forecast-icon">🌤️</span><span class="forecast-temp"><strong>28°</strong> / 21°</span><span class="forecast-rain">5%</span><span class="forecast-score s-high">81</span></div>
+  <div class="forecast-row"><span class="forecast-day">周五</span><span class="forecast-date">6/27</span><span class="forecast-icon">☀️</span><span class="forecast-temp"><strong>30°</strong> / 22°</span><span class="forecast-rain">0%</span><span class="forecast-score s-high">84</span></div>
+</div>
+
+<!-- 潮汐 -->
+<div class="card">
+  <div class="card-title">潮汐曲线 <span class="badge badge-ok">涨潮中</span></div>
+  
+  <!-- SVG 潮汐曲线 -->
+  <div class="tide-chart">
+    <svg viewBox="0 0 360 160" preserveAspectRatio="none">
+      <!-- 网格线 -->
+      <line x1="0" y1="40" x2="360" y2="40" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4"/>
+      <line x1="0" y1="80" x2="360" y2="80" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4"/>
+      <line x1="0" y1="120" x2="360" y2="120" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4"/>
+      <!-- Y轴标签 -->
+      <text x="4" y="38" fill="#80848E" font-size="9">2.0m</text>
+      <text x="4" y="78" fill="#80848E" font-size="9">1.0m</text>
+      <text x="4" y="118" fill="#80848E" font-size="9">0.0m</text>
+      <!-- 潮汐曲线填充 -->
+      <defs>
+        <linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#5865F2" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#5865F2" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>
+      <path d="M0,120 C20,100 30,60 50,30 C60,18 70,16 80,18 C100,22 110,50 130,80 C150,105 160,115 180,118 C200,120 210,100 230,70 C245,50 255,35 270,30 C280,27 290,30 300,40 C320,60 340,90 360,110" fill="url(#tg)"/>
+      <!-- 潮汐曲线描边 -->
+      <path d="M0,120 C20,100 30,60 50,30 C60,18 70,16 80,18 C100,22 110,50 130,80 C150,105 160,115 180,118 C200,120 210,100 230,70 C245,50 255,35 270,30 C280,27 290,30 300,40 C320,60 340,90 360,110" fill="none" stroke="#5865F2" stroke-width="2"/>
+      <!-- 高潮标注 -->
+      <circle cx="65" cy="16" r="4" fill="#5865F2"/>
+      <text x="55" y="10" fill="#5865F2" font-size="9" font-weight="600">满潮</text>
+      <text x="50" y="148" fill="#80848E" font-size="8">06:42</text>
+      <!-- 低潮标注 -->
+      <circle cx="180" cy="118" r="4" fill="#F0B232"/>
+      <text x="165" y="135" fill="#F0B232" font-size="9" font-weight="600">干潮</text>
+      <text x="168" y="148" fill="#80848E" font-size="8">12:15</text>
+      <!-- 第二高潮 -->
+      <circle cx="270" cy="30" r="4" fill="#5865F2"/>
+      <text x="258" y="22" fill="#5865F2" font-size="9" font-weight="600">满潮</text>
+      <text x="253" y="148" fill="#80848E" font-size="8">18:56</text>
+      <!-- 当前位置 -->
+      <circle cx="150" cy="108" r="5" fill="#23A559" stroke="#fff" stroke-width="2"/>
+      <text x="140" y="105" fill="#23A559" font-size="8" font-weight="600">现在</text>
+      <!-- X轴时间 -->
+      <text x="0" y="158" fill="#80848E" font-size="8">0:00</text>
+      <text x="90" y="158" fill="#80848E" font-size="8">6:00</text>
+      <text x="180" y="158" fill="#80848E" font-size="8">12:00</text>
+      <text x="270" y="158" fill="#80848E" font-size="8">18:00</text>
+      <text x="345" y="158" fill="#80848E" font-size="8">24:00</text>
+    </svg>
+  </div>
+
+  <div class="tide-info">
+    <div class="tide-info-item"><div class="tide-info-label">🌊 满潮（高潮）</div><div class="tide-info-time">06:42</div><div class="tide-info-val">+1.8m</div></div>
+    <div class="tide-info-item"><div class="tide-info-label">🌊 干潮（低潮）</div><div class="tide-info-time">12:15</div><div class="tide-info-val">+0.3m</div></div>
+    <div class="tide-info-item"><div class="tide-info-label">🌊 满潮（高潮）</div><div class="tide-info-time">18:56</div><div class="tide-info-val">+1.6m</div></div>
+  </div>
+
+  <div class="tide-phase">
+    <span class="tide-phase-tag spring">大潮</span>
+    <span class="tide-phase-tag rising">涨潮中</span>
+    <span class="tide-phase-tag flood">活讯</span>
+    <span class="tide-phase-tag" style="background:rgba(88,101,242,.06);color:var(--brand)">潮差 1.5m</span>
+  </div>
+
+  <!-- 农历 -->
+  <div class="tide-lunar">
+    <div class="tide-lunar-icon">🌒</div>
+    <div class="tide-lunar-text">
+      <strong>农历五月十九</strong><br>
+      新月后第4天，进入大潮期。潮差逐渐增大，<strong>活讯期间鱼口活跃</strong>，建议在涨潮至满潮时段作钓。
+    </div>
+  </div>
+
+  <div style="font-size:12px;color:var(--sub);line-height:1.6;padding:4px 0">
+    <strong>钓鱼术语：</strong><br>
+    · <strong>大潮</strong>（朔/望前后）：潮差大，水流急，鱼口好<br>
+    · <strong>小潮</strong>（上/下弦前后）：潮差小，水流缓<br>
+    · <strong>活讯</strong>：大潮期间，鱼类觅食活跃<br>
+    · <strong>死讯</strong>：小潮期间，鱼类活动减少<br>
+    · <strong>满潮</strong>：潮位最高点（高潮）<br>
+    · <strong>干潮</strong>：潮位最低点（低潮）
+  </div>
+</div>
+
+<!-- 鱼口预测 -->
+<div class="card">
+  <div class="card-title">鱼口预测</div>
+  <div class="fish-row"><div class="fish-name">鲫鱼</div><div class="fish-badge open">开口积极</div><div class="fish-trend">↑</div></div>
+  <div class="fish-row"><div class="fish-name">鲤鱼</div><div class="fish-badge normal">正常</div><div class="fish-trend">→</div></div>
+  <div class="fish-row"><div class="fish-name">草鱼</div><div class="fish-badge slow">鱼口较慢</div><div class="fish-trend">↓</div></div>
+  <div class="fish-row"><div class="fish-name">鲢鳙</div><div class="fish-badge slow">鱼口较慢</div><div class="fish-trend">↓</div></div>
+</div>
+
+<!-- 钓法建议 -->
+<div class="card">
+  <div class="card-title">钓法建议</div>
+  <div class="tip"><div class="tip-icon b">🎣</div><div class="tip-text">鲫鱼开口积极，建议活饵（蚯蚓/红虫），小钩细线灵敏度高。</div></div>
+  <div class="tip"><div class="tip-icon g">🐟</div><div class="tip-text">鲤鱼底层活动频繁，玉米打窝+商品饵挂钩，等口为主。</div></div>
+  <div class="tip"><div class="tip-icon o">🌊</div><div class="tip-text">当前涨潮中，满潮前后1小时是黄金窗口，近岸作钓效果好。</div></div>
+</div>
+
+</div>
+
+<div class="tabbar">
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>渔获</span></div>
+  <div class="tab active"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>天时</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>钓点</span></div>
+  <div class="tab"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>我的</span></div>
+</div>
+
+</body>
+</html>

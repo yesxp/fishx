@@ -1,335 +1,356 @@
 <template>
-  <view class="page">
+  <view class="page-detail">
+    <!-- Header -->
     <view class="header">
-      <view class="header-left">
-        <button class="btn-back" @click="goBack">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#060607" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-      </view>
-      <text class="title">Catch Detail</text>
-      <view class="header-right">
-        <button class="btn-share" @click="handleShare">Share</button>
+      <view class="header-top">
+        <view class="header-back" @tap="goBack">
+          <text class="back-icon">←</text>
+        </view>
+        <text class="header-title">渔获详情</text>
+        <view style="width: 36px;" />
       </view>
     </view>
 
-    <scroll-view scroll-y class="scroll-content">
-      <!-- Hero image -->
-      <view class="dc-card hero-photo" :style="{ background: bgColor }">
-        <text class="hero-emoji">{{ detail.fishEmoji }}</text>
-      </view>
-
-      <!-- Info card -->
-      <view class="dc-card info-card">
-        <view class="info-header">
-          <view class="species-badge">
-            <text class="badge-emoji">{{ detail.fishEmoji }}</text>
-            <text class="badge-name">{{ detail.fishName }}</text>
-          </view>
-          <text class="meta-time">{{ formatTime(detail.time) }}</text>
-        </view>
-        <view class="info-grid">
-          <view class="info-row">
-            <svg class="row-icon" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <text class="row-text">{{ detail.location }}</text>
-          </view>
-          <view class="info-row">
-            <svg class="row-icon" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
-            <text class="row-text">{{ detail.weather }} · {{ detail.temperature }}</text>
-          </view>
-        </view>
-      </view>
-
-      <!-- Actions -->
-      <view class="dc-card action-card">
-        <view class="action-item" @click="handleLike">
-          <text class="action-icon" :class="{ liked: isLiked }">{{ isLiked ? '❤️' : '🤍' }}</text>
-          <text class="action-count" :class="{ liked: isLiked }">{{ likeCount }}</text>
-        </view>
-        <view class="action-sep"></view>
-        <view class="action-item" @click="handleShare">
-          <svg class="row-icon" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          <text class="action-text">Share</text>
-        </view>
-      </view>
-
-      <!-- Comments -->
-      <CommentList
-        :comments="comments"
-        @submit="handleComment"
+    <!-- Content -->
+    <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
+      <!-- Catch Card (full width) -->
+      <CatchCard
+        :nickname="detail.nickname"
+        :time="detail.time"
+        :fish-name="detail.fishName"
+        fish-emoji="🐟"
+        :liked="detail.liked"
+        :like-count="detail.likeCount"
+        :comment-count="detail.commentCount"
+        :content="detail.content"
+        :tags="detail.tags"
       />
+
+      <!-- Comments Section -->
+      <view class="comments-section">
+        <view class="comments-header">
+          <text class="comments-title">评论 ({{ comments.length }})</text>
+        </view>
+
+        <view v-if="comments.length === 0" class="empty-comments">
+          <text class="empty-icon">💬</text>
+          <text class="empty-text">暂无评论，快来抢沙发！</text>
+        </view>
+
+        <view v-else class="comment-list">
+          <view v-for="comment in comments" :key="comment.id" class="comment-item">
+            <view class="comment-avatar">
+              <text class="comment-avatar-text">{{ comment.nickname.charAt(0) }}</text>
+            </view>
+            <view class="comment-body">
+              <view class="comment-header">
+                <text class="comment-nick">{{ comment.nickname }}</text>
+                <text class="comment-time">{{ comment.time }}</text>
+              </view>
+              <text class="comment-content">{{ comment.content }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view style="height: 120rpx;" />
     </scroll-view>
+
+    <!-- Comment Input -->
+    <view class="comment-bar">
+      <input
+        v-model="commentText"
+        class="comment-input"
+        placeholder="写评论..."
+        confirm-type="send"
+        @confirm="onSendComment"
+      />
+      <view
+        class="comment-send"
+        :class="{ 'comment-send--active': commentText.trim() }"
+        @tap="onSendComment"
+      >
+        <text class="send-text">发送</text>
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { toggleLike, getComments, addComment, type Comment } from '@/api/interact'
-import CommentList from '@/components/CommentList.vue'
+import { ref, reactive } from 'vue'
+import CatchCard from '@/components/CatchCard.vue'
+import { getComments, addComment } from '@/api/interact'
 
-const detail = ref({
-  id: '',
-  fishName: 'Crucian',
-  fishEmoji: '🐟',
-  imagePath: '',
-  location: 'Chongming East Beach',
-  weather: 'Cloudy',
-  temperature: '26°',
-  time: new Date().toISOString()
+const detail = reactive({
+  nickname: '李钓友',
+  time: '2小时前 · 千岛湖',
+  fishName: '3.2斤 鲫鱼',
+  liked: true,
+  likeCount: 128,
+  commentCount: 32,
+  content: '今天手感不错，连杆了好几条！这款蓝鲫饵料真的好用。',
+  tags: [
+    { text: '鲫鱼' },
+    { text: '野钓', type: 'green' as const },
+    { text: '战报', type: 'orange' as const },
+  ],
 })
 
-const bgColor = '#F2F3F5'
-const isLiked = ref(false)
-const likeCount = ref(42)
-const comments = ref<Comment[]>([])
+interface Comment {
+  id: string
+  nickname: string
+  content: string
+  time: string
+}
 
-const pages = getCurrentPages()
-const currentPage = pages[pages.length - 1] as any
-const catchId = currentPage?.options?.id || '1'
+const comments = ref<Comment[]>([])
+const commentText = ref('')
+
+async function loadComments() {
+  const res = await getComments('1')
+  if (res.code === 0) {
+    comments.value = res.data.map((c: any) => ({
+      id: c.id,
+      nickname: c.nickname,
+      content: c.content,
+      time: formatTime(c.time),
+    }))
+  }
+}
+
+function formatTime(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 60) return `${mins}分钟前`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `${hours}小时前`
+  return `${Math.floor(hours / 24)}天前`
+}
+
+async function onSendComment() {
+  const text = commentText.value.trim()
+  if (!text) return
+
+  const res = await addComment('1', text, 'dev_user')
+  if (res.code === 0) {
+    comments.value.push({
+      id: res.data.id,
+      nickname: res.data.nickname,
+      content: res.data.content,
+      time: '刚刚',
+    })
+    commentText.value = ''
+    detail.commentCount++
+  }
+}
 
 function goBack() {
   uni.navigateBack()
 }
 
-async function handleLike() {
-  const res = await toggleLike(catchId, 'current_user')
-  if (res.code === 0) {
-    isLiked.value = res.data.liked
-    likeCount.value = res.data.count
-  }
-}
-
-async function handleComment(content: string) {
-  const res = await addComment(catchId, content, 'current_user')
-  if (res.code === 0) {
-    comments.value.unshift(res.data)
-    uni.showToast({ title: 'Posted', icon: 'success' })
-  }
-}
-
-function handleShare() {
-  // #ifdef H5
-  uni.setClipboardData({
-    data: window.location.href,
-    success: () => uni.showToast({ title: 'Copied', icon: 'success' })
-  })
-  // #endif
-  // #ifdef MP-WEIXIN
-  uni.showToast({ title: 'Tap top-right to share', icon: 'none' })
-  // #endif
-}
-
-function formatTime(t: string) {
-  if (!t) return ''
-  const date = new Date(t)
-  return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`
-}
-
-onMounted(async () => {
-  const res = await getComments(catchId)
-  if (res.code === 0) {
-    comments.value = res.data
-  }
-})
+// Load on mount
+loadComments()
 </script>
 
-<style scoped>
-.page {
+<style scoped lang="scss">
+$bg-page: #F2F3F5;
+$bg-card: #FFFFFF;
+$brand: #5865F2;
+$divider: #E3E5E8;
+$text-primary: #060607;
+$text-secondary: #4E5058;
+$text-muted: #80848E;
+
+.page-detail {
   min-height: 100vh;
-  background: #F2F3F5;
+  background: $bg-page;
   display: flex;
   flex-direction: column;
 }
 
-/* ===== Header ===== */
+/* Header */
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16rpx 16rpx;
-  background: #FFFFFF;
-  border-bottom: 1rpx solid #E3E5E8;
   position: sticky;
   top: 0;
   z-index: 100;
+  background: $bg-card;
+  border-bottom: 1px solid $divider;
+  padding: 12px 16px;
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-}
-
-.btn-back {
-  width: 52rpx;
-  height: 52rpx;
-  border-radius: 50%;
-  background: transparent;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-.btn-back:active {
-  background: rgba(79,84,92,0.08);
-}
-.btn-back svg {
-  width: 24rpx;
-  height: 24rpx;
-}
-
-.title {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #060607;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-}
-
-.btn-share {
-  padding: 10rpx 24rpx;
-  border-radius: 9999px;
-  background: transparent;
-  color: #5865F2;
-  font-size: 26rpx;
-  font-weight: 600;
-  border: none;
-  height: auto;
-  line-height: 1.4;
-  transition: background 0.15s;
-}
-.btn-share:active {
-  background: rgba(88,101,242,0.08);
-}
-
-/* ===== Scroll ===== */
-.scroll-content {
-  flex: 1;
-}
-
-/* ===== Discord Card ===== */
-.dc-card {
-  background: #FFFFFF;
-  border-radius: 16rpx;
-  margin: 12rpx 20rpx;
-}
-
-/* ===== Hero Photo ===== */
-.hero-photo {
-  width: 100%;
-  height: 400rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hero-emoji {
-  font-size: 100rpx;
-}
-
-/* ===== Info ===== */
-.info-card {
-  padding: 24rpx;
-}
-
-.info-header {
+.header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20rpx;
 }
 
-.species-badge {
+.header-back {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #F2F3F5;
   display: flex;
   align-items: center;
-  gap: 6rpx;
-  padding: 4rpx 16rpx;
-  border-radius: 9999px;
-  background: rgba(88,101,242,0.08);
+  justify-content: center;
+  cursor: pointer;
 }
 
-.badge-emoji {
-  font-size: 22rpx;
+.back-icon {
+  font-size: 20px;
+  color: $text-secondary;
 }
 
-.badge-name {
-  font-size: 24rpx;
+.header-title {
+  font-size: 16px;
   font-weight: 600;
-  color: #5865F2;
+  color: $text-primary;
 }
 
-.meta-time {
-  font-size: 22rpx;
-  color: #80848E;
+/* Content */
+.content {
+  flex: 1;
+  padding: 12px;
 }
 
-.info-grid {
+/* Comments */
+.comments-section {
+  background: $bg-card;
+  border-radius: 12px;
+  border: 1px solid $divider;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.comments-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid $divider;
+}
+
+.comments-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.empty-comments {
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.empty-text {
+  font-size: 13px;
+  color: $text-muted;
+}
+
+.comment-list {
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
 }
 
-.info-row {
+.comment-item {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid $divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.comment-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: $divider;
   display: flex;
   align-items: center;
-  gap: 8rpx;
-}
-
-.row-icon {
-  width: 20rpx;
-  height: 20rpx;
+  justify-content: center;
   flex-shrink: 0;
 }
 
-.row-text {
-  font-size: 26rpx;
-  color: #060607;
-}
-
-/* ===== Actions ===== */
-.action-card {
-  display: flex;
-  align-items: center;
-  padding: 16rpx 24rpx;
-}
-
-.action-item {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-  cursor: pointer;
-}
-.action-item:active {
-  opacity: 0.7;
-}
-
-.action-icon {
-  font-size: 28rpx;
-}
-.action-icon.liked {
-  transform: scale(1.15);
-}
-
-.action-count {
-  font-size: 26rpx;
+.comment-avatar-text {
+  font-size: 12px;
   font-weight: 600;
-  color: #4E5058;
-}
-.action-count.liked {
-  color: #F23F43;
+  color: $text-muted;
 }
 
-.action-sep {
-  width: 1px;
-  height: 28rpx;
-  background: #E3E5E8;
-  margin: 0 24rpx;
+.comment-body {
+  flex: 1;
+  min-width: 0;
 }
 
-.action-text {
-  font-size: 26rpx;
-  color: #4E5058;
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.comment-nick {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.comment-time {
+  font-size: 11px;
+  color: $text-muted;
+}
+
+.comment-content {
+  font-size: 13px;
+  color: $text-secondary;
+  line-height: 1.5;
+}
+
+/* Comment Bar */
+.comment-bar {
+  position: sticky;
+  bottom: 0;
+  background: $bg-card;
+  border-top: 1px solid $divider;
+  padding: 8px 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.comment-input {
+  flex: 1;
+  height: 36px;
+  padding: 0 12px;
+  background: #F2F3F5;
+  border-radius: 100px;
+  font-size: 14px;
+  color: $text-primary;
+}
+
+.comment-send {
+  padding: 8px 16px;
+  background: $divider;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.comment-send--active {
+  background: $brand;
+}
+
+.send-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: $text-muted;
+}
+
+.comment-send--active .send-text {
+  color: #fff;
 }
 </style>

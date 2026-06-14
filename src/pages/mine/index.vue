@@ -1,368 +1,313 @@
 <template>
-  <view class="page">
-    <view class="topbar">
-      <view class="topbar-inner">
-        <text class="brand-name">我的</text>
+  <view class="page-mine">
+    <!-- Header -->
+    <view class="header">
+      <view class="header-top">
+        <view class="header-logo">
+          <view class="logo-icon">👤</view>
+          <view>
+            <text class="header-title">我的</text>
+            <text class="header-subtitle">个人中心</text>
+          </view>
+        </view>
+        <view class="header-actions">
+          <view class="header-btn" @tap="goSettings">
+            <text class="icon-text">⚙️</text>
+          </view>
+        </view>
       </view>
     </view>
 
-    <scroll-view scroll-y class="scroll-content">
-      <!-- Profile card -->
-      <view class="dc-card profile-card">
-        <view class="avatar" @click="handleAvatarClick">
-          <text class="avatar-text">{{ userInfo?.nickname?.[0] || '?' }}</text>
-          <view class="avatar-status" :class="isLoggedIn ? 'online' : ''"></view>
+    <!-- Content -->
+    <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
+      <!-- Profile Header -->
+      <view class="profile-header">
+        <view class="profile-avatar">
+          <text class="profile-avatar-text">{{ userInitial }}</text>
         </view>
-        <view class="profile-info">
-          <text class="nickname">{{ userInfo?.nickname || 'Sign in' }}</text>
-          <text class="user-id" v-if="userInfo?.id">ID: {{ userInfo.id }}</text>
-        </view>
-        <view class="profile-edit" @click="handleAvatarClick" v-if="isLoggedIn">
-          <text class="edit-text">Edit</text>
-        </view>
-      </view>
-
-      <!-- Stats: Discord inset list -->
-      <view class="dc-card stats-list">
-        <view class="list-row" @click="goToMyCatch">
-          <text class="stat-value">{{ myCatchCount }}</text>
-          <text class="stat-label">Total Catches</text>
-        </view>
-        <view class="stat-sep"></view>
-        <view class="list-row">
-          <text class="stat-value">{{ mySpotCount }}</text>
-          <text class="stat-label">Spots</text>
-        </view>
-        <view class="stat-sep"></view>
-        <view class="list-row">
-          <text class="stat-value">{{ topFish }}</text>
-          <text class="stat-label">Top Fish</text>
-        </view>
-      </view>
-
-      <!-- Feature list: Discord setting-style list -->
-      <view class="dc-card settings-list">
-        <view class="list-item" @click="goToMyCatch">
-          <text class="item-label">My Catches</text>
-          <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </view>
-        <view class="list-sep"></view>
-        <view class="list-item" @click="goToMySpot">
-          <text class="item-label">My Spots</text>
-          <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </view>
-        <view class="list-sep"></view>
-        <view class="list-item" @click="goToCollection">
-          <text class="item-label">Favorites</text>
-          <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </view>
-      </view>
-
-      <!-- Settings list -->
-      <view class="dc-card settings-list">
-        <view class="list-item" @click="handleLocationAuth">
-          <text class="item-label">Location Access</text>
-          <view class="item-right">
-            <text class="item-status">{{ locationAuth ? 'Granted' : 'Denied' }}</text>
-            <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <text class="profile-name">{{ nickname }}</text>
+        <text class="profile-bio">热爱生活，热爱钓鱼 🎣</text>
+        <view class="profile-stats">
+          <view class="profile-stat">
+            <text class="profile-stat-value">128</text>
+            <text class="profile-stat-label">渔获</text>
+          </view>
+          <view class="profile-stat">
+            <text class="profile-stat-value">2.4k</text>
+            <text class="profile-stat-label">获赞</text>
+          </view>
+          <view class="profile-stat">
+            <text class="profile-stat-value">86</text>
+            <text class="profile-stat-label">关注</text>
           </view>
         </view>
-        <view class="list-sep"></view>
-        <view class="list-item" @click="handleNotification">
-          <text class="item-label">Notifications</text>
-          <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </view>
-        <view class="list-sep"></view>
-        <view class="list-item" @click="handleClearCache">
-          <text class="item-label">Clear Cache</text>
-          <view class="item-right">
-            <text class="item-status">{{ cacheSize }}</text>
-            <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </view>
+
+      <!-- Menu 1: Data -->
+      <view class="profile-menu">
+        <view class="profile-menu-item" v-for="item in menuItems1" :key="item.text" @tap="onMenuTap(item)">
+          <view class="profile-menu-icon" :class="'profile-menu-icon--' + item.color">
+            <text>{{ item.icon }}</text>
           </view>
-        </view>
-        <view class="list-sep"></view>
-        <view class="list-item" @click="goToAbout">
-          <text class="item-label">About</text>
-          <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          <text class="profile-menu-text">{{ item.text }}</text>
+          <text class="profile-menu-arrow">›</text>
         </view>
       </view>
 
-      <!-- Danger zone: logout -->
-      <view class="danger-zone" v-if="isLoggedIn">
-        <button class="danger-btn" @click="handleLogout">Sign Out</button>
+      <!-- Menu 2: System -->
+      <view class="profile-menu">
+        <view class="profile-menu-item" v-for="item in menuItems2" :key="item.text" @tap="onMenuTap(item)">
+          <view class="profile-menu-icon" :class="'profile-menu-icon--' + item.color">
+            <text>{{ item.icon }}</text>
+          </view>
+          <text class="profile-menu-text">{{ item.text }}</text>
+          <text class="profile-menu-arrow">›</text>
+        </view>
       </view>
 
-      <view class="spacer"></view>
+      <view style="height: 120rpx;" />
     </scroll-view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useUserStore } from '@/stores/user'
-import { useCatchStore } from '@/stores/catch'
 
 const userStore = useUserStore()
-const catchStore = useCatchStore()
 
-const { userInfo, isLoggedIn } = userStore
-const { catchList } = catchStore
+const nickname = computed(() => userStore.userInfo?.nickname || '钓鱼达人')
+const userInitial = computed(() => nickname.value?.charAt(0) || 'U')
 
-const myCatchCount = computed(() => catchList.value.length)
-const mySpotCount = ref(8)
-const topFish = ref('Crucian')
-const locationAuth = ref(false)
-const cacheSize = ref('2.3MB')
+const menuItems1 = [
+  { icon: '📷', text: '我的渔获', color: 'blue' },
+  { icon: '❤️', text: '我的收藏', color: 'green' },
+  { icon: '📍', text: '常去钓点', color: 'orange' },
+  { icon: '📊', text: '钓鱼统计', color: 'blue' },
+]
 
-function handleAvatarClick() {
-  if (!isLoggedIn) uni.navigateTo({ url: '/pages/login/index' })
-}
-function goToMyCatch() { uni.showToast({ title: 'Coming soon', icon: 'none' }) }
-function goToMySpot() { uni.showToast({ title: 'Coming soon', icon: 'none' }) }
-function goToCollection() { uni.showToast({ title: 'Coming soon', icon: 'none' }) }
-function handleLocationAuth() {
-  uni.authorize({
-    scope: 'scope.userLocation',
-    success: () => { locationAuth.value = true; uni.showToast({ title: 'Granted', icon: 'success' }) },
-    fail: () => { locationAuth.value = false; uni.showToast({ title: 'Deny in settings', icon: 'none' }) }
-  })
-}
-function handleNotification() { uni.showToast({ title: 'Coming soon', icon: 'none' }) }
-function handleClearCache() {
-  uni.showModal({
-    title: 'Clear Cache', content: 'Are you sure?',
-    success: (res) => { if (res.confirm) { uni.clearStorageSync(); cacheSize.value = '0B'; uni.showToast({ title: 'Cleared', icon: 'success' }) } }
-  })
-}
-function goToAbout() { uni.showToast({ title: 'Coming soon', icon: 'none' }) }
-function handleLogout() {
-  uni.showModal({
-    title: 'Sign Out', content: 'Are you sure?',
-    success: (res) => { if (res.confirm) { userStore.logout(); uni.reLaunch({ url: '/pages/index/index' }) } }
-  })
+const menuItems2 = [
+  { icon: '⚙️', text: '设置', color: 'blue' },
+  { icon: '💬', text: '意见反馈', color: 'orange' },
+  { icon: '📖', text: '关于我们', color: 'green' },
+]
+
+function goSettings() {
+  // TODO: navigate to settings
 }
 
-onMounted(() => {
-  uni.getSetting({ success: (res) => { locationAuth.value = !!res.authSetting['scope.userLocation'] } })
-  catchStore.loadList(true)
-})
+function onMenuTap(item: any) {
+  uni.showToast({ title: item.text, icon: 'none' })
+}
 </script>
 
-<style scoped>
-.page {
+<style scoped lang="scss">
+$bg-page: #F2F3F5;
+$bg-card: #FFFFFF;
+$brand: #5865F2;
+$divider: #E3E5E8;
+$text-primary: #060607;
+$text-secondary: #4E5058;
+$text-muted: #80848E;
+
+.page-mine {
   min-height: 100vh;
-  background: #F2F3F5;
-  display: flex;
-  flex-direction: column;
+  background: $bg-page;
 }
 
-/* ===== Top Bar ===== */
-.topbar {
-  background: #FFFFFF;
-  padding: 16rpx 24rpx;
-  border-bottom: 1rpx solid #E3E5E8;
+/* Header */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: $bg-card;
+  border-bottom: 1px solid $divider;
+  padding: 12px 16px;
 }
 
-.topbar-inner {
-  display: flex;
-  align-items: center;
-}
-
-.brand-name {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #060607;
-}
-
-.scroll-content {
-  flex: 1;
-  padding: 20rpx 20rpx 40rpx;
-}
-
-/* ===== Discord Card ===== */
-.dc-card {
-  background: #FFFFFF;
-  border-radius: 16rpx;
-  margin-bottom: 12rpx;
-}
-
-/* ===== Profile ===== */
-.profile-card {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  padding: 24rpx 20rpx;
-}
-
-.avatar {
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: 50%;
-  background: #5865F2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-}
-
-.avatar-status {
-  position: absolute;
-  bottom: -2rpx;
-  right: -2rpx;
-  width: 20rpx;
-  height: 20rpx;
-  border-radius: 50%;
-  background: #80848E;
-  border: 3rpx solid #FFFFFF;
-}
-.avatar-status.online {
-  background: #23A55A;
-}
-
-.avatar-text {
-  font-size: 36rpx;
-  font-weight: 600;
-  color: #FFFFFF;
-}
-
-.profile-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2rpx;
-}
-
-.nickname {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #060607;
-}
-
-.user-id {
-  font-size: 22rpx;
-  color: #80848E;
-}
-
-.profile-edit {
-  padding: 8rpx 24rpx;
-  border-radius: 9999px;
-  background: #5865F2;
-  transition: background 0.15s;
-}
-.profile-edit:active {
-  background: #4752C4;
-}
-
-.edit-text {
-  font-size: 24rpx;
-  font-weight: 600;
-  color: #FFFFFF;
-}
-
-/* ===== Stats ===== */
-.stats-list {
-  overflow: hidden;
-  padding: 0;
-}
-
-.stats-list .list-row {
-  flex: 1;
-  text-align: center;
-  padding: 24rpx 16rpx;
-}
-
-.stat-value {
-  font-size: 36rpx;
-  font-weight: 700;
-  color: #5865F2;
-  display: block;
-  font-variant-numeric: tabular-nums;
-}
-
-.stat-label {
-  font-size: 22rpx;
-  color: #80848E;
-  margin-top: 4rpx;
-  display: block;
-  font-weight: 500;
-}
-
-.stat-sep {
-  width: 1px;
-  height: 48rpx;
-  background: #E3E5E8;
-  align-self: center;
-}
-
-/* ===== Settings list ===== */
-.settings-list {
-  overflow: hidden;
-  padding: 0;
-}
-
-.list-item {
+.header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18rpx 24rpx;
-  transition: background 0.15s;
-}
-.list-item:active {
-  background: rgba(79,84,92,0.04);
 }
 
-.item-label {
-  font-size: 26rpx;
-  color: #060607;
-  font-weight: 500;
-}
-
-.item-right {
+.header-logo {
   display: flex;
   align-items: center;
-  gap: 6rpx;
+  gap: 10px;
 }
 
-.item-status {
-  font-size: 24rpx;
-  color: #80848E;
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: $brand;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
 }
 
-.item-arrow {
-  width: 20rpx;
-  height: 20rpx;
+.header-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: $text-primary;
+  display: block;
+  line-height: 1.2;
+}
+
+.header-subtitle {
+  font-size: 12px;
+  color: $text-muted;
+  display: block;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.header-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #F2F3F5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-text {
+  font-size: 16px;
+}
+
+/* Content */
+.content {
+  padding: 0 0 0 0;
+  height: calc(100vh - 60px);
+}
+
+/* Profile Header */
+.profile-header {
+  text-align: center;
+  padding: 32px 16px 24px;
+  background: $bg-card;
+  border-bottom: 1px solid $divider;
+  margin-bottom: 12px;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: $divider;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-avatar-text {
+  font-size: 28px;
+  font-weight: 600;
+  color: $text-muted;
+}
+
+.profile-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.profile-bio {
+  font-size: 13px;
+  color: $text-muted;
+  display: block;
+}
+
+.profile-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 16px;
+}
+
+.profile-stat {
+  text-align: center;
+}
+
+.profile-stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: $text-primary;
+  display: block;
+}
+
+.profile-stat-label {
+  font-size: 12px;
+  color: $text-muted;
+  display: block;
+}
+
+/* Profile Menu */
+.profile-menu {
+  background: $bg-card;
+  border-radius: 12px;
+  margin: 0 12px 12px;
+  border: 1px solid $divider;
+  overflow: hidden;
+}
+
+.profile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid $divider;
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:active {
+    background: #F2F3F5;
+  }
+}
+
+.profile-menu-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
   flex-shrink: 0;
 }
 
-.list-sep {
-  height: 1px;
-  background: #E3E5E8;
-  margin-left: 24rpx;
+.profile-menu-icon--blue {
+  background: rgba($brand, 0.1);
 }
 
-/* ===== Danger zone ===== */
-.danger-zone {
-  margin-top: 12rpx;
+.profile-menu-icon--green {
+  background: rgba(#23A559, 0.1);
 }
 
-.danger-btn {
-  width: 100%;
-  height: 80rpx;
-  border-radius: 9999px;
-  background: #FFFFFF;
-  color: #F23F43;
-  font-size: 26rpx;
-  font-weight: 600;
-  border: none;
-  box-shadow: none;
-  transition: background 0.15s;
-}
-.danger-btn:active {
-  background: #F2F3F5;
+.profile-menu-icon--orange {
+  background: rgba(#F0B232, 0.1);
 }
 
-.spacer {
-  height: 40rpx;
+.profile-menu-text {
+  flex: 1;
+  font-size: 14px;
+  color: $text-primary;
+}
+
+.profile-menu-arrow {
+  font-size: 14px;
+  color: $text-muted;
 }
 </style>

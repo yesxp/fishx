@@ -1,251 +1,277 @@
 <template>
-  <view class="page">
-    <view class="topbar">
-      <view class="topbar-inner">
-        <text class="brand-name">钓点</text>
-        <view class="topbar-status">
-          <text class="status-sub">Nearby Spots</text>
+  <view class="page-map">
+    <!-- Header -->
+    <view class="header">
+      <view class="header-top">
+        <view class="header-logo">
+          <view class="logo-icon">📍</view>
+          <view>
+            <text class="header-title">钓点</text>
+            <text class="header-subtitle">钓点·钓场</text>
+          </view>
         </view>
-        <view class="topbar-actions">
-          <view class="icon-btn" @click="locate">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        <view class="header-actions">
+          <view class="header-btn">
+            <text class="icon-text">🔍</text>
+          </view>
+          <view class="header-btn">
+            <text class="icon-text">🔔</text>
           </view>
         </view>
       </view>
     </view>
 
-    <!-- Search bar: Discord input style -->
-    <view class="search-bar">
-      <view class="search-wrap">
-        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input class="search-input" v-model="keyword" placeholder="Search spots..." @confirm="handleSearch" />
-      </view>
-    </view>
-
-    <!-- Map -->
-    <view class="map-container">
-      <view class="map-viewport">
-        <view class="map-grid"></view>
-        <view
-          class="map-marker"
-          v-for="spot in spotList"
-          :key="spot.id"
-          :style="{ left: getMarkerX(spot) + '%', top: getMarkerY(spot) + '%' }"
-          @click="selectedSpot = spot"
-        >
-          <view class="marker-pin" :class="{ selected: selectedSpot?.id === spot.id }"></view>
-        </view>
-        <view class="map-center">
-          <view class="center-dot"></view>
+    <!-- Content -->
+    <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
+      <!-- Map Placeholder -->
+      <view class="map-placeholder">
+        <view class="map-inner">
+          <text class="map-pin">📍</text>
+          <text class="map-label">地图区域</text>
         </view>
       </view>
 
-      <!-- Floating spot card -->
-      <view class="spot-float" v-if="selectedSpot">
+      <!-- Tags -->
+      <scroll-view scroll-x class="tags-scroll" :show-scrollbar="false">
+        <view class="tags-inner">
+          <view
+            v-for="(tag, i) in tags"
+            :key="i"
+            class="tag"
+            :class="{ 'tag--active': activeTag === i }"
+            @tap="activeTag = i"
+          >
+            <text class="tag-text">{{ tag }}</text>
+          </view>
+        </view>
+      </scroll-view>
+
+      <!-- Spot Cards -->
+      <view class="spot-list">
         <SpotCard
-          :id="selectedSpot.id"
-          :name="selectedSpot.name"
-          :type="selectedSpot.type"
-          :rating="selectedSpot.rating"
-          :catchCount="selectedSpot.catchCount"
-          :fishTypes="selectedSpot.fishTypes"
+          v-for="spot in spots"
+          :key="spot.name"
+          :name="spot.name"
+          :type="spot.type"
+          :distance="spot.distance"
+          :rating="spot.rating"
+          :emoji="spot.emoji"
+          :is-paid="spot.isPaid"
+          :is-pit="spot.isPit"
+          @tap="onSpotTap(spot)"
         />
       </view>
-    </view>
+
+      <view style="height: 120rpx;" />
+    </scroll-view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useSpotStore } from '@/stores/spot'
+import { ref } from 'vue'
 import SpotCard from '@/components/SpotCard.vue'
 
-const spotStore = useSpotStore()
-const { spotList } = storeToRefs(spotStore)
+const tags = ['全部', '路亚', '台钓', '海钓']
+const activeTag = ref(0)
 
-const keyword = ref('')
-const selectedSpot = ref<any>(null)
+const spots = [
+  {
+    name: '西湖钓点',
+    type: 'lake',
+    distance: '2.8km',
+    rating: 4.8,
+    emoji: '🏞️',
+    isPaid: false,
+    isPit: false,
+  },
+  {
+    name: '老王钓场',
+    type: 'pond',
+    distance: '5.1km',
+    rating: 4.5,
+    emoji: '🐟',
+    isPaid: true,
+    isPit: true,
+  },
+  {
+    name: '千岛湖大坝',
+    type: 'wild',
+    distance: '12km',
+    rating: 4.9,
+    emoji: '⛰️',
+    isPaid: false,
+    isPit: false,
+  },
+  {
+    name: '龙王塘',
+    type: 'pond',
+    distance: '8.3km',
+    rating: 4.2,
+    emoji: '🎣',
+    isPaid: true,
+    isPit: true,
+  },
+]
 
-function getMarkerX(spot: any) {
-  return 20 + (spot.lng - 120.9) * 50
+function onSpotTap(spot: any) {
+  uni.navigateTo({ url: `/pages/map/detail?id=${spot.name}` })
 }
-
-function getMarkerY(spot: any) {
-  return 20 + (31.5 - spot.lat) * 80
-}
-
-function handleSearch() {
-  if (!keyword.value) { spotStore.loadList(); return }
-  spotStore.spotList = spotList.filter(s => s.name.includes(keyword.value) || s.type.includes(keyword.value))
-}
-
-function locate() {
-  uni.getLocation({
-    type: 'wgs84',
-    success: (res) => {
-      uni.showToast({ title: `${res.latitude.toFixed(2)}, ${res.longitude.toFixed(2)}`, icon: 'none' })
-    }
-  })
-}
-
-onMounted(() => { spotStore.loadList() })
 </script>
 
-<style scoped>
-.page {
+<style scoped lang="scss">
+$bg-page: #F2F3F5;
+$bg-card: #FFFFFF;
+$brand: #5865F2;
+$divider: #E3E5E8;
+$text-primary: #060607;
+$text-secondary: #4E5058;
+$text-muted: #80848E;
+$tag-bg: #F2F3F5;
+
+.page-map {
   min-height: 100vh;
-  background: #F2F3F5;
-  display: flex;
-  flex-direction: column;
+  background: $bg-page;
 }
 
-/* ===== Top Bar ===== */
-.topbar {
-  background: #FFFFFF;
-  padding: 16rpx 24rpx;
-  border-bottom: 1rpx solid #E3E5E8;
+/* Header */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: $bg-card;
+  border-bottom: 1px solid $divider;
+  padding: 12px 16px;
 }
 
-.topbar-inner {
+.header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.brand-name {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #060607;
-}
-
-.topbar-status {
+.header-logo {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
-.status-sub {
-  font-size: 22rpx;
-  color: #4E5058;
-}
-
-.icon-btn {
-  width: 52rpx;
-  height: 52rpx;
-  border-radius: 50%;
-  background: rgba(88,101,242,0.08);
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: $brand;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s;
-}
-.icon-btn:active {
-  background: rgba(88,101,242,0.16);
-}
-.icon-btn svg {
-  width: 24rpx;
-  height: 24rpx;
+  font-size: 18px;
 }
 
-/* ===== Search ===== */
-.search-bar {
-  padding: 12rpx 20rpx;
-  background: #FFFFFF;
-  border-bottom: 1rpx solid #E3E5E8;
+.header-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: $text-primary;
+  display: block;
+  line-height: 1.2;
 }
 
-.search-wrap {
+.header-subtitle {
+  font-size: 12px;
+  color: $text-muted;
+  display: block;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.header-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: $tag-bg;
   display: flex;
   align-items: center;
-  gap: 10rpx;
-  background: #E3E5E8;
-  border-radius: 8rpx;
-  padding: 14rpx 20rpx;
+  justify-content: center;
 }
 
-.search-icon {
-  width: 22rpx;
-  height: 22rpx;
+.icon-text {
+  font-size: 16px;
+}
+
+/* Content */
+.content {
+  padding: 12px;
+  height: calc(100vh - 60px);
+}
+
+/* Map Placeholder */
+.map-placeholder {
+  height: 180px;
+  background: linear-gradient(135deg, #E3F2FD 0%, #B3E5FC 50%, #E8F5E9 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  border: 1px solid $divider;
+}
+
+.map-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-pin {
+  font-size: 40px;
+}
+
+.map-label {
+  font-size: 14px;
+  color: $text-muted;
+}
+
+/* Tags */
+.tags-scroll {
+  white-space: nowrap;
+  margin-bottom: 12px;
+}
+
+.tags-inner {
+  display: flex;
+  gap: 8px;
+}
+
+.tag {
   flex-shrink: 0;
-}
-
-.search-input {
-  flex: 1;
-  font-size: 28rpx;
-  color: #060607;
-  background: transparent;
-  border: none;
-}
-
-.search-input::placeholder {
-  color: #80848E;
-}
-
-/* ===== Map ===== */
-.map-container {
-  flex: 1;
-  position: relative;
-}
-
-.map-viewport {
-  width: 100%;
-  height: 100%;
-  background: #E8F5E9;
-  position: relative;
-  overflow: hidden;
-}
-
-.map-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
-  background-size: 40rpx 40rpx;
-}
-
-.map-marker {
-  position: absolute;
-  transform: translate(-50%, -100%);
-  z-index: 10;
-}
-
-.marker-pin {
-  width: 36rpx;
-  height: 36rpx;
-  border-radius: 50%;
-  background: #FFFFFF;
-  border: 3rpx solid #5865F2;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: $tag-bg;
+  cursor: pointer;
   transition: all 0.15s;
 }
-.marker-pin.selected {
-  background: #5865F2;
-  transform: scale(1.15);
+
+.tag--active {
+  background: $bg-card;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
-.map-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 5;
+.tag-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-secondary;
 }
 
-.center-dot {
-  width: 16rpx;
-  height: 16rpx;
-  border-radius: 50%;
-  background: #5865F2;
-  box-shadow: 0 0 0 6rpx rgba(88,101,242,0.2);
+.tag--active .tag-text {
+  color: $text-primary;
 }
 
-/* ===== Floating spot card ===== */
-.spot-float {
-  position: absolute;
-  bottom: 100rpx;
-  left: 20rpx;
-  right: 20rpx;
-  z-index: 20;
+/* Spot List */
+.spot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 </style>

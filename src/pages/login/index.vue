@@ -1,366 +1,414 @@
 <template>
-  <view class="page">
-    <view class="logo-area">
-      <view class="logo-icon">
-        <text class="logo-emoji">🎣</text>
+  <view class="page-login">
+    <!-- Logo & Branding -->
+    <view class="login-brand">
+      <view class="login-logo">
+        <text class="login-logo-text">🐟</text>
       </view>
-      <text class="logo-title">鱼渔娱</text>
-      <text class="logo-sub">Lightweight fishing tool for anglers</text>
+      <text class="login-title">鱼渔娱</text>
+      <text class="login-subtitle">钓鱼人的一站式轻量工具</text>
     </view>
 
-    <view class="auth-area">
-      <!-- Tab switcher: Discord segmented control -->
-      <view class="auth-tabs">
-        <view
-          class="tab"
-          :class="{ active: loginType === 'wx' }"
-          @click="loginType = 'wx'"
-        >
-          <text class="tab-text">WeChat</text>
-        </view>
-        <view
-          class="tab"
-          :class="{ active: loginType === 'phone' }"
-          @click="loginType = 'phone'"
-        >
-          <text class="tab-text">Phone</text>
-        </view>
-      </view>
-
-      <!-- WeChat login -->
-      <view class="form-panel" v-if="loginType === 'wx'">
-        <button class="wx-btn" @click="handleWxLogin">
-          <text class="wx-icon">💬</text>
-          <text class="wx-label">Continue with WeChat</text>
-        </button>
-        <text class="form-hint">By continuing, you agree to the Terms of Service and Privacy Policy</text>
-      </view>
-
-      <!-- Phone login -->
-      <view class="form-panel" v-else>
+    <!-- Login Methods -->
+    <view class="login-form">
+      <!-- Phone Login -->
+      <view class="login-section">
         <view class="input-group">
-          <text class="input-label">Phone</text>
+          <view class="phone-prefix">
+            <text class="prefix-text">+86</text>
+          </view>
           <input
-            class="input-field"
-            type="number"
-            maxlength="11"
             v-model="phone"
-            placeholder="Enter phone number"
+            type="number"
+            class="phone-input"
+            placeholder="请输入手机号"
+            maxlength="11"
           />
         </view>
-        <view class="input-group">
-          <text class="input-label">Code</text>
-          <view class="code-row">
-            <input
-              class="input-field"
-              type="number"
-              maxlength="6"
-              v-model="code"
-              placeholder="Verification code"
-            />
-            <view
-              class="code-btn"
-              :class="{ disabled: countdown > 0 }"
-              @click="handleSendCode"
-            >
-              <text>{{ countdown > 0 ? countdown + 's' : 'Send' }}</text>
-            </view>
+        <view class="code-row">
+          <input
+            v-model="smsCode"
+            type="number"
+            class="code-input"
+            placeholder="验证码"
+            maxlength="6"
+          />
+          <view
+            class="code-btn"
+            :class="{ 'code-btn--disabled': countdown > 0 }"
+            @tap="onSendCode"
+          >
+            <text class="code-btn-text">{{ countdown > 0 ? `${countdown}s` : '获取验证码' }}</text>
           </view>
         </view>
-        <button class="login-btn" @click="handlePhoneLogin" :disabled="saving">
-          {{ saving ? 'Signing in...' : 'Sign In' }}
-        </button>
+        <view
+          class="login-btn"
+          :class="{ 'login-btn--disabled': !canLogin }"
+          @tap="onPhoneLogin"
+        >
+          <text class="login-btn-text">登录</text>
+        </view>
       </view>
+
+      <!-- Divider -->
+      <view class="divider">
+        <view class="divider-line" />
+        <text class="divider-text">其他方式</text>
+        <view class="divider-line" />
+      </view>
+
+      <!-- Third-party Login -->
+      <view class="third-party">
+        <view class="tp-btn" @tap="onWechatLogin">
+          <text class="tp-icon">💚</text>
+          <text class="tp-text">微信登录</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Agreement -->
+    <view class="agreement">
+      <view class="agree-check" :class="{ 'agree-check--on': agreed }" @tap="agreed = !agreed">
+        <view v-if="agreed" class="check-icon">
+          <text class="check-mark">✓</text>
+        </view>
+      </view>
+      <text class="agree-text">
+        登录即同意
+        <text class="agree-link">《用户协议》</text>
+        和
+        <text class="agree-link">《隐私政策》</text>
+      </text>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { wxLogin, sendSmsCode, phoneLogin } from '@/api/user'
 
 const userStore = useUserStore()
-const loginType = ref<'wx' | 'phone'>('wx')
+
 const phone = ref('')
-const code = ref('')
+const smsCode = ref('')
+const agreed = ref(false)
 const countdown = ref(0)
-const saving = ref(false)
+const logging = ref(false)
+
+const canLogin = computed(() => {
+  return phone.value.length === 11 && smsCode.value.length >= 4 && agreed.value && !logging.value
+})
+
 let timer: any = null
 
-async function handleWxLogin() {
-  uni.showLoading({ title: 'Signing in...' })
-  // #ifdef MP-WEIXIN
+function onSendCode() {
+  if (countdown.value > 0) return
+  if (phone.value.length !== 11) {
+    uni.showToast({ title: '请输入正确的手机号', icon: 'none' })
+    return
+  }
+
+  sendSmsCode(phone.value).then((res: any) => {
+    if (res.code === 0) {
+      uni.showToast({ title: '验证码已发送', icon: 'none' })
+      countdown.value = 60
+      timer = setInterval(() => {
+        countdown.value--
+        if (countdown.value <= 0) {
+          clearInterval(timer)
+        }
+      }, 1000)
+    }
+  })
+}
+
+async function onPhoneLogin() {
+  if (!canLogin.value) return
+  logging.value = true
+
   try {
-    const res = await new Promise((resolve, reject) => {
-      uni.login({ provider: 'weixin', success: resolve, fail: reject })
-    })
-    const loginRes = await wxLogin((res as any).code)
-    if (loginRes.code === 0) {
-      userStore.setLoginInfo(loginRes.data.token, loginRes.data.userInfo)
-      uni.hideLoading()
-      uni.switchTab({ url: '/pages/index/index' })
+    const res = await phoneLogin(phone.value, smsCode.value)
+    if (res.code === 0) {
+      userStore.setLoginInfo(res.data.token, res.data.userInfo)
+      uni.showToast({ title: '登录成功', icon: 'success' })
+      setTimeout(() => {
+        uni.switchTab({ url: '/pages/index/index' })
+      }, 1500)
     }
   } catch (e) {
-    uni.hideLoading()
-    uni.showToast({ title: 'Sign in failed', icon: 'none' })
+    uni.showToast({ title: '登录失败', icon: 'none' })
   }
+
+  logging.value = false
+}
+
+async function onWechatLogin() {
+  // #ifdef MP-WEIXIN
+  uni.login({
+    provider: 'weixin',
+    success: async (loginRes) => {
+      const res = await wxLogin(loginRes.code)
+      if (res.code === 0) {
+        userStore.setLoginInfo(res.data.token, res.data.userInfo)
+        uni.switchTab({ url: '/pages/index/index' })
+      }
+    }
+  })
   // #endif
+
   // #ifdef H5
-  setTimeout(() => {
-    userStore.setLoginInfo('mock_token', {
-      id: 'wx_mock',
-      nickname: 'WeChat User',
-      avatar: ''
-    })
-    uni.hideLoading()
-    uni.switchTab({ url: '/pages/index/index' })
-  }, 500)
-  // #endif
-}
-
-async function handleSendCode() {
-  if (countdown.value > 0) return
-  if (!phone.value || phone.value.length !== 11) {
-    uni.showToast({ title: 'Enter a valid phone', icon: 'none' })
-    return
-  }
-  const res = await sendSmsCode(phone.value)
-  if (res.code === 0) {
-    uni.showToast({ title: 'Code sent', icon: 'success' })
-    countdown.value = 60
-    timer = setInterval(() => {
-      countdown.value--
-      if (countdown.value <= 0) clearInterval(timer)
-    }, 1000)
-  }
-}
-
-async function handlePhoneLogin() {
-  if (!phone.value || phone.value.length !== 11) {
-    uni.showToast({ title: 'Enter a valid phone', icon: 'none' })
-    return
-  }
-  if (!code.value || code.value.length !== 6) {
-    uni.showToast({ title: 'Enter 6-digit code', icon: 'none' })
-    return
-  }
-  saving.value = true
-  uni.showLoading({ title: 'Signing in...' })
-  const res = await phoneLogin(phone.value, code.value)
+  // H5 开发模式自动登录
+  const res = await wxLogin('dev_code')
   if (res.code === 0) {
     userStore.setLoginInfo(res.data.token, res.data.userInfo)
-    uni.hideLoading()
-    uni.switchTab({ url: '/pages/index/index' })
-  } else {
-    uni.hideLoading()
-    uni.showToast({ title: 'Sign in failed', icon: 'none' })
+    uni.showToast({ title: '登录成功', icon: 'success' })
+    setTimeout(() => {
+      uni.switchTab({ url: '/pages/index/index' })
+    }, 1500)
   }
-  saving.value = false
+  // #endif
 }
 </script>
 
-<style scoped>
-.page {
+<style scoped lang="scss">
+$bg-page: #F2F3F5;
+$bg-card: #FFFFFF;
+$brand: #5865F2;
+$divider: #E3E5E8;
+$text-primary: #060607;
+$text-secondary: #4E5058;
+$text-muted: #80848E;
+$tag-bg: #F2F3F5;
+
+.page-login {
   min-height: 100vh;
-  background: #F2F3F5;
+  background: $bg-page;
   display: flex;
   flex-direction: column;
-  padding: 0 40rpx;
+  padding: 0 24px;
 }
 
-/* ===== Logo ===== */
-.logo-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 100rpx;
-  margin-bottom: 80rpx;
+/* Brand */
+.login-brand {
+  text-align: center;
+  padding-top: 80px;
+  margin-bottom: 48px;
 }
 
-.logo-icon {
-  width: 140rpx;
-  height: 140rpx;
-  border-radius: 50%;
-  background: #E3E5E8;
+.login-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: $brand;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24rpx;
+  margin: 0 auto 16px;
 }
 
-.logo-emoji {
-  font-size: 64rpx;
+.login-logo-text {
+  font-size: 40px;
 }
 
-.logo-title {
-  font-size: 40rpx;
+.login-title {
+  font-size: 28px;
   font-weight: 700;
-  color: #060607;
-  margin-bottom: 8rpx;
+  color: $text-primary;
+  display: block;
+  margin-bottom: 6px;
 }
 
-.logo-sub {
-  font-size: 24rpx;
-  color: #4E5058;
+.login-subtitle {
+  font-size: 14px;
+  color: $text-muted;
 }
 
-/* ===== Auth ===== */
-.auth-area {
-  flex: 1;
+/* Form */
+.login-form {
+  background: $bg-card;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid $divider;
 }
 
-/* Tab switcher: Discord segmented control */
-.auth-tabs {
-  display: flex;
-  background: #E3E5E8;
-  border-radius: 8rpx;
-  padding: 4rpx;
-  margin-bottom: 48rpx;
+.login-section {
+  margin-bottom: 20px;
 }
 
-.tab {
-  flex: 1;
-  text-align: center;
-  padding: 14rpx;
-  border-radius: 6rpx;
-  transition: all 0.15s;
-}
-.tab:active {
-  background: rgba(0,0,0,0.04);
-}
-.tab.active {
-  background: #FFFFFF;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-}
-
-.tab-text {
-  font-size: 26rpx;
-  font-weight: 500;
-  color: #4E5058;
-}
-.tab.active .tab-text {
-  color: #060607;
-  font-weight: 600;
-}
-
-/* Form panel */
-.form-panel {
-  padding: 0 8rpx;
-}
-
-/* WeChat button */
-.wx-btn {
+.input-group {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 12rpx;
-  width: 100%;
-  height: 88rpx;
-  border-radius: 9999px;
-  background: #23A55A;
-  border: none;
-  margin-bottom: 20rpx;
-  transition: background 0.15s;
-}
-.wx-btn:active {
-  background: #1d8a4c;
+  background: $tag-bg;
+  border-radius: 10px;
+  padding: 0 12px;
+  margin-bottom: 12px;
 }
 
-.wx-icon {
-  font-size: 32rpx;
+.phone-prefix {
+  padding-right: 10px;
+  border-right: 1px solid $divider;
+  margin-right: 10px;
 }
 
-.wx-label {
-  font-size: 28rpx;
+.prefix-text {
+  font-size: 14px;
   font-weight: 600;
-  color: #FFFFFF;
+  color: $text-primary;
 }
 
-.form-hint {
-  display: block;
-  text-align: center;
-  font-size: 20rpx;
-  color: #80848E;
-  line-height: 1.5;
-}
-
-/* Input groups */
-.input-group {
-  margin-bottom: 28rpx;
-}
-
-.input-label {
-  display: block;
-  font-size: 24rpx;
-  font-weight: 500;
-  color: #060607;
-  margin-bottom: 10rpx;
-}
-
-.input-field {
-  width: 100%;
-  height: 80rpx;
-  background: #E3E5E8;
-  border: none;
-  border-radius: 8rpx;
-  padding: 0 20rpx;
-  font-size: 28rpx;
-  color: #060607;
-}
-
-.input-field::placeholder {
-  color: #80848E;
+.phone-input {
+  flex: 1;
+  height: 44px;
+  font-size: 14px;
+  color: $text-primary;
 }
 
 .code-row {
   display: flex;
-  gap: 12rpx;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
-.code-row .input-field {
+.code-input {
   flex: 1;
+  height: 44px;
+  background: $tag-bg;
+  border-radius: 10px;
+  padding: 0 12px;
+  font-size: 14px;
+  color: $text-primary;
 }
 
 .code-btn {
-  width: 200rpx;
-  height: 80rpx;
-  border-radius: 8rpx;
-  background: rgba(88,101,242,0.08);
+  padding: 0 16px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba($brand, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24rpx;
-  font-weight: 600;
-  color: #5865F2;
-  flex-shrink: 0;
-  transition: background 0.15s;
-}
-.code-btn:active:not(.disabled) {
-  background: rgba(88,101,242,0.16);
-}
-.code-btn.disabled {
-  background: #E3E5E8;
-  color: #80848E;
+  cursor: pointer;
 }
 
-/* Login button */
+.code-btn--disabled {
+  opacity: 0.5;
+}
+
+.code-btn-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: $brand;
+  white-space: nowrap;
+}
+
 .login-btn {
   width: 100%;
-  height: 80rpx;
-  border-radius: 9999px;
-  background: #5865F2;
-  color: #FFFFFF;
-  font-size: 28rpx;
-  font-weight: 600;
-  border: none;
-  margin-top: 12rpx;
-  transition: background 0.15s;
+  height: 48px;
+  border-radius: 12px;
+  background: $brand;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
-.login-btn:active:not(:disabled) {
-  background: #4752C4;
-}
-.login-btn:disabled {
+
+.login-btn--disabled {
   opacity: 0.5;
+}
+
+.login-btn-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: $divider;
+}
+
+.divider-text {
+  font-size: 12px;
+  color: $text-muted;
+  flex-shrink: 0;
+}
+
+/* Third-party */
+.third-party {
+  display: flex;
+  justify-content: center;
+}
+
+.tp-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: $tag-bg;
+  cursor: pointer;
+}
+
+.tp-icon {
+  font-size: 28px;
+}
+
+.tp-text {
+  font-size: 12px;
+  color: $text-secondary;
+}
+
+/* Agreement */
+.agreement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 32px;
+  padding-bottom: 40px;
+}
+
+.agree-check {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid $divider;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.agree-check--on {
+  background: $brand;
+  border-color: $brand;
+}
+
+.check-mark {
+  font-size: 10px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.agree-text {
+  font-size: 12px;
+  color: $text-muted;
+}
+
+.agree-link {
+  color: $brand;
 }
 </style>
