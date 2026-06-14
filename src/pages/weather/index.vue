@@ -303,7 +303,7 @@ $success: #23A559;
 $warning: #F0B232;
 $danger: #F23F43;
 
-.page-weather {
+.page-weather { overflow-x: hidden;
   min-height: 100vh;
   background: $bg-page;
 }
@@ -375,7 +375,7 @@ $danger: #F23F43;
 }
 
 /* Content */
-.content {
+.content { overflow-x: hidden;
   padding: 12px;
   height: calc(100vh - 60px);
 }

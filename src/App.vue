@@ -40,6 +40,13 @@ page {
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* 全局禁止水平滚动 */
+uni-page-body {
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 button::after {

@@ -114,7 +114,7 @@ $text-primary: #060607;
 $text-secondary: #4E5058;
 $text-muted: #80848E;
 
-.page-mine {
+.page-mine { overflow-x: hidden;
   min-height: 100vh;
   background: $bg-page;
 }

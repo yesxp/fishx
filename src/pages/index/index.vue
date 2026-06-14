@@ -180,7 +180,7 @@ $tag-bg: #F2F3F5;
 $success: #23A559;
 $warning: #F0B232;
 
-.page-home {
+.page-home { overflow-x: hidden;
   min-height: 100vh;
   background: $bg-page;
   position: relative;
@@ -297,7 +297,7 @@ $warning: #F0B232;
 }
 
 /* Content */
-.content {
+.content { overflow-x: hidden;
   padding: 12px;
   height: calc(100vh - 140px);
 }

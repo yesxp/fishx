@@ -128,7 +128,7 @@ $text-secondary: #4E5058;
 $text-muted: #80848E;
 $tag-bg: #F2F3F5;
 
-.page-map {
+.page-map { overflow-x: hidden;
   min-height: 100vh;
   background: $bg-page;
 }
@@ -200,7 +200,7 @@ $tag-bg: #F2F3F5;
 }
 
 /* Content */
-.content {
+.content { overflow-x: hidden;
   padding: 12px;
   height: calc(100vh - 60px);
 }
