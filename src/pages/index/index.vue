@@ -1,26 +1,24 @@
 <template>
   <view class="container">
-    <!-- iOS 风格头部：大标题 + 滚动收缩 -->
+    <!-- Discord 风格头部：简洁 + 状态指示 -->
     <view class="header">
-      <view class="header-top">
-        <view class="location">
-          <text class="location-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
-          </text>
-          <text class="location-text">上海市</text>
+      <view class="header-row">
+        <view class="header-brand">
+          <view class="brand-dot"></view>
+          <text class="header-title">鱼渔娱</text>
         </view>
         <view class="header-actions">
           <view class="action-btn" @click="goToCreate">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
           </view>
         </view>
       </view>
-      <text class="header-title">鱼渔娱</text>
+      <text class="header-sub">上海市 · 适合钓鱼</text>
     </view>
 
     <scroll-view scroll-y class="content" @scrolltolower="loadMore">
-      <!-- 天气指数卡片 -->
-      <view class="index-card" @click="goToWeather">
+      <!-- 指数卡片：Discord 卡片风格，微妙阴影 -->
+      <view class="card index-card" @click="goToWeather">
         <view class="index-left">
           <text class="index-score" :style="{ color: indexResult.levelColor }">{{ indexResult.score }}</text>
           <view class="index-meta">
@@ -30,31 +28,32 @@
         </view>
         <view class="index-right">
           <text class="index-suggestion">{{ indexResult.suggestion }}</text>
-          <text class="index-arrow">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </text>
+          <svg class="index-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </view>
       </view>
 
-      <!-- 天气数据行：iOS 列表风格 -->
-      <view class="data-list">
+      <!-- 天气数据：Discord 列表风格 -->
+      <view class="card data-card">
         <view class="data-row">
+          <view class="data-dot" style="background: #F0B232;"></view>
           <text class="data-label">气温</text>
           <text class="data-value">{{ weatherNow?.temp || '--' }}°</text>
         </view>
-        <view class="data-divider"></view>
+        <view class="data-sep"></view>
         <view class="data-row">
+          <view class="data-dot" style="background: #5865F2;"></view>
           <text class="data-label">气压</text>
           <text class="data-value">{{ weatherNow?.pressure || '--' }} hPa</text>
         </view>
-        <view class="data-divider"></view>
+        <view class="data-sep"></view>
         <view class="data-row">
+          <view class="data-dot" style="background: #23A55A;"></view>
           <text class="data-label">风力</text>
-          <text class="data-value">{{ weatherNow?.windScale || '--' }}级 {{ weatherNow?.windDir || '' }}</text>
+          <text class="data-value">{{ weatherNow?.windScale || '--' }}级</text>
         </view>
       </view>
 
-      <!-- 标签筛选：iOS segmented control 风格 -->
+      <!-- 标签筛选：Discord pill 风格 -->
       <scroll-view scroll-x class="tags-scroll" :show-scrollbar="false">
         <view class="tags-row">
           <view class="tag"
@@ -68,12 +67,13 @@
         </view>
       </scroll-view>
 
-      <!-- 渔获列表 -->
+      <!-- 列表头部 -->
       <view class="section-header">
         <text class="section-title">附近渔获</text>
         <text class="section-more">查看全部</text>
       </view>
 
+      <!-- 渔获瀑布流 -->
       <view class="masonry" v-if="catchList.length > 0">
         <view class="masonry-col">
           <CatchCard
@@ -168,87 +168,87 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ===== iOS 设计系统 ===== */
-/* 主色：#007AFF (iOS Blue) */
-/* 背景：#F2F2F7 (iOS System Grouped Background) */
-/* 卡片：#FFFFFF */
-/* 文字：#000000 / #3C3C43 (60%) / #3C3C43 (30%) */
-/* 分隔线：#C6C6C8 */
+/* ===== Discord Design Language ===== */
 
 .container {
   min-height: 100vh;
-  background: #F2F2F7;
+  background: #F2F3F5;
 }
 
-/* === iOS 大标题头部 === */
+/* === 头部 === */
 .header {
   background: #FFFFFF;
-  padding: 12rpx 20rpx 20rpx;
-  border-bottom: 0.5px solid #C6C6C8;
+  padding: 20rpx 24rpx 16rpx;
+  border-bottom: 1px solid rgba(79,84,92,0.12);
 }
 
-.header-top {
+.header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8rpx;
 }
 
-.location {
+.header-brand {
   display: flex;
   align-items: center;
-  gap: 6rpx;
+  gap: 12rpx;
 }
 
-.location-icon {
-  width: 28rpx;
-  height: 28rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.location-icon svg {
-  width: 28rpx;
-  height: 28rpx;
+.brand-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #23A55A;
 }
 
-.location-text {
-  font-size: 26rpx;
-  color: #007AFF;
-  font-weight: 500;
+.header-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #313338;
+  letter-spacing: -0.3rpx;
+}
+
+.header-sub {
+  font-size: 24rpx;
+  color: #5C5E66;
+  margin-top: 4rpx;
 }
 
 .header-actions {
   display: flex;
-  align-items: center;
-  gap: 16rpx;
+  gap: 12rpx;
 }
 
 .action-btn {
-  width: 60rpx;
-  height: 60rpx;
+  width: 56rpx;
+  height: 56rpx;
   border-radius: 50%;
-  background: #F2F2F7;
+  background: rgba(88,101,242,0.08);
   display: flex;
   align-items: center;
   justify-content: center;
 }
+.action-btn:active {
+  background: rgba(88,101,242,0.16);
+}
 .action-btn svg {
-  width: 32rpx;
-  height: 32rpx;
+  width: 28rpx;
+  height: 28rpx;
 }
 
-.header-title {
-  font-size: 60rpx;
-  font-weight: 700;
-  color: #000000;
-  letter-spacing: -0.5rpx;
-}
-
-/* === 内容区 === */
+/* === 内容 === */
 .content {
   flex: 1;
   padding: 16rpx 20rpx;
+}
+
+/* === Discord 卡片 === */
+.card {
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 12rpx;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
 /* === 指数卡片 === */
@@ -256,10 +256,6 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #FFFFFF;
-  border-radius: 16rpx;
-  padding: 24rpx 20rpx;
-  margin-bottom: 16rpx;
 }
 
 .index-left {
@@ -269,7 +265,7 @@ onMounted(() => {
 }
 
 .index-score {
-  font-size: 64rpx;
+  font-size: 60rpx;
   font-weight: 700;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -278,16 +274,16 @@ onMounted(() => {
 .index-meta {
   display: flex;
   flex-direction: column;
-  gap: 4rpx;
+  gap: 2rpx;
 }
 
 .index-label {
-  font-size: 24rpx;
-  color: #8E8E93;
+  font-size: 22rpx;
+  color: #80848E;
 }
 
 .index-level {
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 600;
 }
 
@@ -298,8 +294,8 @@ onMounted(() => {
 }
 
 .index-suggestion {
-  font-size: 24rpx;
-  color: #8E8E93;
+  font-size: 22rpx;
+  color: #80848E;
   text-align: right;
   max-width: 200rpx;
 }
@@ -307,77 +303,79 @@ onMounted(() => {
 .index-arrow {
   width: 24rpx;
   height: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.index-arrow svg {
-  width: 24rpx;
-  height: 24rpx;
+  flex-shrink: 0;
 }
 
-/* === 天气数据行：iOS Inset Grouped List === */
-.data-list {
-  background: #FFFFFF;
-  border-radius: 16rpx;
-  margin-bottom: 16rpx;
-  overflow: hidden;
+/* === 数据列表 === */
+.data-card {
+  padding: 8rpx 20rpx;
 }
 
 .data-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 24rpx 20rpx;
+  padding: 16rpx 0;
+}
+
+.data-dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+  flex-shrink: 0;
 }
 
 .data-label {
-  font-size: 30rpx;
-  color: #000000;
+  flex: 1;
+  font-size: 28rpx;
+  color: #313338;
+  font-weight: 500;
 }
 
 .data-value {
-  font-size: 30rpx;
-  color: #8E8E93;
+  font-size: 28rpx;
+  color: #80848E;
   font-variant-numeric: tabular-nums;
 }
 
-.data-divider {
-  height: 0.5px;
-  background: #C6C6C8;
-  margin-left: 20rpx;
+.data-sep {
+  height: 1px;
+  background: rgba(79,84,92,0.08);
 }
 
-/* === 标签筛选：iOS Segment 风格 === */
+/* === 标签 === */
 .tags-scroll {
-  margin-bottom: 24rpx;
+  margin-bottom: 20rpx;
   white-space: nowrap;
 }
 
 .tags-row {
   display: inline-flex;
-  gap: 12rpx;
-  padding: 4rpx 0;
+  gap: 8rpx;
 }
 
 .tag {
   display: inline-flex;
   align-items: center;
-  height: 56rpx;
-  padding: 0 28rpx;
-  border-radius: 28rpx;
-  background: #E5E5EA;
-  flex-shrink: 0;
+  height: 48rpx;
+  padding: 0 20rpx;
+  border-radius: 24rpx;
+  background: rgba(79,84,92,0.08);
+  transition: all 0.15s;
+}
+
+.tag:active {
+  background: rgba(79,84,92,0.16);
 }
 
 .tag.active {
-  background: #007AFF;
+  background: #5865F2;
 }
 
 .tag-text {
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 500;
-  color: #000000;
+  color: #5C5E66;
   white-space: nowrap;
 }
 
@@ -390,18 +388,18 @@ onMounted(() => {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 16rpx;
+  margin-bottom: 12rpx;
 }
 
 .section-title {
-  font-size: 34rpx;
+  font-size: 30rpx;
   font-weight: 700;
-  color: #000000;
+  color: #313338;
 }
 
 .section-more {
-  font-size: 28rpx;
-  color: #007AFF;
+  font-size: 26rpx;
+  color: #5865F2;
 }
 
 /* === 瀑布流 === */
@@ -427,7 +425,7 @@ onMounted(() => {
 }
 
 .no-more-text {
-  font-size: 24rpx;
-  color: #8E8E93;
+  font-size: 22rpx;
+  color: #80848E;
 }
 </style>

@@ -56,11 +56,11 @@
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "鱼渔娱",
     "navigationBarBackgroundColor": "#FFFFFF",
-    "backgroundColor": "#F2F2F7"
+    "backgroundColor": "#F2F3F5"
   },
   "tabBar": {
-    "color": "#8E8E93",
-    "selectedColor": "#007AFF",
+    "color": "#80848E",
+    "selectedColor": "#5865F2",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
     "list": [

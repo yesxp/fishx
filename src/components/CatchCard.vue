@@ -4,20 +4,14 @@
       <text class="photo-emoji">{{ fishEmoji }}</text>
     </view>
     <view class="card-body">
-      <view class="card-tag">
-        <text class="tag-name">{{ fishName }}</text>
-      </view>
+      <text class="card-name">{{ fishName }}</text>
       <view class="card-meta">
-        <text class="meta-location">{{ location }}</text>
+        <text class="meta-loc">{{ location }}</text>
         <text class="meta-time">{{ formatTime(time) }}</text>
       </view>
-      <view class="card-actions">
-        <view class="action-item">
-          <text class="action-count">{{ likes }}</text>
-        </view>
-        <view class="action-item">
-          <text class="action-count">{{ comments }}</text>
-        </view>
+      <view class="card-footer">
+        <text class="footer-stat">{{ likes }} 赞</text>
+        <text class="footer-stat">{{ comments }} 评</text>
       </view>
     </view>
   </view>
@@ -37,10 +31,10 @@ const props = defineProps<{
   comments?: number
 }>()
 
-const bgColor = getColorByIndex(Math.floor(Math.random() * 8))
+const bgColor = getColorByIndex(Math.floor(Math.random() * 6))
 
 function getColorByIndex(index: number) {
-  const colors = ['#F2F2F7', '#E8F5E9', '#FFF3E0', '#E3F2FD', '#F3E5F5', '#FBE9E7', '#ECEFF1', '#E8EAF6']
+  const colors = ['#F2F3F5', '#E8F5E9', '#FFF3E0', '#E3E5E8', '#F3E5F5', '#ECEFF1']
   return colors[index]
 }
 
@@ -63,70 +57,64 @@ function goToDetail() {
 <style scoped>
 .catch-card {
   background: #FFFFFF;
-  border-radius: 16rpx;
+  border-radius: 12rpx;
   overflow: hidden;
   margin-bottom: 12rpx;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .card-photo {
   width: 100%;
-  height: 280rpx;
+  height: 260rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .photo-emoji {
-  font-size: 80rpx;
+  font-size: 72rpx;
 }
 
 .card-body {
-  padding: 16rpx 16rpx 20rpx;
+  padding: 14rpx 16rpx 18rpx;
 }
 
-.card-tag {
-  margin-bottom: 8rpx;
-}
-
-.tag-name {
+.card-name {
   font-size: 26rpx;
   font-weight: 600;
-  color: #000000;
+  color: #313338;
+  display: block;
+  margin-bottom: 6rpx;
 }
 
 .card-meta {
   display: flex;
   flex-direction: column;
-  gap: 4rpx;
+  gap: 2rpx;
 }
 
-.meta-location {
-  font-size: 24rpx;
-  color: #8E8E93;
+.meta-loc {
+  font-size: 22rpx;
+  color: #80848E;
 }
 
 .meta-time {
-  font-size: 22rpx;
-  color: #AEAEB2;
+  font-size: 20rpx;
+  color: #80848E;
+  opacity: 0.7;
 }
 
-.card-actions {
+.card-footer {
   display: flex;
   align-items: center;
-  gap: 20rpx;
-  margin-top: 12rpx;
-  padding-top: 12rpx;
-  border-top: 0.5px solid #E5E5EA;
+  gap: 16rpx;
+  margin-top: 10rpx;
+  padding-top: 10rpx;
+  border-top: 1px solid rgba(79,84,92,0.08);
 }
 
-.action-item {
-  display: flex;
-  align-items: center;
-  gap: 4rpx;
-}
-
-.action-count {
-  font-size: 22rpx;
-  color: #8E8E93;
+.footer-stat {
+  font-size: 20rpx;
+  color: #80848E;
 }
 </style>

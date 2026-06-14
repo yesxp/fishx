@@ -1,13 +1,12 @@
 <template>
   <view class="container">
-    <!-- iOS 大标题头部 -->
     <view class="header">
       <text class="header-title">我的</text>
     </view>
 
     <scroll-view scroll-y class="content">
-      <!-- 个人信息卡片 -->
-      <view class="profile-card">
+      <!-- 个人信息 -->
+      <view class="card profile-card">
         <view class="avatar" @click="handleAvatarClick">
           <text class="avatar-text">{{ userInfo?.nickname?.[0] || '?' }}</text>
         </view>
@@ -17,19 +16,19 @@
         </view>
       </view>
 
-      <!-- 统计行 -->
-      <view class="stats-list">
+      <!-- 统计 -->
+      <view class="card stats-card">
         <view class="stats-row">
           <view class="stat-item" @click="goToMyCatch">
             <text class="stat-num">{{ myCatchCount }}</text>
             <text class="stat-label">总渔获</text>
           </view>
-          <view class="stat-divider"></view>
+          <view class="stat-sep"></view>
           <view class="stat-item">
             <text class="stat-num">{{ mySpotCount }}</text>
             <text class="stat-label">钓点</text>
           </view>
-          <view class="stat-divider"></view>
+          <view class="stat-sep"></view>
           <view class="stat-item">
             <text class="stat-num">{{ topFish }}</text>
             <text class="stat-label">最常钓</text>
@@ -37,73 +36,55 @@
         </view>
       </view>
 
-      <!-- 功能列表：iOS Inset Grouped Style -->
-      <view class="list-section">
-        <view class="list-group">
-          <view class="list-item" @click="goToMyCatch">
-            <text class="item-label">我的渔获</text>
-            <text class="item-arrow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            </text>
-          </view>
-          <view class="list-divider"></view>
-          <view class="list-item" @click="goToMySpot">
-            <text class="item-label">我的钓点</text>
-            <text class="item-arrow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            </text>
-          </view>
-          <view class="list-divider"></view>
-          <view class="list-item" @click="goToCollection">
-            <text class="item-label">收藏</text>
-            <text class="item-arrow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            </text>
-          </view>
+      <!-- 功能列表 -->
+      <view class="card list-card">
+        <view class="list-item" @click="goToMyCatch">
+          <text class="item-label">我的渔获</text>
+          <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </view>
+        <view class="list-sep"></view>
+        <view class="list-item" @click="goToMySpot">
+          <text class="item-label">我的钓点</text>
+          <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </view>
+        <view class="list-sep"></view>
+        <view class="list-item" @click="goToCollection">
+          <text class="item-label">收藏</text>
+          <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </view>
       </view>
 
-      <!-- 设置列表 -->
-      <view class="list-section">
-        <view class="list-group">
-          <view class="list-item" @click="handleLocationAuth">
-            <text class="item-label">定位授权</text>
-            <view class="item-right">
-              <text class="item-status">{{ locationAuth ? '已授权' : '未授权' }}</text>
-              <text class="item-arrow">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-              </text>
-            </view>
+      <!-- 设置 -->
+      <view class="card list-card">
+        <view class="list-item" @click="handleLocationAuth">
+          <text class="item-label">定位授权</text>
+          <view class="item-right">
+            <text class="item-status">{{ locationAuth ? '已授权' : '未授权' }}</text>
+            <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </view>
-          <view class="list-divider"></view>
-          <view class="list-item" @click="handleNotification">
-            <text class="item-label">通知设置</text>
-            <text class="item-arrow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            </text>
+        </view>
+        <view class="list-sep"></view>
+        <view class="list-item" @click="handleNotification">
+          <text class="item-label">通知设置</text>
+          <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </view>
+        <view class="list-sep"></view>
+        <view class="list-item" @click="handleClearCache">
+          <text class="item-label">清除缓存</text>
+          <view class="item-right">
+            <text class="item-status">{{ cacheSize }}</text>
+            <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </view>
-          <view class="list-divider"></view>
-          <view class="list-item" @click="handleClearCache">
-            <text class="item-label">清除缓存</text>
-            <view class="item-right">
-              <text class="item-status">{{ cacheSize }}</text>
-              <text class="item-arrow">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-              </text>
-            </view>
-          </view>
-          <view class="list-divider"></view>
-          <view class="list-item" @click="goToAbout">
-            <text class="item-label">关于鱼渔娱</text>
-            <text class="item-arrow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-            </text>
-          </view>
+        </view>
+        <view class="list-sep"></view>
+        <view class="list-item" @click="goToAbout">
+          <text class="item-label">关于鱼渔娱</text>
+          <svg class="item-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </view>
       </view>
 
-      <!-- 退出登录 -->
-      <view class="logout-section" v-if="isLoggedIn">
+      <!-- 退出 -->
+      <view class="logout-wrap" v-if="isLoggedIn">
         <button class="logout-btn" @click="handleLogout">退出登录</button>
       </view>
 
@@ -130,81 +111,35 @@ const locationAuth = ref(false)
 const cacheSize = ref('2.3MB')
 
 function handleAvatarClick() {
-  if (!isLoggedIn) {
-    uni.navigateTo({ url: '/pages/login/index' })
-  }
+  if (!isLoggedIn) uni.navigateTo({ url: '/pages/login/index' })
 }
-
-function goToMyCatch() {
-  uni.showToast({ title: '我的渔获页面开发中', icon: 'none' })
-}
-
-function goToMySpot() {
-  uni.showToast({ title: '我的钓点页面开发中', icon: 'none' })
-}
-
-function goToCollection() {
-  uni.showToast({ title: '收藏页面开发中', icon: 'none' })
-}
-
+function goToMyCatch() { uni.showToast({ title: '开发中', icon: 'none' }) }
+function goToMySpot() { uni.showToast({ title: '开发中', icon: 'none' }) }
+function goToCollection() { uni.showToast({ title: '开发中', icon: 'none' }) }
 function handleLocationAuth() {
   uni.authorize({
     scope: 'scope.userLocation',
-    success: () => {
-      locationAuth.value = true
-      uni.showToast({ title: '已授权', icon: 'success' })
-    },
-    fail: () => {
-      locationAuth.value = false
-      uni.showToast({ title: '请在设置中授权', icon: 'none' })
-    }
+    success: () => { locationAuth.value = true; uni.showToast({ title: '已授权', icon: 'success' }) },
+    fail: () => { locationAuth.value = false; uni.showToast({ title: '请在设置中授权', icon: 'none' }) }
   })
 }
-
-function handleNotification() {
-  uni.showToast({ title: '通知设置开发中', icon: 'none' })
-}
-
+function handleNotification() { uni.showToast({ title: '开发中', icon: 'none' }) }
 function handleClearCache() {
   uni.showModal({
-    title: '清除缓存',
-    content: '确定要清除缓存吗？',
-    success: (res) => {
-      if (res.confirm) {
-        uni.clearStorageSync()
-        cacheSize.value = '0B'
-        uni.showToast({ title: '清除成功', icon: 'success' })
-      }
-    }
+    title: '清除缓存', content: '确定？',
+    success: (res) => { if (res.confirm) { uni.clearStorageSync(); cacheSize.value = '0B'; uni.showToast({ title: '已清除', icon: 'success' }) } }
   })
 }
-
-function goToAbout() {
-  uni.showToast({ title: '关于页面开发中', icon: 'none' })
-}
-
+function goToAbout() { uni.showToast({ title: '开发中', icon: 'none' }) }
 function handleLogout() {
   uni.showModal({
-    title: '退出登录',
-    content: '确定要退出登录吗？',
-    success: (res) => {
-      if (res.confirm) {
-        userStore.logout()
-        uni.showToast({ title: '已退出', icon: 'success' })
-        setTimeout(() => {
-          uni.reLaunch({ url: '/pages/index/index' })
-        }, 1500)
-      }
-    }
+    title: '退出登录', content: '确定？',
+    success: (res) => { if (res.confirm) { userStore.logout(); uni.reLaunch({ url: '/pages/index/index' }) } }
   })
 }
 
 onMounted(() => {
-  uni.getSetting({
-    success: (res) => {
-      locationAuth.value = !!res.authSetting['scope.userLocation']
-    }
-  })
+  uni.getSetting({ success: (res) => { locationAuth.value = !!res.authSetting['scope.userLocation'] } })
   catchStore.loadList(true)
 })
 </script>
@@ -212,43 +147,44 @@ onMounted(() => {
 <style scoped>
 .container {
   min-height: 100vh;
-  background: #F2F2F7;
+  background: #F2F3F5;
 }
 
-/* === iOS 大标题头部 === */
 .header {
   background: #FFFFFF;
-  padding: 12rpx 20rpx 20rpx;
-  border-bottom: 0.5px solid #C6C6C8;
+  padding: 20rpx 24rpx 16rpx;
+  border-bottom: 1px solid rgba(79,84,92,0.12);
 }
 
 .header-title {
-  font-size: 60rpx;
+  font-size: 36rpx;
   font-weight: 700;
-  color: #000000;
-  letter-spacing: -0.5rpx;
+  color: #313338;
 }
 
-.content {
-  flex: 1;
+.content { flex: 1; }
+
+/* === 卡片 === */
+.card {
+  background: #FFFFFF;
+  border-radius: 12rpx;
+  margin: 12rpx 20rpx;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
 /* === 个人信息 === */
 .profile-card {
   display: flex;
   align-items: center;
-  gap: 20rpx;
-  background: #FFFFFF;
-  border-radius: 16rpx;
-  padding: 24rpx 20rpx;
-  margin: 16rpx 20rpx;
+  gap: 16rpx;
+  padding: 20rpx;
 }
 
 .avatar {
-  width: 100rpx;
-  height: 100rpx;
+  width: 88rpx;
+  height: 88rpx;
   border-radius: 50%;
-  background: #007AFF;
+  background: #5865F2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -256,7 +192,7 @@ onMounted(() => {
 }
 
 .avatar-text {
-  font-size: 40rpx;
+  font-size: 36rpx;
   font-weight: 600;
   color: #FFFFFF;
 }
@@ -264,25 +200,23 @@ onMounted(() => {
 .profile-info {
   display: flex;
   flex-direction: column;
-  gap: 4rpx;
+  gap: 2rpx;
 }
 
 .nickname {
-  font-size: 34rpx;
+  font-size: 32rpx;
   font-weight: 600;
-  color: #000000;
+  color: #313338;
 }
 
 .user-id {
-  font-size: 24rpx;
-  color: #8E8E93;
+  font-size: 22rpx;
+  color: #80848E;
 }
 
-/* === 统计行 === */
-.stats-list {
-  background: #FFFFFF;
-  border-radius: 16rpx;
-  margin: 0 20rpx 16rpx;
+/* === 统计 === */
+.stats-card {
+  padding: 0;
   overflow: hidden;
 }
 
@@ -294,37 +228,32 @@ onMounted(() => {
 .stat-item {
   flex: 1;
   text-align: center;
-  padding: 24rpx 16rpx;
+  padding: 20rpx 16rpx;
 }
 
 .stat-num {
-  font-size: 40rpx;
+  font-size: 36rpx;
   font-weight: 700;
-  color: #007AFF;
+  color: #5865F2;
   display: block;
 }
 
 .stat-label {
-  font-size: 22rpx;
-  color: #8E8E93;
+  font-size: 20rpx;
+  color: #80848E;
   margin-top: 4rpx;
   display: block;
 }
 
-.stat-divider {
-  width: 0.5px;
-  height: 60rpx;
-  background: #C6C6C8;
+.stat-sep {
+  width: 1px;
+  height: 48rpx;
+  background: rgba(79,84,92,0.12);
 }
 
-/* === 列表组 === */
-.list-section {
-  margin: 0 20rpx 16rpx;
-}
-
-.list-group {
-  background: #FFFFFF;
-  border-radius: 16rpx;
+/* === 列表 === */
+.list-card {
+  padding: 0;
   overflow: hidden;
 }
 
@@ -332,12 +261,16 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24rpx 20rpx;
+  padding: 20rpx;
+}
+
+.list-item:active {
+  background: rgba(79,84,92,0.06);
 }
 
 .item-label {
-  font-size: 30rpx;
-  color: #000000;
+  font-size: 28rpx;
+  color: #313338;
 }
 
 .item-right {
@@ -347,45 +280,39 @@ onMounted(() => {
 }
 
 .item-status {
-  font-size: 26rpx;
-  color: #8E8E93;
+  font-size: 24rpx;
+  color: #80848E;
 }
 
 .item-arrow {
-  width: 24rpx;
-  height: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.item-arrow svg {
-  width: 24rpx;
-  height: 24rpx;
+  width: 20rpx;
+  height: 20rpx;
+  flex-shrink: 0;
 }
 
-.list-divider {
-  height: 0.5px;
-  background: #C6C6C8;
+.list-sep {
+  height: 1px;
+  background: rgba(79,84,92,0.08);
   margin-left: 20rpx;
 }
 
-/* === 退出登录 === */
-.logout-section {
-  margin: 0 20rpx;
+/* === 退出 === */
+.logout-wrap {
+  margin: 12rpx 20rpx;
 }
 
 .logout-btn {
   width: 100%;
-  height: 88rpx;
-  border-radius: 16rpx;
+  height: 80rpx;
+  border-radius: 12rpx;
   background: #FFFFFF;
-  color: #FF3B30;
-  font-size: 30rpx;
+  color: #F23F43;
+  font-size: 28rpx;
   font-weight: 500;
   border: none;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
-
 .logout-btn:active {
-  background: #F2F2F7;
+  background: #F2F3F5;
 }
 </style>

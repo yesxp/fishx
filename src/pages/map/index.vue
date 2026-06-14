@@ -1,32 +1,26 @@
 <template>
   <view class="container">
-    <!-- iOS 大标题头部 -->
     <view class="header">
-      <view class="header-top">
-        <view class="location">
-          <text class="location-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
-          </text>
-          <text class="location-text">定位中...</text>
-        </view>
+      <view class="header-row">
+        <text class="header-title">钓点</text>
         <view class="header-actions">
           <view class="action-btn" @click="locate">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
           </view>
         </view>
       </view>
-      <text class="header-title">钓点</text>
+      <text class="header-sub">发现附近钓点</text>
     </view>
 
-    <!-- 搜索栏：iOS 风格 -->
+    <!-- 搜索栏 -->
     <view class="search-bar">
       <view class="search-wrap">
-        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#8E8E93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input class="search-input" v-model="keyword" placeholder="搜索钓点" />
       </view>
     </view>
 
-    <!-- 地图区域 -->
+    <!-- 地图 -->
     <view class="map-container">
       <view class="map-placeholder">
         <view class="map-grid"></view>
@@ -45,7 +39,6 @@
         </view>
       </view>
 
-      <!-- 钓点卡片 -->
       <view class="spot-card-wrap" v-if="selectedSpot">
         <SpotCard
           :id="selectedSpot.id"
@@ -88,136 +81,92 @@ function locate() {
   uni.getLocation({
     type: 'wgs84',
     success: (res) => {
-      uni.showToast({
-        title: `当前位置: ${res.latitude.toFixed(2)}, ${res.longitude.toFixed(2)}`,
-        icon: 'none'
-      })
+      uni.showToast({ title: `${res.latitude.toFixed(2)}, ${res.longitude.toFixed(2)}`, icon: 'none' })
     }
   })
 }
 
 function handleSearch() {
-  if (!keyword.value) {
-    spotStore.loadList()
-    return
-  }
-  const filtered = spotList.filter(s =>
-    s.name.includes(keyword.value) ||
-    s.type.includes(keyword.value)
-  )
-  spotStore.spotList = filtered
+  if (!keyword.value) { spotStore.loadList(); return }
+  spotStore.spotList = spotList.filter(s => s.name.includes(keyword.value) || s.type.includes(keyword.value))
 }
 
-onMounted(() => {
-  spotStore.loadList()
-})
+onMounted(() => { spotStore.loadList() })
 </script>
 
 <style scoped>
 .container {
   min-height: 100vh;
-  background: #F2F2F7;
+  background: #F2F3F5;
   display: flex;
   flex-direction: column;
 }
 
-/* === iOS 大标题头部 === */
 .header {
   background: #FFFFFF;
-  padding: 12rpx 20rpx 20rpx;
-  border-bottom: 0.5px solid #C6C6C8;
+  padding: 20rpx 24rpx 16rpx;
+  border-bottom: 1px solid rgba(79,84,92,0.12);
 }
 
-.header-top {
+.header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8rpx;
 }
 
-.location {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
+.header-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #313338;
 }
 
-.location-icon {
-  width: 28rpx;
-  height: 28rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.location-icon svg {
-  width: 28rpx;
-  height: 28rpx;
-}
-
-.location-text {
-  font-size: 26rpx;
-  color: #007AFF;
-  font-weight: 500;
+.header-sub {
+  font-size: 24rpx;
+  color: #5C5E66;
+  margin-top: 4rpx;
 }
 
 .header-actions {
   display: flex;
-  align-items: center;
+  gap: 12rpx;
 }
 
 .action-btn {
-  width: 60rpx;
-  height: 60rpx;
+  width: 56rpx;
+  height: 56rpx;
   border-radius: 50%;
-  background: #F2F2F7;
+  background: rgba(88,101,242,0.08);
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.action-btn svg {
-  width: 32rpx;
-  height: 32rpx;
-}
+.action-btn:active { background: rgba(88,101,242,0.16); }
+.action-btn svg { width: 28rpx; height: 28rpx; }
 
-.header-title {
-  font-size: 60rpx;
-  font-weight: 700;
-  color: #000000;
-  letter-spacing: -0.5rpx;
-}
-
-/* === 搜索栏 === */
 .search-bar {
   padding: 12rpx 20rpx;
   background: #FFFFFF;
-  border-bottom: 0.5px solid #C6C6C8;
+  border-bottom: 1px solid rgba(79,84,92,0.12);
 }
 
 .search-wrap {
   display: flex;
   align-items: center;
-  gap: 12rpx;
-  background: #E5E5EA;
-  border-radius: 12rpx;
-  padding: 16rpx 20rpx;
+  gap: 10rpx;
+  background: #F2F3F5;
+  border-radius: 8rpx;
+  padding: 14rpx 16rpx;
 }
 
-.search-icon {
-  width: 28rpx;
-  height: 28rpx;
-  flex-shrink: 0;
-}
+.search-icon { width: 24rpx; height: 24rpx; flex-shrink: 0; }
 
 .search-input {
   flex: 1;
-  font-size: 30rpx;
-  color: #000000;
+  font-size: 28rpx;
+  color: #313338;
 }
 
-/* === 地图 === */
-.map-container {
-  flex: 1;
-  position: relative;
-}
+.map-container { flex: 1; position: relative; }
 
 .map-placeholder {
   width: 100%;
@@ -231,8 +180,8 @@ onMounted(() => {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
   background-size: 40rpx 40rpx;
 }
 
@@ -244,18 +193,17 @@ onMounted(() => {
 }
 
 .marker-dot {
-  width: 40rpx;
-  height: 40rpx;
+  width: 36rpx;
+  height: 36rpx;
   border-radius: 50%;
   background: #FFFFFF;
-  border: 3rpx solid #007AFF;
+  border: 3rpx solid #5865F2;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  transition: all .2s;
+  transition: all 0.15s;
 }
-
 .marker-dot.active {
   transform: scale(1.2);
-  background: #007AFF;
+  background: #5865F2;
 }
 
 .marker-name {
@@ -263,12 +211,11 @@ onMounted(() => {
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 20rpx;
+  font-size: 18rpx;
   white-space: nowrap;
-  color: #000000;
+  color: #313338;
   font-weight: 500;
   margin-top: 4rpx;
-  text-shadow: 0 1px 2px rgba(255,255,255,0.8);
 }
 
 .map-center {
@@ -280,11 +227,11 @@ onMounted(() => {
 }
 
 .center-dot {
-  width: 20rpx;
-  height: 20rpx;
+  width: 18rpx;
+  height: 18rpx;
   border-radius: 50%;
-  background: #007AFF;
-  box-shadow: 0 0 0 6rpx rgba(0,122,255,0.2);
+  background: #5865F2;
+  box-shadow: 0 0 0 6rpx rgba(88,101,242,0.2);
 }
 
 .spot-card-wrap {
@@ -293,11 +240,11 @@ onMounted(() => {
   left: 20rpx;
   right: 20rpx;
   z-index: 20;
-  animation: slideUp .3s ease;
+  animation: slideUp 0.2s ease;
 }
 
 @keyframes slideUp {
-  from { transform: translateY(20rpx); opacity: 0; }
+  from { transform: translateY(16rpx); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 </style>

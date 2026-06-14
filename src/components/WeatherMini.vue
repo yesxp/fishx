@@ -9,9 +9,7 @@
     </view>
     <view class="mini-right">
       <text class="mini-text">{{ text }}</text>
-      <text class="mini-arrow">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </text>
+      <svg class="mini-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </view>
   </view>
 </template>
@@ -34,20 +32,21 @@ function goToWeather() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24rpx 20rpx;
+  padding: 20rpx;
   background: #FFFFFF;
-  border-radius: 16rpx;
-  margin: 0 0 16rpx;
+  border-radius: 12rpx;
+  margin-bottom: 12rpx;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .mini-left {
   display: flex;
   align-items: center;
-  gap: 20rpx;
+  gap: 16rpx;
 }
 
 .mini-score {
-  font-size: 52rpx;
+  font-size: 48rpx;
   font-weight: 700;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -60,12 +59,12 @@ function goToWeather() {
 }
 
 .mini-label {
-  font-size: 22rpx;
-  color: #8E8E93;
+  font-size: 20rpx;
+  color: #80848E;
 }
 
 .mini-level {
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 600;
 }
 
@@ -76,20 +75,14 @@ function goToWeather() {
 }
 
 .mini-text {
-  font-size: 24rpx;
-  color: #8E8E93;
-  max-width: 240rpx;
+  font-size: 22rpx;
+  color: #80848E;
+  max-width: 220rpx;
 }
 
 .mini-arrow {
-  width: 24rpx;
-  height: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.mini-arrow svg {
-  width: 24rpx;
-  height: 24rpx;
+  width: 20rpx;
+  height: 20rpx;
+  flex-shrink: 0;
 }
 </style>

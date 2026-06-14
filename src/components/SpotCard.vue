@@ -2,7 +2,7 @@
   <view class="spot-card" @click="goToDetail">
     <view class="card-top">
       <view class="spot-avatar">
-        <text class="avatar-emoji">📍</text>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
       </view>
       <view class="spot-info">
         <text class="spot-name">{{ name }}</text>
@@ -38,8 +38,9 @@ function goToDetail() {
 <style scoped>
 .spot-card {
   background: #FFFFFF;
-  border-radius: 16rpx;
+  border-radius: 12rpx;
   padding: 20rpx;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .card-top {
@@ -49,17 +50,18 @@ function goToDetail() {
 }
 
 .spot-avatar {
-  width: 56rpx;
-  height: 56rpx;
-  border-radius: 14rpx;
-  background: #F2F2F7;
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: rgba(88,101,242,0.08);
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
-
-.avatar-emoji {
-  font-size: 24rpx;
+.spot-avatar svg {
+  width: 28rpx;
+  height: 28rpx;
 }
 
 .spot-info {
@@ -67,15 +69,15 @@ function goToDetail() {
 }
 
 .spot-name {
-  font-size: 30rpx;
+  font-size: 28rpx;
   font-weight: 600;
-  color: #000000;
+  color: #313338;
 }
 
 .spot-type {
-  font-size: 24rpx;
-  color: #8E8E93;
-  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: #80848E;
+  margin-top: 2rpx;
 }
 
 .spot-rating {
@@ -86,27 +88,28 @@ function goToDetail() {
 }
 
 .rating-num {
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 600;
-  color: #FF9500;
+  color: #F0B232;
 }
 
 .rating-count {
-  font-size: 22rpx;
-  color: #8E8E93;
+  font-size: 20rpx;
+  color: #80848E;
 }
 
 .card-tags {
   display: flex;
-  gap: 8rpx;
+  gap: 6rpx;
   flex-wrap: wrap;
 }
 
 .tag-item {
-  padding: 4rpx 12rpx;
-  border-radius: 8rpx;
-  background: #F2F2F7;
-  font-size: 22rpx;
-  color: #3C3C43;
+  padding: 4rpx 10rpx;
+  border-radius: 4rpx;
+  background: rgba(88,101,242,0.08);
+  font-size: 20rpx;
+  color: #5865F2;
+  font-weight: 500;
 }
 </style>

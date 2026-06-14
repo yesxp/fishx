@@ -1,37 +1,39 @@
-/* 鱼渔娱 — iOS 设计系统 */
+/* 鱼渔娱 — Discord 设计系统 (Light) */
 
-/* === iOS System Colors === */
-$blue: #007AFF;
-$green: #34C759;
-$orange: #FF9500;
-$red: #FF3B30;
-$yellow: #FFCC00;
-$purple: #5856D6;
-$teal: #5AC8FA;
-$gray: #8E8E93;
-$gray2: #AEAEB2;
-$gray3: #C7C7CC;
-$gray4: #D1D1D6;
-$gray5: #E5E5EA;
-$gray6: #F2F2F7;
+/* === Discord Brand === */
+$blurple: #5865F2;
+$blurple-dark: #4752C4;
+$blurple-light: #A5B3F0;
 
-/* === 背景 === */
-$bg: #F2F2F7;
-$card: #FFFFFF;
+/* === Discord Light Theme === */
+$bg-primary: #FFFFFF;
+$bg-secondary: #F2F3F5;
+$bg-tertiary: #E3E5E8;
+$bg-floating: #FFFFFF;
 
 /* === 文字 === */
-$text: #000000;
-$sub: #3C3C43;
-$tertiary: #8E8E93;
+$text-normal: #313338;
+$text-muted: #5C5E66;
+$text-faint: #80848E;
+$header-primary: #313338;
+$header-secondary: #5C5E66;
+
+/* === 状态色 === */
+$green: #23A55A;
+$yellow: #F0B232;
+$red: #F23F43;
+$fuchsia: #EB459E;
+
+/* === 交互 === */
+$hover: rgba(79,84,92,0.08);
+$active: rgba(79,84,92,0.16);
+$selected: rgba(88,101,242,0.08);
 
 /* === 圆角 === */
-$radius: 16rpx;
-$radius-sm: 12rpx;
-$radius-xs: 8rpx;
-$radius-full: 100px;
+$radius-sm: 4rpx;
+$radius-md: 8rpx;
+$radius-lg: 12rpx;
+$radius-xl: 16rpx;
 
 /* === 分隔线 === */
-$separator: #C6C6C8;
-
-/* === 阴影（克制使用） === */
-$shadow: 0 1px 3px rgba(0,0,0,0.08);
+$divider: rgba(79,84,92,0.12);
