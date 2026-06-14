@@ -1,48 +1,37 @@
-/* 鱼渔娱全局样式变量 */
+/* 鱼渔娱 — iOS 设计系统 */
 
-/* 品牌色 */
-$primary: #2196F3;
-$primary-light: #E3F2FD;
-$primary-dark: #1565C0;
+/* === iOS System Colors === */
+$blue: #007AFF;
+$green: #34C759;
+$orange: #FF9500;
+$red: #FF3B30;
+$yellow: #FFCC00;
+$purple: #5856D6;
+$teal: #5AC8FA;
+$gray: #8E8E93;
+$gray2: #AEAEB2;
+$gray3: #C7C7CC;
+$gray4: #D1D1D6;
+$gray5: #E5E5EA;
+$gray6: #F2F2F7;
 
-$accent: #00BCD4;
-$accent-light: #E0F7FA;
-
-/* 指数色 */
-$green: #4CAF50;
-$green-light: #E8F5E9;
-$lime: #8BC34A;
-$yellow: #FFC107;
-$orange: #FF9800;
-$red: #F44336;
-
-/* 背景与卡片 */
-$bg: #F8FAFE;
+/* === 背景 === */
+$bg: #F2F2F7;
 $card: #FFFFFF;
-$card2: #F5F7FA;
 
-/* 文字 */
-$text: #1A2B4A;
-$sub: #6B7A99;
-$border: #E8ECF2;
+/* === 文字 === */
+$text: #000000;
+$sub: #3C3C43;
+$tertiary: #8E8E93;
 
-/* 圆角 */
-$radius: 16px;
-$radius-sm: 12px;
-$radius-xs: 8px;
+/* === 圆角 === */
+$radius: 16rpx;
+$radius-sm: 12rpx;
+$radius-xs: 8rpx;
 $radius-full: 100px;
 
-/* 阴影 */
-$shadow: 0 2px 12px rgba(26,43,74,.06);
-$shadow-lg: 0 8px 32px rgba(26,43,74,.08);
+/* === 分隔线 === */
+$separator: #C6C6C8;
 
-/* Glass tokens (iOS glassmorphism) */
-$glass-bg: rgba(255,255,255,0.72);
-$glass-bg-heavy: rgba(255,255,255,0.85);
-$glass-border: rgba(255,255,255,0.5);
-$glass-blur: 20px;
-$glass-shadow: 0 8px 32px rgba(0,0,0,0.06);
-$glass-shadow-lg: 0 16px 48px rgba(0,0,0,0.08);
-
-/* 全局渐变背景 */
-$bg-gradient: linear-gradient(180deg, #EBF5FF 0%, #F0F9FF 50%, #F8FAFE 100%);
+/* === 阴影（克制使用） === */
+$shadow: 0 1px 3px rgba(0,0,0,0.08);

@@ -8,13 +8,11 @@
         <text class="spot-name">{{ name }}</text>
         <text class="spot-type">{{ type }}{{ distance ? ' · ' + distance : '' }}</text>
         <view class="spot-rating">
-          <text class="rating-star">⭐</text>
           <text class="rating-num">{{ rating }}</text>
           <text class="rating-count">· {{ catchCount }}条渔获</text>
         </view>
       </view>
     </view>
-    
     <view class="card-tags">
       <text class="tag-item" v-for="fish in fishTypes" :key="fish">{{ fish }}</text>
     </view>
@@ -39,13 +37,9 @@ function goToDetail() {
 
 <style scoped>
 .spot-card {
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.5);
-  border-radius: 20px;
+  background: #FFFFFF;
+  border-radius: 16rpx;
   padding: 20rpx;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
 }
 
 .card-top {
@@ -55,17 +49,17 @@ function goToDetail() {
 }
 
 .spot-avatar {
-  width: 60rpx;
-  height: 60rpx;
-  border-radius: 16rpx;
-  background: linear-gradient(135deg, #2196F3, #00BCD4);
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 14rpx;
+  background: #F2F2F7;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .avatar-emoji {
-  font-size: 28rpx;
+  font-size: 24rpx;
 }
 
 .spot-info {
@@ -74,13 +68,13 @@ function goToDetail() {
 
 .spot-name {
   font-size: 30rpx;
-  font-weight: 700;
-  color: #1A2B4A;
+  font-weight: 600;
+  color: #000000;
 }
 
 .spot-type {
-  font-size: 22rpx;
-  color: #6B7A99;
+  font-size: 24rpx;
+  color: #8E8E93;
   margin-top: 4rpx;
 }
 
@@ -91,19 +85,15 @@ function goToDetail() {
   margin-top: 4rpx;
 }
 
-.rating-star {
-  font-size: 20rpx;
-}
-
 .rating-num {
   font-size: 24rpx;
   font-weight: 600;
-  color: #FF9800;
+  color: #FF9500;
 }
 
 .rating-count {
   font-size: 22rpx;
-  color: #6B7A99;
+  color: #8E8E93;
 }
 
 .card-tags {
@@ -114,11 +104,9 @@ function goToDetail() {
 
 .tag-item {
   padding: 4rpx 12rpx;
-  border-radius: 100px;
-  background: rgba(227,242,253,0.72);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  font-size: 20rpx;
-  color: #2196F3;
+  border-radius: 8rpx;
+  background: #F2F2F7;
+  font-size: 22rpx;
+  color: #3C3C43;
 }
 </style>

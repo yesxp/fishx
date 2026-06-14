@@ -1,107 +1,116 @@
 <template>
   <view class="container">
+    <!-- iOS 风格头部：大标题 + 滚动收缩 -->
     <view class="header">
-      <view class="header-left">
-        <view class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.46-3.44 6-7 6-3.56 0-7.56-2.54-8.5-6Z"/><path d="M18 12v.5"/><path d="M16 17.93a9.77 9.77 0 0 1 0-11.86"/><path d="M7 10.67C5.58 10.33 4.5 10 3 10c-1.5 0-3 .33-4 .67"/></svg></view>
-        <view class="info">
-          <text class="title">鱼渔娱</text>
-          <text class="subtitle">上海市</text>
+      <view class="header-top">
+        <view class="location">
+          <text class="location-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+          </text>
+          <text class="location-text">上海市</text>
+        </view>
+        <view class="header-actions">
+          <view class="action-btn" @click="goToCreate">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </view>
         </view>
       </view>
-      <view class="header-right">
-        <button class="btn-camera" @click="goToCreate">📷</button>
-      </view>
+      <text class="header-title">鱼渔娱</text>
     </view>
-    
+
     <scroll-view scroll-y class="content" @scrolltolower="loadMore">
-      <!-- 天气指数条 -->
-      <WeatherMini 
-        :score="indexResult.score"
-        :level="indexResult.level"
-        :color="indexResult.levelColor"
-        :text="indexResult.suggestion"
-      />
-      
-      <!-- 核心数据 -->
-      <view class="stats-grid">
-        <view class="stat-card">
-          <text class="stat-icon">🌡️</text>
-          <text class="stat-val">{{ weatherNow?.temp || '26' }}°</text>
-          <text class="stat-label">气温</text>
+      <!-- 天气指数卡片 -->
+      <view class="index-card" @click="goToWeather">
+        <view class="index-left">
+          <text class="index-score" :style="{ color: indexResult.levelColor }">{{ indexResult.score }}</text>
+          <view class="index-meta">
+            <text class="index-label">钓鱼指数</text>
+            <text class="index-level" :style="{ color: indexResult.levelColor }">{{ indexResult.level }}</text>
+          </view>
         </view>
-        <view class="stat-card">
-          <text class="stat-icon">📊</text>
-          <text class="stat-val">{{ weatherNow?.pressure || '1009' }}</text>
-          <text class="stat-label">气压 hPa</text>
-        </view>
-        <view class="stat-card">
-          <text class="stat-icon">💨</text>
-          <text class="stat-val">{{ weatherNow?.windScale || '2' }}级</text>
-          <text class="stat-label">南风</text>
+        <view class="index-right">
+          <text class="index-suggestion">{{ indexResult.suggestion }}</text>
+          <text class="index-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </text>
         </view>
       </view>
-      
-      <!-- 标签筛选 -->
-      <scroll-view scroll-x class="tags-scroll">
-        <view class="tag" 
-          v-for="tag in tags" 
-          :key="tag.id"
-          :class="{ active: selectedTag === tag.id }"
-          @click="selectedTag = tag.id"
-        >
-          {{ tag.icon }} {{ tag.name }}
+
+      <!-- 天气数据行：iOS 列表风格 -->
+      <view class="data-list">
+        <view class="data-row">
+          <text class="data-label">气温</text>
+          <text class="data-value">{{ weatherNow?.temp || '--' }}°</text>
+        </view>
+        <view class="data-divider"></view>
+        <view class="data-row">
+          <text class="data-label">气压</text>
+          <text class="data-value">{{ weatherNow?.pressure || '--' }} hPa</text>
+        </view>
+        <view class="data-divider"></view>
+        <view class="data-row">
+          <text class="data-label">风力</text>
+          <text class="data-value">{{ weatherNow?.windScale || '--' }}级 {{ weatherNow?.windDir || '' }}</text>
+        </view>
+      </view>
+
+      <!-- 标签筛选：iOS segmented control 风格 -->
+      <scroll-view scroll-x class="tags-scroll" :show-scrollbar="false">
+        <view class="tags-row">
+          <view class="tag"
+            v-for="tag in tags"
+            :key="tag.id"
+            :class="{ active: selectedTag === tag.id }"
+            @click="selectedTag = tag.id"
+          >
+            <text class="tag-text">{{ tag.name }}</text>
+          </view>
         </view>
       </scroll-view>
-      
-      <!-- 渔获瀑布流 -->
-      <view class="section">
+
+      <!-- 渔获列表 -->
+      <view class="section-header">
         <text class="section-title">附近渔获</text>
-        <text class="section-more">查看全部 →</text>
+        <text class="section-more">查看全部</text>
       </view>
-      
+
       <view class="masonry" v-if="catchList.length > 0">
         <view class="masonry-col">
-          <CatchCard 
-            v-for="item in catchList" 
+          <CatchCard
+            v-for="item in catchList"
             :key="item.id"
             v-if="getIndex(item) % 2 === 0"
             v-bind="item"
           />
         </view>
         <view class="masonry-col">
-          <CatchCard 
-            v-for="item in catchList" 
+          <CatchCard
+            v-for="item in catchList"
             :key="item.id"
             v-if="getIndex(item) % 2 === 1"
             v-bind="item"
           />
         </view>
       </view>
-      
+
       <!-- 空态 -->
-      <EmptyState 
+      <EmptyState
         v-else
-        icon="🎣"
+        icon=""
         title="还没有渔获记录"
-        desc="快去钓鱼吧！记录你的每一次收获"
-        btnText="去钓鱼吧！"
+        desc="快去钓鱼吧，记录你的每一次收获"
+        btnText="去钓鱼"
         @action="goToCreate"
       />
-      
-      <!-- 加载更多 -->
+
       <view class="loading-more" v-if="loading">
         <LoadingSpinner text="加载中..." />
       </view>
-      
+
       <view class="no-more" v-if="noMore && catchList.length > 0">
-        <text class="no-more-text">—— 没有更多了 ——</text>
+        <text class="no-more-text">没有更多了</text>
       </view>
     </scroll-view>
-    
-    <!-- 浮动拍照按钮 -->
-    <view class="fab" @click="goToCreate">
-      <text class="fab-icon">📷</text>
-    </view>
   </view>
 </template>
 
@@ -110,7 +119,6 @@ import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useWeatherStore } from '@/stores/weather'
 import { useCatchStore } from '@/stores/catch'
-import WeatherMini from '@/components/WeatherMini.vue'
 import CatchCard from '@/components/CatchCard.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -125,11 +133,11 @@ const selectedTag = ref('all')
 const noMore = ref(false)
 
 const tags = [
-  { id: 'all', name: '全部', icon: '' },
-  { id: 'crucian', name: '鲫鱼', icon: '🐟' },
-  { id: 'carp', name: '鲤鱼', icon: '🐠' },
-  { id: 'grass', name: '草鱼', icon: '🐡' },
-  { id: 'bass', name: '鲈鱼', icon: '🎣' },
+  { id: 'all', name: '全部' },
+  { id: 'crucian', name: '鲫鱼' },
+  { id: 'carp', name: '鲤鱼' },
+  { id: 'grass', name: '草鱼' },
+  { id: 'bass', name: '鲈鱼' },
 ]
 
 function getIndex(item: any) {
@@ -138,6 +146,10 @@ function getIndex(item: any) {
 
 function goToCreate() {
   uni.navigateTo({ url: '/pages/catch/create' })
+}
+
+function goToWeather() {
+  uni.switchTab({ url: '/pages/weather/index' })
 }
 
 async function loadMore() {
@@ -156,172 +168,246 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* ===== iOS 设计系统 ===== */
+/* 主色：#007AFF (iOS Blue) */
+/* 背景：#F2F2F7 (iOS System Grouped Background) */
+/* 卡片：#FFFFFF */
+/* 文字：#000000 / #3C3C43 (60%) / #3C3C43 (30%) */
+/* 分隔线：#C6C6C8 */
+
 .container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #EBF5FF 0%, #F0F9FF 50%, #F8FAFE 100%);
-  position: relative;
+  background: #F2F2F7;
 }
 
+/* === iOS 大标题头部 === */
 .header {
+  background: #FFFFFF;
+  padding: 12rpx 20rpx 20rpx;
+  border-bottom: 0.5px solid #C6C6C8;
+}
+
+.header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16rpx 28rpx;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.5);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  margin-bottom: 8rpx;
 }
 
-.header-left {
+.location {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.location-icon {
+  width: 28rpx;
+  height: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.location-icon svg {
+  width: 28rpx;
+  height: 28rpx;
+}
+
+.location-text {
+  font-size: 26rpx;
+  color: #007AFF;
+  font-weight: 500;
+}
+
+.header-actions {
   display: flex;
   align-items: center;
   gap: 16rpx;
 }
 
-.logo {
-  width: 44rpx;
-  height: 44rpx;
-  border-radius: 12rpx;
-  background: rgba(33,150,243,0.1);
-  border: 1px solid rgba(33,150,243,0.2);
+.action-btn {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: #F2F2F7;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
-.logo svg {
-  width: 24rpx;
-  height: 24rpx;
+.action-btn svg {
+  width: 32rpx;
+  height: 32rpx;
 }
 
-.info {
+.header-title {
+  font-size: 60rpx;
+  font-weight: 700;
+  color: #000000;
+  letter-spacing: -0.5rpx;
+}
+
+/* === 内容区 === */
+.content {
+  flex: 1;
+  padding: 16rpx 20rpx;
+}
+
+/* === 指数卡片 === */
+.index-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 24rpx 20rpx;
+  margin-bottom: 16rpx;
+}
+
+.index-left {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.index-score {
+  font-size: 64rpx;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.index-meta {
   display: flex;
   flex-direction: column;
   gap: 4rpx;
 }
 
-.title {
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #1A2B4A;
+.index-label {
+  font-size: 24rpx;
+  color: #8E8E93;
 }
 
-.subtitle {
-  font-size: 22rpx;
-  color: #6B7A99;
+.index-level {
+  font-size: 28rpx;
+  font-weight: 600;
 }
 
-.header-right {
+.index-right {
   display: flex;
   align-items: center;
+  gap: 8rpx;
 }
 
-.btn-camera {
-  width: 44rpx;
-  height: 44rpx;
-  border-radius: 12rpx;
-  background: rgba(33,150,243,0.1);
-  color: #2196F3;
+.index-suggestion {
   font-size: 24rpx;
+  color: #8E8E93;
+  text-align: right;
+  max-width: 200rpx;
+}
+
+.index-arrow {
+  width: 24rpx;
+  height: 24rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(33,150,243,0.2);
+}
+.index-arrow svg {
+  width: 24rpx;
+  height: 24rpx;
 }
 
-.content {
-  flex: 1;
+/* === 天气数据行：iOS Inset Grouped List === */
+.data-list {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  margin-bottom: 16rpx;
+  overflow: hidden;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12rpx;
-  padding: 0 16rpx;
-  margin-bottom: 20rpx;
+.data-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 20rpx;
 }
 
-.stat-card {
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.5);
-  border-radius: 20px;
-  padding: 20rpx 12rpx;
-  text-align: center;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+.data-label {
+  font-size: 30rpx;
+  color: #000000;
 }
 
-.stat-icon {
-  font-size: 36rpx;
-  margin-bottom: 8rpx;
+.data-value {
+  font-size: 30rpx;
+  color: #8E8E93;
+  font-variant-numeric: tabular-nums;
 }
 
-.stat-val {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #1A2B4A;
+.data-divider {
+  height: 0.5px;
+  background: #C6C6C8;
+  margin-left: 20rpx;
 }
 
-.stat-label {
-  font-size: 20rpx;
-  color: #6B7A99;
-}
-
+/* === 标签筛选：iOS Segment 风格 === */
 .tags-scroll {
+  margin-bottom: 24rpx;
   white-space: nowrap;
-  padding: 0 16rpx;
-  margin-bottom: 20rpx;
+}
+
+.tags-row {
+  display: inline-flex;
+  gap: 12rpx;
+  padding: 4rpx 0;
 }
 
 .tag {
   display: inline-flex;
   align-items: center;
-  gap: 4rpx;
-  padding: 12rpx 24rpx;
-  border-radius: 100px;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: #6B7A99;
-  font-size: 24rpx;
-  margin-right: 12rpx;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  height: 56rpx;
+  padding: 0 28rpx;
+  border-radius: 28rpx;
+  background: #E5E5EA;
+  flex-shrink: 0;
 }
 
 .tag.active {
-  background: linear-gradient(135deg, #2196F3, #00BCD4);
+  background: #007AFF;
+}
+
+.tag-text {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #000000;
+  white-space: nowrap;
+}
+
+.tag.active .tag-text {
   color: #FFFFFF;
 }
 
-.section {
+/* === 列表头部 === */
+.section-header {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  padding: 0 16rpx;
   margin-bottom: 16rpx;
 }
 
 .section-title {
-  font-size: 30rpx;
+  font-size: 34rpx;
   font-weight: 700;
-  color: #1A2B4A;
+  color: #000000;
 }
 
 .section-more {
-  font-size: 26rpx;
-  color: #2196F3;
+  font-size: 28rpx;
+  color: #007AFF;
 }
 
+/* === 瀑布流 === */
 .masonry {
   display: flex;
   gap: 12rpx;
-  padding: 0 16rpx;
 }
 
 .masonry-col {
@@ -330,6 +416,7 @@ onMounted(() => {
   flex-direction: column;
 }
 
+/* === 底部 === */
 .loading-more {
   padding: 40rpx 0;
 }
@@ -341,25 +428,6 @@ onMounted(() => {
 
 .no-more-text {
   font-size: 24rpx;
-  color: #94A3B8;
-}
-
-.fab {
-  position: fixed;
-  right: 40rpx;
-  bottom: 200rpx;
-  width: 100rpx;
-  height: 100rpx;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #2196F3, #00BCD4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8rpx 24rpx rgba(33,150,243,.3);
-  z-index: 50;
-}
-
-.fab-icon {
-  font-size: 40rpx;
+  color: #8E8E93;
 }
 </style>

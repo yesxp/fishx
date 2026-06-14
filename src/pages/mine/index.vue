@@ -1,98 +1,112 @@
 <template>
   <view class="container">
+    <!-- iOS 大标题头部 -->
     <view class="header">
-      <view class="header-left">
-        <view class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg></view>
-        <view class="info">
-          <text class="title">我的</text>
-          <text class="subtitle">{{ userInfo?.nickname || '未登录' }}</text>
-        </view>
-      </view>
-      <view class="header-right">
-        <button class="btn-camera" @click="goToCreate">📷</button>
-      </view>
+      <text class="header-title">我的</text>
     </view>
-    
+
     <scroll-view scroll-y class="content">
-      <!-- 个人信息 -->
+      <!-- 个人信息卡片 -->
       <view class="profile-card">
         <view class="avatar" @click="handleAvatarClick">
-          <text class="avatar-emoji">{{ userInfo?.avatar || '🎣' }}</text>
+          <text class="avatar-text">{{ userInfo?.nickname?.[0] || '?' }}</text>
         </view>
-        <text class="nickname">{{ userInfo?.nickname || '点击登录' }}</text>
-        <text class="user-id">ID: {{ userInfo?.id || '--' }}</text>
-      </view>
-      
-      <!-- 统计卡片 -->
-      <view class="stats-row">
-        <view class="stat-item" @click="goToMyCatch">
-          <text class="stat-num">{{ myCatchCount }}</text>
-          <text class="stat-label">总渔获</text>
-        </view>
-        <view class="stat-item">
-          <text class="stat-num">{{ mySpotCount }}</text>
-          <text class="stat-label">钓点</text>
-        </view>
-        <view class="stat-item">
-          <text class="stat-num">{{ topFish }}</text>
-          <text class="stat-label">最常钓</text>
+        <view class="profile-info">
+          <text class="nickname">{{ userInfo?.nickname || '点击登录' }}</text>
+          <text class="user-id" v-if="userInfo?.id">ID: {{ userInfo.id }}</text>
         </view>
       </view>
-      
-      <!-- 功能菜单 -->
-      <view class="menu-section">
-        <view class="menu-item" @click="goToMyCatch">
-          <view class="menu-icon" style="background: #E3F2FD; color: #2196F3;">🐟</view>
-          <text class="menu-text">我的渔获</text>
-          <text class="menu-arrow">›</text>
-        </view>
-        <view class="menu-item" @click="goToMySpot">
-          <view class="menu-icon" style="background: #E0F7FA; color: #00BCD4;">📍</view>
-          <text class="menu-text">我的钓点</text>
-          <text class="menu-arrow">›</text>
-        </view>
-        <view class="menu-item" @click="goToCollection">
-          <view class="menu-icon" style="background: #FFF3E0; color: #FF9800;">⭐</view>
-          <text class="menu-text">收藏</text>
-          <text class="menu-arrow">›</text>
-        </view>
-      </view>
-      
-      <!-- 设置菜单 -->
-      <view class="menu-section">
-        <view class="menu-item" @click="handleLocationAuth">
-          <view class="menu-icon" style="background: #E8F5E9; color: #4CAF50;">📍</view>
-          <text class="menu-text">定位授权</text>
-          <view class="menu-status">
-            <text class="status-text">{{ locationAuth ? '已授权' : '未授权' }}</text>
+
+      <!-- 统计行 -->
+      <view class="stats-list">
+        <view class="stats-row">
+          <view class="stat-item" @click="goToMyCatch">
+            <text class="stat-num">{{ myCatchCount }}</text>
+            <text class="stat-label">总渔获</text>
           </view>
-          <text class="menu-arrow">›</text>
-        </view>
-        <view class="menu-item" @click="handleNotification">
-          <view class="menu-icon" style="background: #F3E5F5; color: #9C27B0;">🔔</view>
-          <text class="menu-text">通知设置</text>
-          <text class="menu-arrow">›</text>
-        </view>
-        <view class="menu-item" @click="handleClearCache">
-          <view class="menu-icon" style="background: #FFEBEE; color: #F44336;">🗑️</view>
-          <text class="menu-text">清除缓存</text>
-          <text class="menu-status">
-            <text class="status-text">{{ cacheSize }}</text>
-          </text>
-          <text class="menu-arrow">›</text>
-        </view>
-        <view class="menu-item" @click="goToAbout">
-          <view class="menu-icon" style="background: #F1F5F9; color: #64748B;">ℹ️</view>
-          <text class="menu-text">关于鱼渔娱</text>
-          <text class="menu-arrow">›</text>
+          <view class="stat-divider"></view>
+          <view class="stat-item">
+            <text class="stat-num">{{ mySpotCount }}</text>
+            <text class="stat-label">钓点</text>
+          </view>
+          <view class="stat-divider"></view>
+          <view class="stat-item">
+            <text class="stat-num">{{ topFish }}</text>
+            <text class="stat-label">最常钓</text>
+          </view>
         </view>
       </view>
-      
+
+      <!-- 功能列表：iOS Inset Grouped Style -->
+      <view class="list-section">
+        <view class="list-group">
+          <view class="list-item" @click="goToMyCatch">
+            <text class="item-label">我的渔获</text>
+            <text class="item-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </text>
+          </view>
+          <view class="list-divider"></view>
+          <view class="list-item" @click="goToMySpot">
+            <text class="item-label">我的钓点</text>
+            <text class="item-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </text>
+          </view>
+          <view class="list-divider"></view>
+          <view class="list-item" @click="goToCollection">
+            <text class="item-label">收藏</text>
+            <text class="item-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 设置列表 -->
+      <view class="list-section">
+        <view class="list-group">
+          <view class="list-item" @click="handleLocationAuth">
+            <text class="item-label">定位授权</text>
+            <view class="item-right">
+              <text class="item-status">{{ locationAuth ? '已授权' : '未授权' }}</text>
+              <text class="item-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </text>
+            </view>
+          </view>
+          <view class="list-divider"></view>
+          <view class="list-item" @click="handleNotification">
+            <text class="item-label">通知设置</text>
+            <text class="item-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </text>
+          </view>
+          <view class="list-divider"></view>
+          <view class="list-item" @click="handleClearCache">
+            <text class="item-label">清除缓存</text>
+            <view class="item-right">
+              <text class="item-status">{{ cacheSize }}</text>
+              <text class="item-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </text>
+            </view>
+          </view>
+          <view class="list-divider"></view>
+          <view class="list-item" @click="goToAbout">
+            <text class="item-label">关于鱼渔娱</text>
+            <text class="item-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </text>
+          </view>
+        </view>
+      </view>
+
       <!-- 退出登录 -->
       <view class="logout-section" v-if="isLoggedIn">
         <button class="logout-btn" @click="handleLogout">退出登录</button>
       </view>
-      
+
       <view style="height: 40rpx;"></view>
     </scroll-view>
   </view>
@@ -109,40 +123,30 @@ const catchStore = useCatchStore()
 const { userInfo, isLoggedIn } = userStore
 const { catchList } = catchStore
 
-// 统计数据
 const myCatchCount = computed(() => catchList.value.length)
 const mySpotCount = ref(8)
 const topFish = ref('鲫鱼')
-
-// 定位授权状态
 const locationAuth = ref(false)
-
-// 缓存大小
 const cacheSize = ref('2.3MB')
 
-// 头像点击
 function handleAvatarClick() {
   if (!isLoggedIn) {
     uni.navigateTo({ url: '/pages/login/index' })
   }
 }
 
-// 跳转我的渔获
 function goToMyCatch() {
   uni.showToast({ title: '我的渔获页面开发中', icon: 'none' })
 }
 
-// 跳转我的钓点
 function goToMySpot() {
   uni.showToast({ title: '我的钓点页面开发中', icon: 'none' })
 }
 
-// 跳转收藏
 function goToCollection() {
   uni.showToast({ title: '收藏页面开发中', icon: 'none' })
 }
 
-// 定位授权
 function handleLocationAuth() {
   uni.authorize({
     scope: 'scope.userLocation',
@@ -157,12 +161,10 @@ function handleLocationAuth() {
   })
 }
 
-// 通知设置
 function handleNotification() {
   uni.showToast({ title: '通知设置开发中', icon: 'none' })
 }
 
-// 清除缓存
 function handleClearCache() {
   uni.showModal({
     title: '清除缓存',
@@ -177,12 +179,10 @@ function handleClearCache() {
   })
 }
 
-// 关于页面
 function goToAbout() {
   uni.showToast({ title: '关于页面开发中', icon: 'none' })
 }
 
-// 退出登录
 function handleLogout() {
   uni.showModal({
     title: '退出登录',
@@ -199,20 +199,12 @@ function handleLogout() {
   })
 }
 
-// 跳转拍照
-function goToCreate() {
-  uni.navigateTo({ url: '/pages/catch/create' })
-}
-
 onMounted(() => {
-  // 检查定位授权
   uni.getSetting({
     success: (res) => {
       locationAuth.value = !!res.authSetting['scope.userLocation']
     }
   })
-  
-  // 加载渔获数据
   catchStore.loadList(true)
 })
 </script>
@@ -220,236 +212,180 @@ onMounted(() => {
 <style scoped>
 .container {
   min-height: 100vh;
-  background: linear-gradient(180deg, #EBF5FF 0%, #F0F9FF 50%, #F8FAFE 100%);
+  background: #F2F2F7;
 }
 
+/* === iOS 大标题头部 === */
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16rpx 28rpx;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.5);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  background: #FFFFFF;
+  padding: 12rpx 20rpx 20rpx;
+  border-bottom: 0.5px solid #C6C6C8;
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-
-.logo {
-  width: 44rpx;
-  height: 44rpx;
-  border-radius: 12rpx;
-  background: rgba(33,150,243,0.1);
-  border: 1px solid rgba(33,150,243,0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.logo svg {
-  width: 24rpx;
-  height: 24rpx;
-}
-
-.info {
-  display: flex;
-  flex-direction: column;
-  gap: 4rpx;
-}
-
-.title {
-  font-size: 34rpx;
+.header-title {
+  font-size: 60rpx;
   font-weight: 700;
-  color: #1A2B4A;
-}
-
-.subtitle {
-  font-size: 22rpx;
-  color: #6B7A99;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-}
-
-.btn-camera {
-  width: 44rpx;
-  height: 44rpx;
-  border-radius: 12rpx;
-  background: rgba(33,150,243,0.1);
-  color: #2196F3;
-  font-size: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(33,150,243,0.2);
+  color: #000000;
+  letter-spacing: -0.5rpx;
 }
 
 .content {
   flex: 1;
 }
 
+/* === 个人信息 === */
 .profile-card {
-  margin: 24rpx;
-  padding: 48rpx;
-  background: linear-gradient(135deg, #E3F2FD, #E0F7FA);
-  border-radius: 24rpx;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 24rpx 20rpx;
+  margin: 16rpx 20rpx;
 }
 
 .avatar {
-  width: 140rpx;
-  height: 140rpx;
+  width: 100rpx;
+  height: 100rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2196F3, #00BCD4);
-  margin: 0 auto 20rpx;
+  background: #007AFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8rpx 32rpx rgba(33,150,243,.3);
+  flex-shrink: 0;
 }
 
-.avatar-emoji {
-  font-size: 64rpx;
+.avatar-text {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
 }
 
 .nickname {
-  font-size: 36rpx;
-  font-weight: 700;
-  color: #1A2B4A;
-  margin-bottom: 8rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #000000;
 }
 
 .user-id {
   font-size: 24rpx;
-  color: #6B7A99;
+  color: #8E8E93;
+}
+
+/* === 统计行 === */
+.stats-list {
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  margin: 0 20rpx 16rpx;
+  overflow: hidden;
 }
 
 .stats-row {
   display: flex;
-  gap: 1px;
-  margin: 0 24rpx 24rpx;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 20rpx;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.5);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  align-items: center;
 }
 
 .stat-item {
   flex: 1;
   text-align: center;
-  padding: 28rpx 16rpx;
-  cursor: pointer;
-}
-
-.stat-item:active {
-  background: #F8FAFE;
+  padding: 24rpx 16rpx;
 }
 
 .stat-num {
   font-size: 40rpx;
   font-weight: 700;
-  color: #2196F3;
+  color: #007AFF;
   display: block;
 }
 
 .stat-label {
   font-size: 22rpx;
-  color: #6B7A99;
+  color: #8E8E93;
   margin-top: 4rpx;
+  display: block;
 }
 
-.menu-section {
-  margin: 0 24rpx 24rpx;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 20rpx;
+.stat-divider {
+  width: 0.5px;
+  height: 60rpx;
+  background: #C6C6C8;
+}
+
+/* === 列表组 === */
+.list-section {
+  margin: 0 20rpx 16rpx;
+}
+
+.list-group {
+  background: #FFFFFF;
+  border-radius: 16rpx;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.5);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
 }
 
-.menu-item {
+.list-item {
   display: flex;
   align-items: center;
-  padding: 28rpx 24rpx;
-  border-bottom: 1rpx solid #F1F5F9;
-  cursor: pointer;
+  justify-content: space-between;
+  padding: 24rpx 20rpx;
 }
 
-.menu-item:last-child {
-  border-bottom: none;
+.item-label {
+  font-size: 30rpx;
+  color: #000000;
 }
 
-.menu-item:active {
-  background: #F8FAFE;
+.item-right {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
 }
 
-.menu-icon {
-  width: 56rpx;
-  height: 56rpx;
-  border-radius: 14rpx;
+.item-status {
+  font-size: 26rpx;
+  color: #8E8E93;
+}
+
+.item-arrow {
+  width: 24rpx;
+  height: 24rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24rpx;
-  margin-right: 20rpx;
+}
+.item-arrow svg {
+  width: 24rpx;
+  height: 24rpx;
 }
 
-.menu-text {
-  flex: 1;
-  font-size: 28rpx;
-  font-weight: 500;
-  color: #1A2B4A;
+.list-divider {
+  height: 0.5px;
+  background: #C6C6C8;
+  margin-left: 20rpx;
 }
 
-.menu-status {
-  margin-right: 12rpx;
-}
-
-.status-text {
-  font-size: 22rpx;
-  color: #94A3B8;
-}
-
-.menu-arrow {
-  font-size: 28rpx;
-  color: #94A3B8;
-}
-
+/* === 退出登录 === */
 .logout-section {
-  margin: 0 24rpx;
+  margin: 0 20rpx;
 }
 
 .logout-btn {
   width: 100%;
   height: 88rpx;
   border-radius: 16rpx;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 2rpx solid #F44336;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
-  color: #F44336;
-  font-size: 28rpx;
-  font-weight: 600;
+  background: #FFFFFF;
+  color: #FF3B30;
+  font-size: 30rpx;
+  font-weight: 500;
+  border: none;
 }
 
 .logout-btn:active {
-  background: #FFEBEE;
+  background: #F2F2F7;
 }
 </style>

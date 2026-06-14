@@ -1,30 +1,21 @@
 <template>
   <view class="catch-card" @click="goToDetail">
-    <!-- 图片 -->
     <view class="card-photo" :style="{ background: bgColor }">
       <text class="photo-emoji">{{ fishEmoji }}</text>
     </view>
-    
-    <!-- 内容 -->
     <view class="card-body">
-      <FishBadge :name="fishName" :emoji="fishEmoji" />
-      
+      <view class="card-tag">
+        <text class="tag-name">{{ fishName }}</text>
+      </view>
       <view class="card-meta">
-        <text class="meta-location">📍 {{ location }}</text>
+        <text class="meta-location">{{ location }}</text>
         <text class="meta-time">{{ formatTime(time) }}</text>
       </view>
-      
-      <view class="card-weather">
-        <text class="weather-text">🌤️ {{ temperature }} {{ weather }}</text>
-      </view>
-      
       <view class="card-actions">
         <view class="action-item">
-          <text class="action-icon">❤️</text>
           <text class="action-count">{{ likes }}</text>
         </view>
         <view class="action-item">
-          <text class="action-icon">💬</text>
           <text class="action-count">{{ comments }}</text>
         </view>
       </view>
@@ -33,8 +24,6 @@
 </template>
 
 <script setup lang="ts">
-import FishBadge from './FishBadge.vue'
-
 const props = defineProps<{
   id: string
   fishName: string
@@ -51,7 +40,7 @@ const props = defineProps<{
 const bgColor = getColorByIndex(Math.floor(Math.random() * 8))
 
 function getColorByIndex(index: number) {
-  const colors = ['#E3F2FD', '#E0F7FA', '#FFF3E0', '#E8F5E9', '#F3E5F5', '#FBE9E7', '#ECEFF1', '#E8EAF6']
+  const colors = ['#F2F2F7', '#E8F5E9', '#FFF3E0', '#E3F2FD', '#F3E5F5', '#FBE9E7', '#ECEFF1', '#E8EAF6']
   return colors[index]
 }
 
@@ -60,7 +49,6 @@ function formatTime(t: string) {
   const date = new Date(t)
   const now = new Date()
   const diff = now.getTime() - date.getTime()
-  
   if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前'
   if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前'
   if (diff < 172800000) return '昨天'
@@ -74,14 +62,10 @@ function goToDetail() {
 
 <style scoped>
 .catch-card {
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.5);
-  border-radius: 20px;
+  background: #FFFFFF;
+  border-radius: 16rpx;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
-  margin-bottom: 16rpx;
+  margin-bottom: 12rpx;
 }
 
 .card-photo {
@@ -90,7 +74,6 @@ function goToDetail() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,0.35);
 }
 
 .photo-emoji {
@@ -98,33 +81,33 @@ function goToDetail() {
 }
 
 .card-body {
-  padding: 16rpx;
+  padding: 16rpx 16rpx 20rpx;
+}
+
+.card-tag {
+  margin-bottom: 8rpx;
+}
+
+.tag-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #000000;
 }
 
 .card-meta {
   display: flex;
   flex-direction: column;
   gap: 4rpx;
-  margin-top: 12rpx;
 }
 
 .meta-location {
   font-size: 24rpx;
-  color: #1A2B4A;
+  color: #8E8E93;
 }
 
 .meta-time {
-  font-size: 20rpx;
-  color: #6B7A99;
-}
-
-.card-weather {
-  margin-top: 8rpx;
-}
-
-.weather-text {
-  font-size: 20rpx;
-  color: #6B7A99;
+  font-size: 22rpx;
+  color: #AEAEB2;
 }
 
 .card-actions {
@@ -133,7 +116,7 @@ function goToDetail() {
   gap: 20rpx;
   margin-top: 12rpx;
   padding-top: 12rpx;
-  border-top: 1rpx solid #F1F5F9;
+  border-top: 0.5px solid #E5E5EA;
 }
 
 .action-item {
@@ -142,12 +125,8 @@ function goToDetail() {
   gap: 4rpx;
 }
 
-.action-icon {
-  font-size: 20rpx;
-}
-
 .action-count {
-  font-size: 20rpx;
-  color: #6B7A99;
+  font-size: 22rpx;
+  color: #8E8E93;
 }
 </style>

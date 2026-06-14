@@ -9,14 +9,14 @@
     </view>
     <view class="mini-right">
       <text class="mini-text">{{ text }}</text>
-      <text class="mini-arrow">›</text>
+      <text class="mini-arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#C7C7CC" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </text>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-
 const props = defineProps<{
   score: number
   level: string
@@ -34,26 +34,23 @@ function goToWeather() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx 24rpx;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.5);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
-  margin: 0 16rpx 16rpx;
+  padding: 24rpx 20rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  margin: 0 0 16rpx;
 }
 
 .mini-left {
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  gap: 20rpx;
 }
 
 .mini-score {
-  font-size: 48rpx;
-  font-weight: 800;
+  font-size: 52rpx;
+  font-weight: 700;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .mini-info {
@@ -63,12 +60,12 @@ function goToWeather() {
 }
 
 .mini-label {
-  font-size: 20rpx;
-  color: #6B7A99;
+  font-size: 22rpx;
+  color: #8E8E93;
 }
 
 .mini-level {
-  font-size: 26rpx;
+  font-size: 28rpx;
   font-weight: 600;
 }
 
@@ -79,12 +76,20 @@ function goToWeather() {
 }
 
 .mini-text {
-  font-size: 22rpx;
-  color: #6B7A99;
+  font-size: 24rpx;
+  color: #8E8E93;
+  max-width: 240rpx;
 }
 
 .mini-arrow {
-  font-size: 28rpx;
-  color: #6B7A99;
+  width: 24rpx;
+  height: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mini-arrow svg {
+  width: 24rpx;
+  height: 24rpx;
 }
 </style>

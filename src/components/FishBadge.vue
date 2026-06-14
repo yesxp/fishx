@@ -1,6 +1,5 @@
 <template>
   <view class="fish-badge" :style="{ background: bgColor, color: textColor }">
-    <text class="badge-emoji">{{ emoji }}</text>
     <text class="badge-name">{{ name }}</text>
   </view>
 </template>
@@ -18,22 +17,9 @@ defineProps<{
 .fish-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4rpx;
   padding: 4rpx 12rpx;
-  border-radius: 100px;
-  background: rgba(255,255,255,0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.4);
-  font-size: 20rpx;
+  border-radius: 8rpx;
+  font-size: 22rpx;
   font-weight: 500;
-}
-
-.badge-emoji {
-  font-size: 20rpx;
-}
-
-.badge-name {
-  font-size: 20rpx;
 }
 </style>
