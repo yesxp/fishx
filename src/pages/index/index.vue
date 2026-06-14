@@ -107,6 +107,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useWeatherStore } from '@/stores/weather'
 import { useCatchStore } from '@/stores/catch'
 import WeatherMini from '@/components/WeatherMini.vue'
@@ -117,8 +118,8 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue'
 const weatherStore = useWeatherStore()
 const catchStore = useCatchStore()
 
-const { weatherNow, indexResult } = weatherStore
-const { catchList, loading, total } = catchStore
+const { weatherNow, indexResult } = storeToRefs(weatherStore)
+const { catchList, loading, total } = storeToRefs(catchStore)
 
 const selectedTag = ref('all')
 const noMore = ref(false)
