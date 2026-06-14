@@ -22,8 +22,12 @@
     <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
       <!-- Profile Header -->
       <view class="profile-header">
-        <view class="profile-avatar">
-          <text class="profile-avatar-text">{{ userInitial }}</text>
+        <view class="profile-banner" />
+        <view class="profile-avatar-wrap">
+          <view class="profile-avatar">
+            <text class="profile-avatar-text">{{ userInitial }}</text>
+          </view>
+          <view class="profile-status" />
         </view>
         <text class="profile-name">{{ nickname }}</text>
         <text class="profile-bio">热爱生活，热爱钓鱼 🎣</text>
@@ -190,21 +194,48 @@ $text-muted: #80848E;
 /* Profile Header */
 .profile-header {
   text-align: center;
-  padding: 32px 16px 24px;
+  padding: 0 16px 24px;
   background: $bg-card;
   border-bottom: 1px solid $divider;
   margin-bottom: 12px;
+  position: relative;
+}
+
+.profile-banner {
+  height: 120px;
+  background: linear-gradient(135deg, #5865F2 0%, #4752C4 50%, #3C45A5 100%);
+  border-radius: 12px 12px 0 0;
+  margin: 0 -16px;
+}
+
+.profile-avatar-wrap {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: -40px auto 12px;
 }
 
 .profile-avatar {
-  width: 72px;
-  height: 72px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: $divider;
-  margin: 0 auto 12px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 4px solid $bg-card;
+  box-sizing: border-box;
+}
+
+.profile-status {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: $status-green;
+  border: 3px solid $bg-card;
 }
 
 .profile-avatar-text {
