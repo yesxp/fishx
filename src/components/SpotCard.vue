@@ -9,12 +9,14 @@
         <text class="spot-type">{{ type }}{{ distance ? ' · ' + distance : '' }}</text>
         <view class="spot-rating">
           <text class="rating-num">{{ rating }}</text>
-          <text class="rating-count">· {{ catchCount }}条渔获</text>
+          <text class="rating-count">· {{ catchCount }} catches</text>
         </view>
       </view>
     </view>
     <view class="card-tags">
-      <text class="tag-item" v-for="fish in fishTypes" :key="fish">{{ fish }}</text>
+      <view class="tag-item" v-for="fish in fishTypes" :key="fish">
+        <text>{{ fish }}</text>
+      </view>
     </view>
   </view>
 </template>
@@ -38,20 +40,24 @@ function goToDetail() {
 <style scoped>
 .spot-card {
   background: #FFFFFF;
-  border-radius: 12rpx;
-  padding: 20rpx;
+  border-radius: 8rpx;
+  padding: 16rpx 20rpx;
   box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  transition: background 0.15s;
+}
+.spot-card:active {
+  background: rgba(79,84,92,0.04);
 }
 
 .card-top {
   display: flex;
-  gap: 16rpx;
+  gap: 14rpx;
   margin-bottom: 12rpx;
 }
 
 .spot-avatar {
-  width: 52rpx;
-  height: 52rpx;
+  width: 48rpx;
+  height: 48rpx;
   border-radius: 50%;
   background: rgba(88,101,242,0.08);
   display: flex;
@@ -60,24 +66,33 @@ function goToDetail() {
   flex-shrink: 0;
 }
 .spot-avatar svg {
-  width: 28rpx;
-  height: 28rpx;
+  width: 24rpx;
+  height: 24rpx;
 }
 
 .spot-info {
   flex: 1;
+  min-width: 0;
 }
 
 .spot-name {
   font-size: 28rpx;
   font-weight: 600;
   color: #313338;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .spot-type {
   font-size: 22rpx;
   color: #80848E;
   margin-top: 2rpx;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .spot-rating {
@@ -105,8 +120,8 @@ function goToDetail() {
 }
 
 .tag-item {
-  padding: 4rpx 10rpx;
-  border-radius: 4rpx;
+  padding: 2rpx 12rpx;
+  border-radius: 20rpx;
   background: rgba(88,101,242,0.08);
   font-size: 20rpx;
   color: #5865F2;

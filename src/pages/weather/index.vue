@@ -1,93 +1,91 @@
 <template>
-  <view class="container">
-    <view class="header">
-      <view class="header-row">
-        <text class="header-title">天时</text>
+  <view class="page">
+    <view class="topbar">
+      <view class="topbar-inner">
+        <text class="brand-name">天时</text>
       </view>
-      <text class="header-sub">上海 · 钓鱼指数</text>
+      <text class="topbar-sub">Fishing Forecast · Shanghai</text>
     </view>
 
-    <scroll-view scroll-y class="content">
-      <!-- 大字指数 -->
-      <view class="card hero-card">
+    <scroll-view scroll-y class="scroll-content">
+      <!-- Hero: big score -->
+      <view class="dc-card hero-card">
         <text class="hero-score" :style="{ color: indexResult.levelColor }">{{ indexResult.score }}</text>
-        <text class="hero-label">今日钓鱼指数</text>
+        <text class="hero-label">Fishing Index</text>
         <view class="hero-badge" :style="{ background: indexResult.levelColor + '18', color: indexResult.levelColor }">
           {{ indexResult.suggestion }}
         </view>
       </view>
 
-      <!-- 天气数据 -->
-      <view class="card data-card">
-        <view class="data-row">
-          <view class="data-dot" style="background: #F0B232;"></view>
-          <text class="data-label">气温</text>
-          <text class="data-value">{{ weatherNow?.temp || '--' }}°</text>
+      <!-- Weather data list -->
+      <view class="dc-card weather-list">
+        <view class="list-row" :class="{'has-divider': true}">
+          <view class="list-dot" style="background: #F0B232;"></view>
+          <text class="list-label">Temperature</text>
+          <text class="list-value">{{ weatherNow?.temp || '--' }}°</text>
         </view>
-        <view class="data-sep"></view>
-        <view class="data-row">
-          <view class="data-dot" style="background: #5865F2;"></view>
-          <text class="data-label">湿度</text>
-          <text class="data-value">{{ weatherNow?.humidity || '--' }}%</text>
+        <view class="list-row" :class="{'has-divider': true}">
+          <view class="list-dot" style="background: #5865F2;"></view>
+          <text class="list-label">Humidity</text>
+          <text class="list-value">{{ weatherNow?.humidity || '--' }}%</text>
         </view>
-        <view class="data-sep"></view>
-        <view class="data-row">
-          <view class="data-dot" style="background: #23A55A;"></view>
-          <text class="data-label">气压</text>
-          <text class="data-value">{{ weatherNow?.pressure || '--' }} hPa</text>
+        <view class="list-row" :class="{'has-divider': true}">
+          <view class="list-dot" style="background: #23A55A;"></view>
+          <text class="list-label">Pressure</text>
+          <text class="list-value">{{ weatherNow?.pressure || '--' }} hPa</text>
         </view>
-        <view class="data-sep"></view>
-        <view class="data-row">
-          <view class="data-dot" style="background: #EB459E;"></view>
-          <text class="data-label">天气</text>
-          <text class="data-value">{{ weatherNow?.text || '--' }}</text>
+        <view class="list-row" :class="{'has-divider': true}">
+          <view class="list-dot" style="background: #EB459E;"></view>
+          <text class="list-label">Condition</text>
+          <text class="list-value">{{ weatherNow?.text || '--' }}</text>
         </view>
-        <view class="data-sep"></view>
-        <view class="data-row">
-          <view class="data-dot" style="background: #F23F43;"></view>
-          <text class="data-label">风力</text>
-          <text class="data-value">{{ weatherNow?.windScale || '--' }}级 {{ weatherNow?.windDir || '' }}</text>
+        <view class="list-row">
+          <view class="list-dot" style="background: #F23F43;"></view>
+          <text class="list-label">Wind</text>
+          <text class="list-value">{{ weatherNow?.windScale || '--' }}级 {{ weatherNow?.windDir || '' }}</text>
         </view>
       </view>
 
-      <!-- 气压趋势 -->
-      <view class="card chart-card">
-        <text class="card-title">气压趋势</text>
-        <view class="chart">
-          <view
-            class="bar"
-            v-for="(item, i) in pressureData"
-            :key="i"
-            :style="{
-              height: item.percent + '%',
-              background: i === 12 ? '#5865F2' : (item.value > 1005 ? '#23A55A' : '#E3E5E8')
-            }"
-          ></view>
-        </view>
-        <view class="chart-labels">
-          <text class="chart-label">12h前</text>
-          <text class="chart-label">现在</text>
-          <text class="chart-label">12h后</text>
+      <!-- Pressure chart -->
+      <view class="dc-card chart-card">
+        <text class="card-title">Pressure Trend</text>
+        <view class="chart-wrap">
+          <view class="chart">
+            <view
+              class="bar"
+              v-for="(item, i) in pressureData"
+              :key="i"
+              :style="{
+                height: item.percent + '%',
+                background: i === 12 ? '#5865F2' : (item.value > 1005 ? '#23A55A' : '#E3E5E8')
+              }"
+            ></view>
+          </view>
+          <view class="chart-labels">
+            <text class="cl">12h ago</text>
+            <text class="cl">Now</text>
+            <text class="cl">12h later</text>
+          </view>
         </view>
       </view>
 
-      <!-- 最佳出钓时段 -->
-      <view class="card">
-        <text class="card-title">最佳出钓时段</text>
+      <!-- Best time slots -->
+      <view class="dc-card">
+        <text class="card-title">Best Times</text>
         <view class="slot-list">
           <view class="slot-row" v-for="item in bestTimes" :key="item.time">
             <view class="slot-dot" :class="item.level"></view>
             <text class="slot-time">{{ item.time }}</text>
-            <text class="slot-level">{{ item.level === 'good' ? '黄金时段' : item.level === 'ok' ? '可以出钓' : '不建议' }}</text>
+            <text class="slot-level">{{ item.level === 'good' ? 'Prime' : item.level === 'ok' ? 'Good' : 'Poor' }}</text>
             <text class="slot-score" :style="{ color: item.score >= 80 ? '#23A55A' : item.score >= 50 ? '#F0B232' : '#F23F43' }">{{ item.score }}</text>
           </view>
         </view>
       </view>
 
-      <!-- 逐小时鱼口 -->
-      <view class="card chart-card">
-        <text class="card-title">逐小时鱼口</text>
-        <view class="hourly-chart">
+      <!-- Hourly -->
+      <view class="dc-card chart-card">
+        <text class="card-title">Hourly Bite Forecast</text>
+        <view class="hourly-scroll">
           <view
             class="hourly-item"
             v-for="(item, i) in hourly"
@@ -109,7 +107,7 @@
         </view>
       </view>
 
-      <view style="height: 40rpx;"></view>
+      <view class="spacer"></view>
     </scroll-view>
   </view>
 </template>
@@ -146,47 +144,55 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.container {
+.page {
   min-height: 100vh;
   background: #F2F3F5;
+  display: flex;
+  flex-direction: column;
 }
 
-.header {
+/* ===== Top Bar ===== */
+.topbar {
   background: #FFFFFF;
-  padding: 20rpx 24rpx 16rpx;
-  border-bottom: 1px solid rgba(79,84,92,0.12);
+  padding: 16rpx 24rpx 16rpx;
+  border-bottom: 2rpx solid rgba(79,84,92,0.12);
 }
 
-.header-title {
-  font-size: 36rpx;
+.topbar-inner {
+  display: flex;
+  align-items: center;
+}
+
+.brand-name {
+  font-size: 32rpx;
   font-weight: 700;
   color: #313338;
 }
 
-.header-sub {
-  font-size: 24rpx;
+.topbar-sub {
+  font-size: 22rpx;
   color: #5C5E66;
   margin-top: 4rpx;
+  display: block;
 }
 
-.content {
+.scroll-content {
   flex: 1;
   padding: 16rpx 20rpx;
 }
 
-/* === 卡片 === */
-.card {
+/* ===== Discord Card ===== */
+.dc-card {
   background: #FFFFFF;
-  border-radius: 12rpx;
-  padding: 20rpx;
+  border-radius: 8rpx;
   margin-bottom: 12rpx;
   box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
-/* === 指数 === */
+/* ===== Hero ===== */
 .hero-card {
   text-align: center;
-  padding: 32rpx 20rpx;
+  padding: 36rpx 20rpx;
 }
 
 .hero-score {
@@ -197,32 +203,36 @@ onMounted(() => {
 }
 
 .hero-label {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #80848E;
-  margin: 8rpx 0 16rpx;
+  margin: 8rpx 0 20rpx;
   display: block;
 }
 
 .hero-badge {
   display: inline-block;
-  padding: 8rpx 24rpx;
-  border-radius: 100px;
-  font-size: 26rpx;
+  padding: 6rpx 24rpx;
+  border-radius: 22rpx;
+  font-size: 24rpx;
   font-weight: 600;
 }
 
-/* === 数据列表 === */
-.data-card {
-  padding: 8rpx 20rpx;
+/* ===== Weather list ===== */
+.weather-list {
+  padding: 6rpx 0;
 }
 
-.data-row {
+.list-row {
   display: flex;
   align-items: center;
-  padding: 16rpx 0;
+  padding: 14rpx 20rpx;
 }
 
-.data-dot {
+.list-row.has-divider {
+  border-bottom: 1rpx solid rgba(79,84,92,0.08);
+}
+
+.list-dot {
   width: 8rpx;
   height: 8rpx;
   border-radius: 50%;
@@ -230,30 +240,37 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.data-label {
+.list-label {
   flex: 1;
   font-size: 28rpx;
   color: #313338;
   font-weight: 500;
 }
 
-.data-value {
+.list-value {
   font-size: 28rpx;
   color: #80848E;
   font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
-.data-sep {
-  height: 1px;
-  background: rgba(79,84,92,0.08);
-}
-
-/* === 图表 === */
+/* ===== Chart ===== */
 .card-title {
   font-size: 26rpx;
   font-weight: 600;
   color: #313338;
-  margin-bottom: 16rpx;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.chart-card {
+  padding: 20rpx;
+}
+
+.chart-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
 }
 
 .chart {
@@ -261,7 +278,6 @@ onMounted(() => {
   align-items: flex-end;
   gap: 4rpx;
   height: 140rpx;
-  margin-bottom: 8rpx;
 }
 
 .bar {
@@ -275,21 +291,21 @@ onMounted(() => {
   justify-content: space-between;
 }
 
-.chart-label {
+.cl {
   font-size: 20rpx;
   color: #80848E;
 }
 
-/* === 时间段 === */
+/* ===== Slot list ===== */
 .slot-list {
-  margin-top: 8rpx;
+  padding: 8rpx 20rpx 16rpx;
 }
 
 .slot-row {
   display: flex;
   align-items: center;
-  padding: 14rpx 0;
-  border-bottom: 1px solid rgba(79,84,92,0.06);
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid rgba(79,84,92,0.06);
 }
 .slot-row:last-child {
   border-bottom: none;
@@ -325,12 +341,11 @@ onMounted(() => {
   font-variant-numeric: tabular-nums;
 }
 
-/* === 逐小时 === */
-.hourly-chart {
+/* ===== Hourly ===== */
+.hourly-scroll {
   display: flex;
   gap: 6rpx;
   overflow-x: auto;
-  padding-bottom: 4rpx;
 }
 
 .hourly-item {
@@ -366,5 +381,9 @@ onMounted(() => {
 .hourly-time {
   font-size: 18rpx;
   color: #80848E;
+}
+
+.spacer {
+  height: 40rpx;
 }
 </style>

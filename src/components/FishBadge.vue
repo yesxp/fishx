@@ -17,8 +17,8 @@ defineProps<{
 .fish-badge {
   display: inline-flex;
   align-items: center;
-  padding: 3rpx 10rpx;
-  border-radius: 4rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 20rpx;
   font-size: 20rpx;
   font-weight: 500;
 }

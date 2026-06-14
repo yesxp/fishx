@@ -1,78 +1,78 @@
 <template>
-  <view class="container">
+  <view class="page">
     <view class="header">
       <view class="header-left">
-        <button class="btn-back" @click="goBack">←</button>
-        <text class="title">{{ spot?.name || '钓点详情' }}</text>
+        <button class="btn-back" @click="goBack">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#313338" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
       </view>
+      <text class="title">{{ spot?.name || 'Spot Detail' }}</text>
       <view class="header-right">
-        <button class="btn-share">分享</button>
+        <button class="btn-share" @click="handleShare">Share</button>
       </view>
     </view>
-    
-    <scroll-view scroll-y class="content">
-      <!-- 钓点信息 -->
-      <view class="spot-hero">
-        <view class="hero-icon">📍</view>
+
+    <scroll-view scroll-y class="scroll-content">
+      <!-- Hero -->
+      <view class="dc-card spot-hero">
+        <text class="hero-icon">📍</text>
         <text class="hero-name">{{ spot?.name }}</text>
         <text class="hero-type">{{ spot?.type }}</text>
-        
         <view class="hero-stats">
-          <view class="stat-item">
+          <view class="stat-col">
             <text class="stat-num">{{ spot?.rating }}</text>
-            <text class="stat-label">评分</text>
+            <text class="stat-label">Rating</text>
           </view>
-          <view class="stat-divider"></view>
-          <view class="stat-item">
+          <view class="stat-col">
             <text class="stat-num">{{ spot?.catchCount }}</text>
-            <text class="stat-label">渔获</text>
+            <text class="stat-label">Catches</text>
           </view>
-          <view class="stat-divider"></view>
-          <view class="stat-item">
-            <text class="stat-num">{{ spot?.distance || '未知' }}</text>
-            <text class="stat-label">距离</text>
+          <view class="stat-col">
+            <text class="stat-num">{{ spot?.distance || '--' }}</text>
+            <text class="stat-label">Distance</text>
           </view>
         </view>
       </view>
-      
-      <!-- 鱼种标签 -->
-      <view class="fish-section">
-        <text class="section-title">常见鱼种</text>
+
+      <!-- Fish species -->
+      <view class="dc-card section-card">
+        <text class="card-title">Species Found</text>
         <view class="fish-tags">
           <view class="fish-tag" v-for="fish in spot?.fishTypes" :key="fish">
-            <text class="tag-emoji">🐟</text>
             <text class="tag-name">{{ fish }}</text>
           </view>
         </view>
       </view>
-      
-      <!-- 操作按钮 -->
+
+      <!-- Actions -->
       <view class="action-section">
         <button class="action-btn primary" @click="handleNavigate">
-          <text class="btn-icon">🧭</text>
-          <text class="btn-text">导航前往</text>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+          <text class="btn-label">Navigate</text>
         </button>
         <button class="action-btn secondary" @click="handleCheckIn">
-          <text class="btn-icon">✅</text>
-          <text class="btn-text">打卡</text>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5C5E66" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <text class="btn-label">Check In</text>
         </button>
       </view>
-      
-      <!-- 附近渔获 -->
-      <view class="catch-section">
-        <text class="section-title">该钓点的渔获</text>
-        <view class="catch-list">
-          <view class="catch-item" v-for="i in 4" :key="i">
-            <view class="catch-photo" :style="{ background: fishColors[i % 4] }">
-              <text class="catch-emoji">{{ fishEmojis[i % 4] }}</text>
-            </view>
-            <view class="catch-info">
-              <text class="catch-fish">{{ fishNames[i % 4] }}</text>
-              <text class="catch-time">{{ i }}小时前</text>
-            </view>
+
+      <!-- Nearby catches -->
+      <view class="section-header-wrap">
+        <text class="section-title">Catches Here</text>
+      </view>
+      <view class="recent-list">
+        <view class="recent-item" v-for="i in 4" :key="i">
+          <view class="recent-photo" :style="{ background: fishColors[i % 4] }">
+            <text class="recent-emoji">{{ fishEmojis[i % 4] }}</text>
+          </view>
+          <view class="recent-info">
+            <text class="recent-fish">{{ fishNames[i % 4] }}</text>
+            <text class="recent-time">{{ i }}h ago</text>
           </view>
         </view>
       </view>
+
+      <view class="spacer"></view>
     </scroll-view>
   </view>
 </template>
@@ -85,9 +85,9 @@ import { checkIn } from '@/api/spot'
 const spotStore = useSpotStore()
 const spot = ref<any>(null)
 
-const fishNames = ['鲫鱼', '鲤鱼', '鲈鱼', '草鱼']
+const fishNames = ['Crucian', 'Carp', 'Bass', 'Grass Carp']
 const fishEmojis = ['🐟', '🐠', '🎣', '🐡']
-const fishColors = ['#E3F2FD', '#E0F7FA', '#FFF3E0', '#E8F5E9']
+const fishColors = ['#F2F3F5', '#E8F5E9', '#FFF3E0', '#E3E5E8']
 
 const pages = getCurrentPages()
 const currentPage = pages[pages.length - 1] as any
@@ -111,8 +111,15 @@ function handleNavigate() {
 async function handleCheckIn() {
   const res = await checkIn(spotId)
   if (res.code === 0) {
-    uni.showToast({ title: '打卡成功', icon: 'success' })
+    uni.showToast({ title: 'Checked in', icon: 'success' })
   }
+}
+
+function handleShare() {
+  uni.setClipboardData({
+    data: window.location.href,
+    success: () => uni.showToast({ title: 'Copied', icon: 'success' })
+  })
 }
 
 onMounted(async () => {
@@ -122,21 +129,21 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.container {
+.page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #EBF5FF 0%, #F0F9FF 50%, #F8FAFE 100%);
+  background: #F2F3F5;
+  display: flex;
+  flex-direction: column;
 }
 
+/* ===== Header ===== */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx 32rpx;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.5);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  padding: 16rpx 16rpx;
+  background: #FFFFFF;
+  border-bottom: 2rpx solid rgba(79,84,92,0.12);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -145,25 +152,35 @@ onMounted(async () => {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 16rpx;
 }
 
 .btn-back {
-  width: 60rpx;
-  height: 60rpx;
-  border-radius: 16rpx;
-  background: #F1F5F9;
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: transparent;
   border: none;
-  font-size: 32rpx;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
+}
+.btn-back:active {
+  background: rgba(79,84,92,0.08);
+}
+.btn-back svg {
+  width: 24rpx;
+  height: 24rpx;
 }
 
 .title {
-  font-size: 34rpx;
+  font-size: 32rpx;
   font-weight: 700;
-  color: #1A2B4A;
+  color: #313338;
+  max-width: 400rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .header-right {
@@ -172,190 +189,222 @@ onMounted(async () => {
 }
 
 .btn-share {
-  padding: 12rpx 24rpx;
-  border-radius: 12rpx;
-  background: #F1F5F9;
-  border: none;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  background: transparent;
+  color: #5865F2;
   font-size: 26rpx;
-  color: #6B7A99;
+  font-weight: 500;
+  border: none;
+  height: auto;
+  line-height: 1;
+  transition: background 0.15s;
+}
+.btn-share:active {
+  background: rgba(88,101,242,0.08);
 }
 
-.content {
+/* ===== Scroll ===== */
+.scroll-content {
   flex: 1;
 }
 
+/* ===== Discord Card ===== */
+.dc-card {
+  background: #FFFFFF;
+  border-radius: 8rpx;
+  margin: 12rpx 20rpx;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* ===== Hero ===== */
 .spot-hero {
   text-align: center;
-  padding: 48rpx 24rpx;
-  background: linear-gradient(135deg, #E3F2FD, #E0F7FA);
+  padding: 40rpx 20rpx;
 }
 
 .hero-icon {
-  font-size: 64rpx;
-  margin-bottom: 16rpx;
+  font-size: 56rpx;
+  display: block;
+  margin-bottom: 12rpx;
 }
 
 .hero-name {
-  font-size: 40rpx;
+  font-size: 36rpx;
   font-weight: 700;
-  color: #1A2B4A;
+  color: #313338;
   display: block;
 }
 
 .hero-type {
-  font-size: 26rpx;
-  color: #6B7A99;
-  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #5C5E66;
+  margin-top: 4rpx;
+  display: block;
 }
 
 .hero-stats {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 32rpx;
+  gap: 24rpx;
   margin-top: 24rpx;
-  padding: 20rpx;
-  background: rgba(255,255,255,.8);
-  border-radius: 16rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid rgba(79,84,92,0.08);
 }
 
-.stat-item {
+.stat-col {
   text-align: center;
 }
 
 .stat-num {
-  font-size: 36rpx;
+  font-size: 32rpx;
   font-weight: 700;
-  color: #2196F3;
+  color: #5865F2;
   display: block;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-label {
-  font-size: 22rpx;
-  color: #6B7A99;
+  font-size: 20rpx;
+  color: #80848E;
+  margin-top: 2rpx;
+  display: block;
 }
 
-.stat-divider {
-  width: 1rpx;
-  height: 48rpx;
-  background: #E2E8F0;
+/* ===== Section card ===== */
+.section-card {
+  padding: 20rpx;
 }
 
-.fish-section, .action-section, .catch-section {
-  padding: 24rpx;
-}
-
-.section-title {
-  font-size: 28rpx;
+.card-title {
+  font-size: 26rpx;
   font-weight: 600;
-  color: #1A2B4A;
+  color: #313338;
   margin-bottom: 16rpx;
   display: block;
 }
 
 .fish-tags {
   display: flex;
-  gap: 12rpx;
+  gap: 8rpx;
   flex-wrap: wrap;
 }
 
 .fish-tag {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-  padding: 12rpx 20rpx;
-  background: rgba(227,242,253,0.72);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 100px;
-}
-
-.tag-emoji {
-  font-size: 20rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 20rpx;
+  background: rgba(88,101,242,0.08);
 }
 
 .tag-name {
   font-size: 24rpx;
-  color: #2196F3;
+  color: #5865F2;
   font-weight: 500;
 }
 
+/* ===== Actions ===== */
 .action-section {
   display: flex;
-  gap: 16rpx;
+  gap: 12rpx;
+  margin: 12rpx 20rpx;
 }
 
 .action-btn {
   flex: 1;
-  height: 88rpx;
-  border-radius: 16rpx;
+  height: 80rpx;
+  border-radius: 8rpx;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8rpx;
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 600;
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, #2196F3, #00BCD4);
+  background: #5865F2;
   color: #FFFFFF;
+  transition: background 0.15s;
+}
+.action-btn.primary:active {
+  background: #4752C4;
 }
 
 .action-btn.secondary {
-  background: #F1F5F9;
-  color: #1A2B4A;
+  background: #F2F3F5;
+  color: #313338;
+  transition: background 0.15s;
+}
+.action-btn.secondary:active {
+  background: #E3E5E8;
 }
 
-.btn-icon {
+.btn-label {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+/* ===== Section header ===== */
+.section-header-wrap {
+  padding: 24rpx 20rpx 12rpx;
+}
+
+.section-title {
   font-size: 28rpx;
+  font-weight: 700;
+  color: #313338;
 }
 
-.catch-list {
+/* ===== Recent list ===== */
+.recent-list {
   display: flex;
   flex-direction: column;
-  gap: 12rpx;
+  gap: 8rpx;
+  padding: 0 20rpx 12rpx;
 }
 
-.catch-item {
+.recent-item {
   display: flex;
   align-items: center;
   gap: 16rpx;
-  padding: 16rpx;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 12rpx;
-  border: 1px solid rgba(255,255,255,0.5);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  padding: 12rpx;
+  background: #FFFFFF;
+  border-radius: 8rpx;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
-.catch-photo {
+.recent-photo {
   width: 80rpx;
   height: 80rpx;
-  border-radius: 12rpx;
+  border-radius: 8rpx;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
-.catch-emoji {
-  font-size: 36rpx;
+.recent-emoji {
+  font-size: 32rpx;
 }
 
-.catch-info {
+.recent-info {
   flex: 1;
 }
 
-.catch-fish {
+.recent-fish {
   font-size: 28rpx;
   font-weight: 600;
-  color: #1A2B4A;
+  color: #313338;
 }
 
-.catch-time {
+.recent-time {
   font-size: 22rpx;
-  color: #6B7A99;
+  color: #80848E;
+}
+
+.spacer {
+  height: 40rpx;
 }
 </style>

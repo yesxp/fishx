@@ -1,75 +1,76 @@
 <template>
-  <view class="login-page">
-    <!-- 顶部 Logo -->
-    <view class="logo-section">
-      <view class="logo-circle">
+  <view class="page">
+    <view class="logo-area">
+      <view class="logo-icon">
         <text class="logo-emoji">🎣</text>
       </view>
-      <text class="app-name">鱼渔娱</text>
-      <text class="app-slogan">钓鱼人的一站式轻量工具</text>
+      <text class="logo-title">鱼渔娱</text>
+      <text class="logo-sub">Lightweight fishing tool for anglers</text>
     </view>
-    
-    <!-- 登录方式切换 -->
-    <view class="login-tabs">
-      <view 
-        class="tab-item" 
-        :class="{ active: loginType === 'wx' }"
-        @click="loginType = 'wx'"
-      >
-        <text>微信登录</text>
-      </view>
-      <view 
-        class="tab-item" 
-        :class="{ active: loginType === 'phone' }"
-        @click="loginType = 'phone'"
-      >
-        <text>手机号登录</text>
-      </view>
-    </view>
-    
-    <!-- 微信登录 -->
-    <view class="login-form" v-if="loginType === 'wx'">
-      <button class="wx-btn" @click="handleWxLogin">
-        <text class="wx-icon">💬</text>
-        <text class="wx-text">微信授权登录</text>
-      </button>
-      <text class="wx-hint">点击即表示同意《用户协议》和《隐私政策》</text>
-    </view>
-    
-    <!-- 手机号登录 -->
-    <view class="login-form" v-else>
-      <view class="input-group">
-        <text class="input-label">手机号</text>
-        <input 
-          class="input-field" 
-          type="number" 
-          maxlength="11"
-          v-model="phone" 
-          placeholder="请输入手机号"
-        />
-      </view>
-      <view class="input-group">
-        <text class="input-label">验证码</text>
-        <view class="code-row">
-          <input 
-            class="input-field" 
-            type="number" 
-            maxlength="6"
-            v-model="code" 
-            placeholder="请输入验证码"
-          />
-          <view 
-            class="code-btn" 
-            :class="{ disabled: countdown > 0 }"
-            @click="handleSendCode"
-          >
-            <text>{{ countdown > 0 ? countdown + 's' : '获取验证码' }}</text>
-          </view>
+
+    <view class="auth-area">
+      <!-- Tab switcher: Discord pill style -->
+      <view class="auth-tabs">
+        <view
+          class="tab"
+          :class="{ active: loginType === 'wx' }"
+          @click="loginType = 'wx'"
+        >
+          <text class="tab-text">WeChat</text>
+        </view>
+        <view
+          class="tab"
+          :class="{ active: loginType === 'phone' }"
+          @click="loginType = 'phone'"
+        >
+          <text class="tab-text">Phone</text>
         </view>
       </view>
-      <button class="login-btn" @click="handlePhoneLogin">
-        登录
-      </button>
+
+      <!-- WeChat login -->
+      <view class="form-panel" v-if="loginType === 'wx'">
+        <button class="wx-btn" @click="handleWxLogin">
+          <text class="wx-icon">💬</text>
+          <text class="wx-label">Continue with WeChat</text>
+        </button>
+        <text class="form-hint">By continuing, you agree to the Terms of Service and Privacy Policy</text>
+      </view>
+
+      <!-- Phone login -->
+      <view class="form-panel" v-else>
+        <view class="input-group">
+          <text class="input-label">Phone</text>
+          <input
+            class="input-field"
+            type="number"
+            maxlength="11"
+            v-model="phone"
+            placeholder="Enter phone number"
+          />
+        </view>
+        <view class="input-group">
+          <text class="input-label">Code</text>
+          <view class="code-row">
+            <input
+              class="input-field"
+              type="number"
+              maxlength="6"
+              v-model="code"
+              placeholder="Verification code"
+            />
+            <view
+              class="code-btn"
+              :class="{ disabled: countdown > 0 }"
+              @click="handleSendCode"
+            >
+              <text>{{ countdown > 0 ? countdown + 's' : 'Send' }}</text>
+            </view>
+          </view>
+        </view>
+        <button class="login-btn" @click="handlePhoneLogin" :disabled="saving">
+          {{ saving ? 'Signing in...' : 'Sign In' }}
+        </button>
+      </view>
     </view>
   </view>
 </template>
@@ -84,20 +85,15 @@ const loginType = ref<'wx' | 'phone'>('wx')
 const phone = ref('')
 const code = ref('')
 const countdown = ref(0)
+const saving = ref(false)
 let timer: any = null
 
-// 微信登录
 async function handleWxLogin() {
-  uni.showLoading({ title: '登录中...' })
-  
+  uni.showLoading({ title: 'Signing in...' })
   // #ifdef MP-WEIXIN
   try {
     const res = await new Promise((resolve, reject) => {
-      uni.login({
-        provider: 'weixin',
-        success: resolve,
-        fail: reject
-      })
+      uni.login({ provider: 'weixin', success: resolve, fail: reject })
     })
     const loginRes = await wxLogin((res as any).code)
     if (loginRes.code === 0) {
@@ -107,16 +103,14 @@ async function handleWxLogin() {
     }
   } catch (e) {
     uni.hideLoading()
-    uni.showToast({ title: '登录失败', icon: 'none' })
+    uni.showToast({ title: 'Sign in failed', icon: 'none' })
   }
   // #endif
-  
   // #ifdef H5
-  // H5 模拟登录
   setTimeout(() => {
     userStore.setLoginInfo('mock_token', {
       id: 'wx_mock',
-      nickname: '微信用户',
+      nickname: 'WeChat User',
       avatar: ''
     })
     uni.hideLoading()
@@ -125,185 +119,197 @@ async function handleWxLogin() {
   // #endif
 }
 
-// 发送验证码
 async function handleSendCode() {
   if (countdown.value > 0) return
   if (!phone.value || phone.value.length !== 11) {
-    uni.showToast({ title: '请输入正确手机号', icon: 'none' })
+    uni.showToast({ title: 'Enter a valid phone', icon: 'none' })
     return
   }
-  
   const res = await sendSmsCode(phone.value)
   if (res.code === 0) {
-    uni.showToast({ title: '验证码已发送', icon: 'success' })
+    uni.showToast({ title: 'Code sent', icon: 'success' })
     countdown.value = 60
     timer = setInterval(() => {
       countdown.value--
-      if (countdown.value <= 0) {
-        clearInterval(timer)
-      }
+      if (countdown.value <= 0) clearInterval(timer)
     }, 1000)
   }
 }
 
-// 手机号登录
 async function handlePhoneLogin() {
   if (!phone.value || phone.value.length !== 11) {
-    uni.showToast({ title: '请输入正确手机号', icon: 'none' })
+    uni.showToast({ title: 'Enter a valid phone', icon: 'none' })
     return
   }
   if (!code.value || code.value.length !== 6) {
-    uni.showToast({ title: '请输入6位验证码', icon: 'none' })
+    uni.showToast({ title: 'Enter 6-digit code', icon: 'none' })
     return
   }
-  
-  uni.showLoading({ title: '登录中...' })
+  saving.value = true
+  uni.showLoading({ title: 'Signing in...' })
   const res = await phoneLogin(phone.value, code.value)
-  
   if (res.code === 0) {
     userStore.setLoginInfo(res.data.token, res.data.userInfo)
     uni.hideLoading()
     uni.switchTab({ url: '/pages/index/index' })
   } else {
     uni.hideLoading()
-    uni.showToast({ title: '登录失败', icon: 'none' })
+    uni.showToast({ title: 'Sign in failed', icon: 'none' })
   }
+  saving.value = false
 }
 </script>
 
 <style scoped>
-.login-page {
+.page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #EBF5FF 0%, #F0F9FF 50%, #F8FAFE 100%);
+  background: #F2F3F5;
+  display: flex;
+  flex-direction: column;
   padding: 0 40rpx;
 }
 
-.logo-section {
+/* ===== Logo ===== */
+.logo-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 120rpx;
+  padding-top: 100rpx;
   margin-bottom: 80rpx;
 }
 
-.logo-circle {
-  width: 160rpx;
-  height: 160rpx;
-  border-radius: 40rpx;
-  background: linear-gradient(135deg, #2196F3, #00BCD4);
+.logo-icon {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background: #F2F3F5;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 16rpx 48rpx rgba(33,150,243,.3);
   margin-bottom: 24rpx;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .logo-emoji {
-  font-size: 72rpx;
+  font-size: 64rpx;
 }
 
-.app-name {
-  font-size: 44rpx;
+.logo-title {
+  font-size: 40rpx;
   font-weight: 700;
-  color: #1A2B4A;
+  color: #313338;
   margin-bottom: 8rpx;
 }
 
-.app-slogan {
-  font-size: 26rpx;
-  color: #6B7A99;
+.logo-sub {
+  font-size: 24rpx;
+  color: #5C5E66;
 }
 
-.login-tabs {
+/* ===== Auth ===== */
+.auth-area {
+  flex: 1;
+}
+
+/* Tab switcher */
+.auth-tabs {
   display: flex;
-  background: #F1F5F9;
-  border-radius: 16rpx;
-  padding: 6rpx;
+  background: #F2F3F5;
+  border-radius: 8rpx;
+  padding: 4rpx;
   margin-bottom: 48rpx;
 }
 
-.tab-item {
+.tab {
   flex: 1;
   text-align: center;
-  padding: 20rpx;
-  border-radius: 12rpx;
-  font-size: 28rpx;
-  color: #6B7A99;
-  transition: all .2s;
+  padding: 14rpx;
+  border-radius: 6rpx;
+  transition: all 0.15s;
+}
+.tab.active {
+  background: #FFFFFF;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
-.tab-item.active {
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  color: #1A2B4A;
+.tab-text {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #5C5E66;
+}
+.tab.active .tab-text {
+  color: #313338;
   font-weight: 600;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
 }
 
-.login-form {
-  padding: 0 20rpx;
+/* Form panel */
+.form-panel {
+  padding: 0 8rpx;
 }
 
+/* WeChat button */
 .wx-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16rpx;
+  gap: 12rpx;
   width: 100%;
-  height: 96rpx;
-  background: #07C160;
-  border-radius: 16rpx;
+  height: 88rpx;
+  border-radius: 8rpx;
+  background: #23A55A;
   border: none;
-  margin-bottom: 24rpx;
+  margin-bottom: 20rpx;
 }
 
 .wx-icon {
-  font-size: 36rpx;
+  font-size: 32rpx;
 }
 
-.wx-text {
-  font-size: 32rpx;
+.wx-label {
+  font-size: 28rpx;
   font-weight: 600;
   color: #FFFFFF;
 }
 
-.wx-hint {
+.form-hint {
   display: block;
   text-align: center;
-  font-size: 22rpx;
-  color: #6B7A99;
-  line-height: 1.6;
+  font-size: 20rpx;
+  color: #80848E;
+  line-height: 1.5;
 }
 
+/* Input groups */
 .input-group {
-  margin-bottom: 32rpx;
+  margin-bottom: 28rpx;
 }
 
 .input-label {
   display: block;
-  font-size: 26rpx;
+  font-size: 24rpx;
   font-weight: 500;
-  color: #1A2B4A;
-  margin-bottom: 12rpx;
+  color: #313338;
+  margin-bottom: 10rpx;
 }
 
 .input-field {
   width: 100%;
-  height: 96rpx;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.5);
-  border-radius: 16rpx;
-  padding: 0 24rpx;
-  font-size: 30rpx;
-  color: #1A2B4A;
+  height: 80rpx;
+  background: #F2F3F5;
+  border: 2rpx solid transparent;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  color: #313338;
+  transition: border-color 0.15s;
+}
+.input-field:focus {
+  border-color: #5865F2;
 }
 
 .code-row {
   display: flex;
-  gap: 16rpx;
+  gap: 12rpx;
 }
 
 .code-row .input-field {
@@ -312,36 +318,43 @@ async function handlePhoneLogin() {
 
 .code-btn {
   width: 200rpx;
-  height: 96rpx;
-  background: #E3F2FD;
-  border-radius: 16rpx;
+  height: 80rpx;
+  background: rgba(88,101,242,0.08);
+  border-radius: 8rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26rpx;
-  color: #2196F3;
-  font-weight: 500;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #5865F2;
   flex-shrink: 0;
+  transition: background 0.15s;
 }
-
+.code-btn:active:not(.disabled) {
+  background: rgba(88,101,242,0.16);
+}
 .code-btn.disabled {
-  background: #F1F5F9;
-  color: #94A3B8;
+  background: #F2F3F5;
+  color: #80848E;
 }
 
+/* Login button */
 .login-btn {
   width: 100%;
-  height: 96rpx;
-  background: linear-gradient(135deg, #2196F3, #00BCD4);
-  border-radius: 16rpx;
-  border: none;
-  font-size: 32rpx;
-  font-weight: 600;
+  height: 80rpx;
+  border-radius: 8rpx;
+  background: #5865F2;
   color: #FFFFFF;
-  margin-top: 16rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  border: none;
+  margin-top: 12rpx;
+  transition: background 0.15s;
 }
-
-.login-btn:active {
-  opacity: .85;
+.login-btn:active:not(:disabled) {
+  background: #4752C4;
+}
+.login-btn:disabled {
+  opacity: 0.5;
 }
 </style>

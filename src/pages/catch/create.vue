@@ -1,42 +1,39 @@
 <template>
-  <view class="container">
+  <view class="page">
     <view class="header">
       <view class="header-left">
-        <button class="btn-back" @click="goBack">←</button>
-        <text class="title">记录渔获</text>
+        <button class="btn-cancel" @click="goBack">Cancel</button>
       </view>
+      <text class="title">New Catch</text>
       <view class="header-right">
         <button class="btn-save" @click="handleSave" :disabled="saving">
-          {{ saving ? '保存中...' : '保存' }}
+          {{ saving ? 'Saving...' : 'Save' }}
         </button>
       </view>
     </view>
-    
-    <scroll-view scroll-y class="content">
-      <!-- 图片区域 -->
-      <view class="photo-section" @click="chooseImage">
-        <image 
-          v-if="imagePath" 
-          :src="imagePath" 
+
+    <scroll-view scroll-y class="scroll-content">
+      <!-- Photo section -->
+      <view class="dc-card photo-section" @click="chooseImage">
+        <image
+          v-if="imagePath"
+          :src="imagePath"
           class="photo-preview"
           mode="aspectFill"
         />
         <view v-else class="photo-placeholder">
-          <text class="photo-icon">📷</text>
-          <text class="photo-text">拍照或选择图片</text>
+          <svg class="photo-icon" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <text class="photo-label">Add Photo</text>
         </view>
       </view>
-      
-      <!-- AI 识别结果 -->
-      <view class="identify-section" v-if="identifyResults.length > 0">
-        <view class="section-title">
-          <text class="title-icon">🤖</text>
-          <text>AI 识别结果</text>
-        </view>
+
+      <!-- AI results -->
+      <view class="dc-card identify-section" v-if="identifyResults.length > 0">
+        <text class="card-title">AI Identification</text>
         <view class="identify-list">
-          <view 
-            class="identify-item" 
-            v-for="(item, i) in identifyResults" 
+          <view
+            class="identify-item"
+            v-for="(item, i) in identifyResults"
             :key="i"
             :class="{ selected: selectedFish === item.name }"
             @click="selectFish(item)"
@@ -44,76 +41,76 @@
             <text class="fish-emoji">{{ item.emoji }}</text>
             <view class="fish-info">
               <text class="fish-name">{{ item.name }}</text>
-              <view class="confidence-bar">
-                <view 
-                  class="confidence-fill" 
-                  :style="{ 
+              <view class="confidence-track">
+                <view
+                  class="confidence-fill"
+                  :style="{
                     width: (item.confidence * 100) + '%',
-                    background: item.confidence >= 0.7 ? '#4CAF50' : '#FFC107'
+                    background: item.confidence >= 0.7 ? '#23A55A' : '#F0B232'
                   }"
                 ></view>
               </view>
               <text class="confidence-text">
-                {{ Math.round(item.confidence * 100) }}%
-                {{ item.confidence < 0.7 ? ' - 置信度较低，请确认' : '' }}
+                {{ Math.round(item.confidence * 100) }}%{{ item.confidence < 0.7 ? ' · Low confidence' : '' }}
               </text>
             </view>
-            <text class="check-icon" v-if="selectedFish === item.name">✓</text>
+            <view class="check-mark" v-if="selectedFish === item.name">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#5865F2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </view>
           </view>
         </view>
       </view>
-      
-      <!-- 表单 -->
-      <view class="form-section">
-        <view class="form-item">
-          <text class="form-label">鱼种</text>
-          <input 
-            class="form-input" 
-            v-model="fishName" 
-            placeholder="点击上方选择或手动输入"
+
+      <!-- Form -->
+      <view class="dc-card form-section">
+        <view class="form-group">
+          <text class="form-label">Species</text>
+          <input
+            class="form-input"
+            v-model="fishName"
+            placeholder="Select or type species"
           />
         </view>
-        
-        <view class="form-item">
-          <text class="form-label">钓点</text>
-          <input 
-            class="form-input" 
-            v-model="location" 
-            placeholder="当前位置"
+
+        <view class="form-group">
+          <text class="form-label">Location</text>
+          <input
+            class="form-input"
+            v-model="location"
+            placeholder="Current location"
           />
         </view>
-        
+
         <view class="form-row">
-          <view class="form-item half">
-            <text class="form-label">天气</text>
-            <input 
-              class="form-input" 
-              v-model="weather" 
-              placeholder="自动获取"
+          <view class="form-group half">
+            <text class="form-label">Weather</text>
+            <input
+              class="form-input"
+              v-model="weather"
+              placeholder="Auto"
             />
           </view>
-          <view class="form-item half">
-            <text class="form-label">温度</text>
-            <input 
-              class="form-input" 
-              v-model="temperature" 
-              placeholder="自动获取"
+          <view class="form-group half">
+            <text class="form-label">Temperature</text>
+            <input
+              class="form-input"
+              v-model="temperature"
+              placeholder="Auto"
             />
           </view>
         </view>
-        
-        <view class="form-item switch-item">
-          <text class="form-label">仅自己可见</text>
-          <switch 
-            :checked="isPrivate" 
-            @change="isPrivate = $event.detail.value"
-            color="#2196F3"
-          />
+
+        <view class="form-toggle">
+          <text class="form-label">Private</text>
+          <view class="toggle-wrap" @click="isPrivate = !isPrivate">
+            <view class="toggle-track" :class="{ active: isPrivate }">
+              <view class="toggle-thumb"></view>
+            </view>
+          </view>
         </view>
       </view>
-      
-      <!-- 底部安全区 -->
-      <view style="height: 40rpx;"></view>
+
+      <view class="spacer"></view>
     </scroll-view>
   </view>
 </template>
@@ -137,7 +134,6 @@ const identifyResults = ref<FishIdentifyResult[]>([])
 const selectedFish = ref('')
 const saving = ref(false)
 
-// 选择图片
 async function chooseImage() {
   uni.chooseImage({
     count: 1,
@@ -145,14 +141,10 @@ async function chooseImage() {
     sourceType: ['camera', 'album'],
     success: async (res) => {
       imagePath.value = res.tempFilePaths[0]
-      
-      // AI 识别
-      uni.showLoading({ title: '识别中...' })
+      uni.showLoading({ title: 'Identifying...' })
       const results = await identifyFish(imagePath.value)
       identifyResults.value = results
       uni.hideLoading()
-      
-      // 自动选择置信度最高的
       if (results.length > 0) {
         const best = results.reduce((a, b) => a.confidence > b.confidence ? a : b)
         selectFish(best)
@@ -161,64 +153,42 @@ async function chooseImage() {
   })
 }
 
-// 选择鱼种
 function selectFish(item: FishIdentifyResult) {
   selectedFish.value = item.name
   fishName.value = item.name
 }
 
-// 返回
-function goBack() {
-  uni.navigateBack()
-}
-
-// 保存
 async function handleSave() {
-  if (!imagePath.value) {
-    uni.showToast({ title: '请先拍照', icon: 'none' })
-    return
-  }
-  
-  if (!fishName.value) {
-    uni.showToast({ title: '请选择鱼种', icon: 'none' })
-    return
-  }
-  
   saving.value = true
-  
   const data = {
-    fishName: fishName.value,
+    fishName: fishName.value || 'Unknown',
     fishEmoji: identifyResults.value.find(f => f.name === fishName.value)?.emoji || '🐟',
     imagePath: imagePath.value,
-    location: location.value || '未知钓点',
-    weather: weather.value || '多云',
+    location: location.value || 'Unknown',
+    weather: weather.value || 'Cloudy',
     temperature: temperature.value || '26°',
     isPrivate: isPrivate.value,
     userId: 'current_user'
   }
-  
   const result = await catchStore.addCatch(data)
-  
   saving.value = false
-  
   if (result) {
-    uni.showToast({ title: '保存成功', icon: 'success' })
-    setTimeout(() => {
-      uni.navigateBack()
-    }, 1500)
+    uni.showToast({ title: 'Saved', icon: 'success' })
+    setTimeout(() => uni.navigateBack(), 1500)
   } else {
-    uni.showToast({ title: '保存失败', icon: 'none' })
+    uni.showToast({ title: 'Failed', icon: 'none' })
   }
 }
 
+function goBack() {
+  uni.navigateBack()
+}
+
 onMounted(() => {
-  // 获取天气信息
   if (weatherStore.weatherNow) {
     weather.value = weatherStore.weatherNow.text
     temperature.value = weatherStore.weatherNow.temp + '°'
   }
-  
-  // 获取位置
   uni.getLocation({
     type: 'wgs84',
     success: (res) => {
@@ -229,21 +199,21 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.container {
+.page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #EBF5FF 0%, #F0F9FF 50%, #F8FAFE 100%);
+  background: #F2F3F5;
+  display: flex;
+  flex-direction: column;
 }
 
+/* ===== Header ===== */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx 32rpx;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.5);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  padding: 16rpx 20rpx;
+  background: #FFFFFF;
+  border-bottom: 2rpx solid rgba(79,84,92,0.12);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -252,25 +222,26 @@ onMounted(() => {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 16rpx;
 }
 
-.btn-back {
-  width: 60rpx;
-  height: 60rpx;
-  border-radius: 16rpx;
-  background: #F1F5F9;
+.btn-cancel {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #5C5E66;
+  background: transparent;
   border: none;
-  font-size: 32rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0;
+  height: auto;
+  line-height: 1;
+}
+.btn-cancel:active {
+  color: #313338;
 }
 
 .title {
-  font-size: 34rpx;
+  font-size: 32rpx;
   font-weight: 700;
-  color: #1A2B4A;
+  color: #313338;
 }
 
 .header-right {
@@ -279,33 +250,42 @@ onMounted(() => {
 }
 
 .btn-save {
-  padding: 16rpx 32rpx;
-  border-radius: 16rpx;
-  background: linear-gradient(135deg, #2196F3, #00BCD4);
-  color: #fff;
-  font-size: 28rpx;
-  font-weight: 600;
+  padding: 8rpx 24rpx;
+  border-radius: 20rpx;
+  background: #5865F2;
+  color: #FFFFFF;
+  font-size: 26rpx;
+  font-weight: 500;
   border: none;
+  height: auto;
+  line-height: 1;
+  transition: background 0.15s;
 }
-
+.btn-save:active:not(:disabled) {
+  background: #4752C4;
+}
 .btn-save:disabled {
-  opacity: .5;
+  opacity: 0.5;
 }
 
-.content {
+/* ===== Scroll ===== */
+.scroll-content {
   flex: 1;
 }
 
+/* ===== Discord Card ===== */
+.dc-card {
+  background: #FFFFFF;
+  border-radius: 8rpx;
+  margin: 12rpx 20rpx;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* ===== Photo ===== */
 .photo-section {
-  margin: 24rpx;
-  height: 400rpx;
-  border-radius: 20rpx;
+  height: 360rpx;
   overflow: hidden;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.5);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  cursor: pointer;
 }
 
 .photo-preview {
@@ -320,68 +300,61 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #F1F5F9;
+  gap: 12rpx;
+  background: #F2F3F5;
 }
 
 .photo-icon {
-  font-size: 64rpx;
-  margin-bottom: 16rpx;
+  width: 56rpx;
+  height: 56rpx;
+  opacity: 0.6;
 }
 
-.photo-text {
-  font-size: 28rpx;
-  color: #6B7A99;
+.photo-label {
+  font-size: 26rpx;
+  color: #80848E;
+  font-weight: 500;
 }
 
+/* ===== AI section ===== */
 .identify-section {
-  margin: 0 24rpx 24rpx;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 20rpx;
-  padding: 24rpx;
-  border: 1px solid rgba(255,255,255,0.5);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  padding: 20rpx;
 }
 
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  font-size: 28rpx;
+.card-title {
+  font-size: 26rpx;
   font-weight: 600;
-  color: #1A2B4A;
+  color: #313338;
   margin-bottom: 16rpx;
-}
-
-.title-icon {
-  font-size: 28rpx;
+  display: block;
 }
 
 .identify-list {
   display: flex;
   flex-direction: column;
-  gap: 12rpx;
+  gap: 8rpx;
 }
 
 .identify-item {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  padding: 16rpx;
-  border-radius: 12rpx;
-  background: #F8FAFE;
+  gap: 12rpx;
+  padding: 14rpx;
+  border-radius: 8rpx;
   border: 2rpx solid transparent;
-  transition: all .2s;
+  transition: all 0.15s;
+  cursor: pointer;
 }
-
+.identify-item:active {
+  background: rgba(79,84,92,0.04);
+}
 .identify-item.selected {
-  border-color: #2196F3;
-  background: #E3F2FD;
+  border-color: #5865F2;
+  background: rgba(88,101,242,0.04);
 }
 
 .fish-emoji {
-  font-size: 40rpx;
+  font-size: 36rpx;
 }
 
 .fish-info {
@@ -391,70 +364,71 @@ onMounted(() => {
 .fish-name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #1A2B4A;
+  color: #313338;
 }
 
-.confidence-bar {
-  height: 8rpx;
-  background: #E2E8F0;
-  border-radius: 4rpx;
+.confidence-track {
+  height: 6rpx;
+  background: #E3E5E8;
+  border-radius: 3rpx;
   margin: 8rpx 0;
   overflow: hidden;
 }
 
 .confidence-fill {
   height: 100%;
-  border-radius: 4rpx;
-  transition: width .3s ease;
+  border-radius: 3rpx;
+  transition: width 0.3s ease;
 }
 
 .confidence-text {
   font-size: 20rpx;
-  color: #6B7A99;
+  color: #80848E;
 }
 
-.check-icon {
-  font-size: 28rpx;
-  color: #2196F3;
-  font-weight: 700;
+.check-mark {
+  width: 24rpx;
+  height: 24rpx;
+  flex-shrink: 0;
+}
+.check-mark svg {
+  width: 24rpx;
+  height: 24rpx;
 }
 
+/* ===== Form ===== */
 .form-section {
-  margin: 0 24rpx 24rpx;
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 20rpx;
-  padding: 24rpx;
-  border: 1px solid rgba(255,255,255,0.5);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  padding: 20rpx;
 }
 
-.form-item {
+.form-group {
   margin-bottom: 20rpx;
 }
-
-.form-item:last-child {
+.form-group:last-child {
   margin-bottom: 0;
 }
 
 .form-label {
   display: block;
-  font-size: 26rpx;
+  font-size: 24rpx;
   font-weight: 500;
-  color: #1A2B4A;
+  color: #5C5E66;
   margin-bottom: 8rpx;
 }
 
 .form-input {
   width: 100%;
-  height: 80rpx;
-  background: #F8FAFE;
-  border: 2rpx solid #E2E8F0;
-  border-radius: 12rpx;
-  padding: 0 20rpx;
+  height: 72rpx;
+  background: #F2F3F5;
+  border: 2rpx solid transparent;
+  border-radius: 8rpx;
+  padding: 0 16rpx;
   font-size: 28rpx;
-  color: #1A2B4A;
+  color: #313338;
+  transition: border-color 0.15s;
+}
+.form-input:focus {
+  border-color: #5865F2;
 }
 
 .form-row {
@@ -462,17 +436,53 @@ onMounted(() => {
   gap: 16rpx;
 }
 
-.form-item.half {
+.form-group.half {
   flex: 1;
 }
 
-.switch-item {
+/* Toggle */
+.form-toggle {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 8rpx 0 0;
+}
+.form-toggle .form-label {
+  margin-bottom: 0;
 }
 
-.switch-item .form-label {
-  margin-bottom: 0;
+.toggle-wrap {
+  padding: 4rpx;
+}
+
+.toggle-track {
+  width: 80rpx;
+  height: 44rpx;
+  border-radius: 22rpx;
+  background: #E3E5E8;
+  position: relative;
+  transition: background 0.2s;
+}
+.toggle-track.active {
+  background: #5865F2;
+}
+
+.toggle-thumb {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  position: absolute;
+  top: 4rpx;
+  left: 4rpx;
+  transition: left 0.2s;
+}
+.toggle-track.active .toggle-thumb {
+  left: 40rpx;
+}
+
+.spacer {
+  height: 40rpx;
 }
 </style>

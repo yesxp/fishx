@@ -1,61 +1,62 @@
 <template>
-  <view class="container">
-    <!-- Discord 风格头部：简洁 + 状态指示 -->
-    <view class="header">
-      <view class="header-row">
-        <view class="header-brand">
-          <view class="brand-dot"></view>
-          <text class="header-title">鱼渔娱</text>
+  <view class="page">
+    <!-- Top bar: brand + status dot -->
+    <view class="topbar">
+      <view class="topbar-inner">
+        <view class="brand">
+          <view class="brand-status"></view>
+          <text class="brand-name">鱼渔娱</text>
         </view>
-        <view class="header-actions">
-          <view class="action-btn" @click="goToCreate">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        <view class="topbar-status">
+          <text class="status-location">上海市</text>
+          <text class="status-dot-live" :style="{ color: indexResult.levelColor }">{{ indexResult.level }}</text>
+        </view>
+        <view class="topbar-actions">
+          <view class="icon-btn" @click="goToCreate">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </view>
         </view>
       </view>
-      <text class="header-sub">上海市 · 适合钓鱼</text>
     </view>
 
-    <scroll-view scroll-y class="content" @scrolltolower="loadMore">
-      <!-- 指数卡片：Discord 卡片风格，微妙阴影 -->
-      <view class="card index-card" @click="goToWeather">
-        <view class="index-left">
+    <scroll-view scroll-y class="scroll-content" @scrolltolower="loadMore">
+      <!-- Index card: Discord style -->
+      <view class="dc-card index-card" @click="goToWeather">
+        <view class="index-main">
           <text class="index-score" :style="{ color: indexResult.levelColor }">{{ indexResult.score }}</text>
           <view class="index-meta">
-            <text class="index-label">钓鱼指数</text>
+            <text class="index-label">Fishing Index</text>
             <text class="index-level" :style="{ color: indexResult.levelColor }">{{ indexResult.level }}</text>
           </view>
         </view>
         <view class="index-right">
-          <text class="index-suggestion">{{ indexResult.suggestion }}</text>
-          <svg class="index-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          <text class="index-desc">{{ indexResult.suggestion }}</text>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </view>
       </view>
 
-      <!-- 天气数据：Discord 列表风格 -->
-      <view class="card data-card">
-        <view class="data-row">
-          <view class="data-dot" style="background: #F0B232;"></view>
-          <text class="data-label">气温</text>
-          <text class="data-value">{{ weatherNow?.temp || '--' }}°</text>
+      <!-- Current weather: Discord inset list -->
+      <view class="dc-card weather-list">
+        <view class="list-row" :class="{'has-divider': true}">
+          <view class="list-dot" style="background: #F0B232;"></view>
+          <text class="list-label">Temperature</text>
+          <text class="list-value">{{ weatherNow?.temp || '--' }}°</text>
         </view>
-        <view class="data-sep"></view>
-        <view class="data-row">
-          <view class="data-dot" style="background: #5865F2;"></view>
-          <text class="data-label">气压</text>
-          <text class="data-value">{{ weatherNow?.pressure || '--' }} hPa</text>
+        <view class="list-row" :class="{'has-divider': true}">
+          <view class="list-dot" style="background: #5865F2;"></view>
+          <text class="list-label">Atmospheric Pressure</text>
+          <text class="list-value">{{ weatherNow?.pressure || '--' }} hPa</text>
         </view>
-        <view class="data-sep"></view>
-        <view class="data-row">
-          <view class="data-dot" style="background: #23A55A;"></view>
-          <text class="data-label">风力</text>
-          <text class="data-value">{{ weatherNow?.windScale || '--' }}级</text>
+        <view class="list-row">
+          <view class="list-dot" style="background: #23A55A;"></view>
+          <text class="list-label">Wind Scale</text>
+          <text class="list-value">{{ weatherNow?.windScale || '--' }}级</text>
         </view>
       </view>
 
-      <!-- 标签筛选：Discord pill 风格 -->
-      <scroll-view scroll-x class="tags-scroll" :show-scrollbar="false">
-        <view class="tags-row">
+      <!-- Filter tags: Discord pill tags -->
+      <scroll-view scroll-x class="tags-bar" :show-scrollbar="false">
+        <view class="tags-wrap">
           <view class="tag"
             v-for="tag in tags"
             :key="tag.id"
@@ -67,18 +68,18 @@
         </view>
       </scroll-view>
 
-      <!-- 列表头部 -->
+      <!-- Section header -->
       <view class="section-header">
-        <text class="section-title">附近渔获</text>
-        <text class="section-more">查看全部</text>
+        <text class="section-title">Catches Nearby</text>
+        <text class="section-action">View All</text>
       </view>
 
-      <!-- 渔获瀑布流 -->
+      <!-- Masonry feed -->
       <view class="masonry" v-if="catchList.length > 0">
         <view class="masonry-col">
           <CatchCard
             v-for="item in catchList"
-            :key="item.id"
+            :key="'a-' + item.id"
             v-if="getIndex(item) % 2 === 0"
             v-bind="item"
           />
@@ -86,29 +87,28 @@
         <view class="masonry-col">
           <CatchCard
             v-for="item in catchList"
-            :key="item.id"
+            :key="'b-' + item.id"
             v-if="getIndex(item) % 2 === 1"
             v-bind="item"
           />
         </view>
       </view>
 
-      <!-- 空态 -->
       <EmptyState
         v-else
         icon=""
-        title="还没有渔获记录"
-        desc="快去钓鱼吧，记录你的每一次收获"
-        btnText="去钓鱼"
+        title="No catches yet"
+        desc="Start fishing and record your first catch"
+        btnText="Start Fishing"
         @action="goToCreate"
       />
 
-      <view class="loading-more" v-if="loading">
-        <LoadingSpinner text="加载中..." />
+      <view class="load-more-area" v-if="loading">
+        <LoadingSpinner text="Loading..." />
       </view>
 
-      <view class="no-more" v-if="noMore && catchList.length > 0">
-        <text class="no-more-text">没有更多了</text>
+      <view class="end-area" v-if="noMore && catchList.length > 0">
+        <text class="end-text">No more</text>
       </view>
     </scroll-view>
   </view>
@@ -133,11 +133,11 @@ const selectedTag = ref('all')
 const noMore = ref(false)
 
 const tags = [
-  { id: 'all', name: '全部' },
-  { id: 'crucian', name: '鲫鱼' },
-  { id: 'carp', name: '鲤鱼' },
-  { id: 'grass', name: '草鱼' },
-  { id: 'bass', name: '鲈鱼' },
+  { id: 'all', name: 'All' },
+  { id: 'crucian', name: 'Crucian' },
+  { id: 'carp', name: 'Carp' },
+  { id: 'grass', name: 'Grass Carp' },
+  { id: 'bass', name: 'Bass' },
 ]
 
 function getIndex(item: any) {
@@ -168,104 +168,116 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ===== Discord Design Language ===== */
-
-.container {
+.page {
   min-height: 100vh;
   background: #F2F3F5;
+  display: flex;
+  flex-direction: column;
 }
 
-/* === 头部 === */
-.header {
+/* ===== Top Bar ===== */
+.topbar {
   background: #FFFFFF;
-  padding: 20rpx 24rpx 16rpx;
-  border-bottom: 1px solid rgba(79,84,92,0.12);
+  padding: 12rpx 24rpx 14rpx;
+  border-bottom: 2rpx solid rgba(79,84,92,0.12);
 }
 
-.header-row {
+.topbar-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.header-brand {
+.brand {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  gap: 8rpx;
 }
 
-.brand-dot {
+.brand-status {
   width: 12rpx;
   height: 12rpx;
   border-radius: 50%;
   background: #23A55A;
+  box-shadow: 0 0 0 2rpx rgba(35,165,90,0.2);
 }
 
-.header-title {
-  font-size: 36rpx;
+.brand-name {
+  font-size: 32rpx;
   font-weight: 700;
   color: #313338;
-  letter-spacing: -0.3rpx;
+  letter-spacing: -0.5rpx;
 }
 
-.header-sub {
-  font-size: 24rpx;
-  color: #5C5E66;
-  margin-top: 4rpx;
-}
-
-.header-actions {
+.topbar-status {
   display: flex;
-  gap: 12rpx;
+  align-items: center;
+  gap: 6rpx;
 }
 
-.action-btn {
-  width: 56rpx;
-  height: 56rpx;
+.status-location {
+  font-size: 22rpx;
+  color: #5C5E66;
+  font-weight: 500;
+}
+
+.status-dot-live {
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.icon-btn {
+  width: 52rpx;
+  height: 52rpx;
   border-radius: 50%;
   background: rgba(88,101,242,0.08);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.15s;
 }
-.action-btn:active {
+.icon-btn:active {
   background: rgba(88,101,242,0.16);
 }
-.action-btn svg {
-  width: 28rpx;
-  height: 28rpx;
+.icon-btn svg {
+  width: 24rpx;
+  height: 24rpx;
 }
 
-/* === 内容 === */
-.content {
+/* ===== Scroll Content ===== */
+.scroll-content {
   flex: 1;
   padding: 16rpx 20rpx;
 }
 
-/* === Discord 卡片 === */
-.card {
+/* ===== Discord Card ===== */
+.dc-card {
   background: #FFFFFF;
-  border-radius: 12rpx;
-  padding: 20rpx;
+  border-radius: 8rpx;
   margin-bottom: 12rpx;
   box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
-/* === 指数卡片 === */
+/* ===== Index Card ===== */
 .index-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 24rpx 20rpx;
+  transition: background 0.15s;
+}
+.index-card:active {
+  background: rgba(79,84,92,0.04);
 }
 
-.index-left {
+.index-main {
   display: flex;
-  align-items: center;
-  gap: 20rpx;
+  align-items: baseline;
+  gap: 16rpx;
 }
 
 .index-score {
-  font-size: 60rpx;
+  font-size: 72rpx;
   font-weight: 700;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -274,12 +286,12 @@ onMounted(() => {
 .index-meta {
   display: flex;
   flex-direction: column;
-  gap: 2rpx;
 }
 
 .index-label {
-  font-size: 22rpx;
+  font-size: 20rpx;
   color: #80848E;
+  font-weight: 500;
 }
 
 .index-level {
@@ -290,34 +302,33 @@ onMounted(() => {
 .index-right {
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  gap: 6rpx;
 }
 
-.index-suggestion {
+.index-desc {
   font-size: 22rpx;
   color: #80848E;
+  max-width: 180rpx;
   text-align: right;
-  max-width: 200rpx;
+  line-height: 1.3;
 }
 
-.index-arrow {
-  width: 24rpx;
-  height: 24rpx;
-  flex-shrink: 0;
+/* ===== Weather List (inset list) ===== */
+.weather-list {
+  padding: 6rpx 0;
 }
 
-/* === 数据列表 === */
-.data-card {
-  padding: 8rpx 20rpx;
-}
-
-.data-row {
+.list-row {
   display: flex;
   align-items: center;
-  padding: 16rpx 0;
+  padding: 14rpx 20rpx;
 }
 
-.data-dot {
+.list-row.has-divider {
+  border-bottom: 1rpx solid rgba(79,84,92,0.08);
+}
+
+.list-dot {
   width: 8rpx;
   height: 8rpx;
   border-radius: 50%;
@@ -325,31 +336,26 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.data-label {
+.list-label {
   flex: 1;
   font-size: 28rpx;
   color: #313338;
   font-weight: 500;
 }
 
-.data-value {
+.list-value {
   font-size: 28rpx;
   color: #80848E;
   font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
-.data-sep {
-  height: 1px;
-  background: rgba(79,84,92,0.08);
+/* ===== Tags ===== */
+.tags-bar {
+  margin-bottom: 16rpx;
 }
 
-/* === 标签 === */
-.tags-scroll {
-  margin-bottom: 20rpx;
-  white-space: nowrap;
-}
-
-.tags-row {
+.tags-wrap {
   display: inline-flex;
   gap: 8rpx;
 }
@@ -357,52 +363,51 @@ onMounted(() => {
 .tag {
   display: inline-flex;
   align-items: center;
-  height: 48rpx;
+  height: 44rpx;
   padding: 0 20rpx;
-  border-radius: 24rpx;
+  border-radius: 22rpx;
   background: rgba(79,84,92,0.08);
-  transition: all 0.15s;
+  transition: background 0.15s;
+  flex-shrink: 0;
 }
-
 .tag:active {
   background: rgba(79,84,92,0.16);
 }
-
 .tag.active {
   background: #5865F2;
 }
 
 .tag-text {
-  font-size: 26rpx;
+  font-size: 24rpx;
   font-weight: 500;
   color: #5C5E66;
   white-space: nowrap;
 }
-
 .tag.active .tag-text {
   color: #FFFFFF;
 }
 
-/* === 列表头部 === */
+/* ===== Section Header ===== */
 .section-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 12rpx;
+  padding: 8rpx 0 12rpx;
 }
 
 .section-title {
-  font-size: 30rpx;
+  font-size: 28rpx;
   font-weight: 700;
   color: #313338;
 }
 
-.section-more {
-  font-size: 26rpx;
+.section-action {
+  font-size: 24rpx;
   color: #5865F2;
+  font-weight: 500;
 }
 
-/* === 瀑布流 === */
+/* ===== Masonry ===== */
 .masonry {
   display: flex;
   gap: 12rpx;
@@ -414,18 +419,21 @@ onMounted(() => {
   flex-direction: column;
 }
 
-/* === 底部 === */
-.loading-more {
-  padding: 40rpx 0;
+/* ===== Bottom ===== */
+.load-more-area {
+  padding: 48rpx 0;
+  display: flex;
+  justify-content: center;
 }
 
-.no-more {
-  padding: 40rpx 0;
+.end-area {
+  padding: 48rpx 0;
   text-align: center;
 }
 
-.no-more-text {
+.end-text {
   font-size: 22rpx;
   color: #80848E;
+  font-weight: 500;
 }
 </style>

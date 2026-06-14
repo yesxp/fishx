@@ -1,39 +1,50 @@
-/* 鱼渔娱 — Discord 设计系统 (Light) */
+/* 鱼渔娱 — Discord Light Theme 精确复刻 */
 
 /* === Discord Brand === */
 $blurple: #5865F2;
 $blurple-dark: #4752C4;
+$blurple-darker: #3C45A5;
 $blurple-light: #A5B3F0;
 
-/* === Discord Light Theme === */
+/* === Discord Light Theme Backgrounds === */
 $bg-primary: #FFFFFF;
 $bg-secondary: #F2F3F5;
 $bg-tertiary: #E3E5E8;
 $bg-floating: #FFFFFF;
 
-/* === 文字 === */
+/* === Discord Text === */
 $text-normal: #313338;
 $text-muted: #5C5E66;
 $text-faint: #80848E;
 $header-primary: #313338;
 $header-secondary: #5C5E66;
 
-/* === 状态色 === */
-$green: #23A55A;
-$yellow: #F0B232;
-$red: #F23F43;
-$fuchsia: #EB459E;
+/* === Discord Status Colors === */
+$status-green: #23A55A;
+$status-yellow: #F0B232;
+$status-red: #F23F43;
+$status-fuchsia: #EB459E;
 
-/* === 交互 === */
+/* === Discord Interaction Modifiers === */
 $hover: rgba(79,84,92,0.08);
 $active: rgba(79,84,92,0.16);
 $selected: rgba(88,101,242,0.08);
 
-/* === 圆角 === */
+/* === Discord Dividers === */
+$divider: rgba(79,84,92,0.08);
+$divider-strong: rgba(79,84,92,0.12);
+
+/* === Discord Shadows === */
+$shadow-low: 0 1px 2px rgba(0,0,0,0.06);
+$shadow-medium: 0 4px 8px rgba(0,0,0,0.12);
+$shadow-high: 0 8px 16px rgba(0,0,0,0.16);
+
+/* === Discord Border Radius === */
 $radius-sm: 4rpx;
 $radius-md: 8rpx;
 $radius-lg: 12rpx;
 $radius-xl: 16rpx;
+$radius-pill: 20px;
 
-/* === 分隔线 === */
-$divider: rgba(79,84,92,0.12);
+/* === Discord Font === */
+$font-primary: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;

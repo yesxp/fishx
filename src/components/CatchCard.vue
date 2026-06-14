@@ -10,8 +10,14 @@
         <text class="meta-time">{{ formatTime(time) }}</text>
       </view>
       <view class="card-footer">
-        <text class="footer-stat">{{ likes }} 赞</text>
-        <text class="footer-stat">{{ comments }} 评</text>
+        <view class="footer-stat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <text>{{ likes ?? 0 }}</text>
+        </view>
+        <view class="footer-stat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <text>{{ comments ?? 0 }}</text>
+        </view>
       </view>
     </view>
   </view>
@@ -31,22 +37,17 @@ const props = defineProps<{
   comments?: number
 }>()
 
-const bgColor = getColorByIndex(Math.floor(Math.random() * 6))
-
-function getColorByIndex(index: number) {
-  const colors = ['#F2F3F5', '#E8F5E9', '#FFF3E0', '#E3E5E8', '#F3E5F5', '#ECEFF1']
-  return colors[index]
-}
+const bgColor = '#F2F3F5'
 
 function formatTime(t: string) {
   if (!t) return ''
   const date = new Date(t)
   const now = new Date()
   const diff = now.getTime() - date.getTime()
-  if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前'
-  if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前'
-  if (diff < 172800000) return '昨天'
-  return (date.getMonth() + 1) + '月' + date.getDate() + '日'
+  if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago'
+  if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago'
+  if (diff < 172800000) return 'Yesterday'
+  return (date.getMonth() + 1) + '/' + date.getDate()
 }
 
 function goToDetail() {
@@ -57,26 +58,30 @@ function goToDetail() {
 <style scoped>
 .catch-card {
   background: #FFFFFF;
-  border-radius: 12rpx;
+  border-radius: 8rpx;
   overflow: hidden;
   margin-bottom: 12rpx;
   box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  transition: background 0.15s;
+}
+.catch-card:active {
+  background: rgba(79,84,92,0.04);
 }
 
 .card-photo {
   width: 100%;
-  height: 260rpx;
+  height: 240rpx;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .photo-emoji {
-  font-size: 72rpx;
+  font-size: 64rpx;
 }
 
 .card-body {
-  padding: 14rpx 16rpx 18rpx;
+  padding: 12rpx 16rpx 16rpx;
 }
 
 .card-name {
@@ -84,7 +89,7 @@ function goToDetail() {
   font-weight: 600;
   color: #313338;
   display: block;
-  margin-bottom: 6rpx;
+  margin-bottom: 4rpx;
 }
 
 .card-meta {
@@ -95,26 +100,44 @@ function goToDetail() {
 
 .meta-loc {
   font-size: 22rpx;
-  color: #80848E;
+  color: #5C5E66;
 }
 
 .meta-time {
   font-size: 20rpx;
   color: #80848E;
-  opacity: 0.7;
 }
 
 .card-footer {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  margin-top: 10rpx;
-  padding-top: 10rpx;
-  border-top: 1px solid rgba(79,84,92,0.08);
+  gap: 20rpx;
+  margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx solid rgba(79,84,92,0.08);
 }
 
 .footer-stat {
-  font-size: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.footer-stat svg {
+  width: 18rpx;
+  height: 18rpx;
+}
+
+.footer-stat text,
+.footer-stat text {
+  font-size: 22rpx;
   color: #80848E;
+  font-weight: 500;
+}
+
+.footer-stat text {
+  font-size: 22rpx;
+  color: #80848E;
+  font-weight: 500;
 }
 </style>

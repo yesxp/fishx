@@ -31,8 +31,8 @@ defineProps<{
 }
 
 .dot {
-  width: 12rpx;
-  height: 12rpx;
+  width: 10rpx;
+  height: 10rpx;
   border-radius: 50%;
   background: #5865F2;
   animation: pulse 0.6s ease-in-out infinite alternate;
@@ -48,5 +48,6 @@ defineProps<{
 .spinner-text {
   font-size: 22rpx;
   color: #80848E;
+  font-weight: 500;
 }
 </style>

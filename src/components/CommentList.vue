@@ -1,10 +1,7 @@
 <template>
-  <view class="comment-section">
-    <view class="comment-title">
-      <text class="title-text">评论 ({{ comments.length }})</text>
-    </view>
-    
-    <!-- 评论列表 -->
+  <view class="comment-section dc-card">
+    <text class="comment-title">{{ comments.length }} Comments</text>
+
     <view class="comment-list" v-if="comments.length > 0">
       <view class="comment-item" v-for="item in comments" :key="item.id">
         <view class="comment-avatar">{{ item.avatar }}</view>
@@ -17,26 +14,25 @@
         </view>
       </view>
     </view>
-    
+
     <view class="comment-empty" v-else>
-      <text class="empty-text">暂无评论，快来抢沙发！</text>
+      <text class="empty-text">No comments yet</text>
     </view>
-    
-    <!-- 输入框 -->
+
     <view class="comment-input-wrap">
-      <input 
-        class="comment-input" 
+      <input
+        class="comment-input"
         v-model="inputText"
-        placeholder="说点什么..."
+        placeholder="Add a comment..."
         confirm-type="send"
         @confirm="handleSubmit"
       />
-      <view 
-        class="send-btn" 
+      <view
+        class="send-btn"
         :class="{ active: inputText.length > 0 }"
         @click="handleSubmit"
       >
-        <text>发送</text>
+        <text>Send</text>
       </view>
     </view>
   </view>
@@ -61,11 +57,10 @@ function formatTime(t: string) {
   const date = new Date(t)
   const now = new Date()
   const diff = now.getTime() - date.getTime()
-  
-  if (diff < 60000) return '刚刚'
-  if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前'
-  if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前'
-  return (date.getMonth() + 1) + '月' + date.getDate() + '日'
+  if (diff < 60000) return 'Just now'
+  if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago'
+  if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago'
+  return (date.getMonth() + 1) + '/' + date.getDate()
 }
 
 function handleSubmit() {
@@ -77,119 +72,120 @@ function handleSubmit() {
 
 <style scoped>
 .comment-section {
-  background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 24rpx;
-  box-shadow: 0 2px 12px rgba(26,43,74,.06);
+  padding: 20rpx;
 }
 
 .comment-title {
-  margin-bottom: 20rpx;
-}
-
-.title-text {
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 600;
-  color: #1A2B4A;
+  color: #313338;
+  margin-bottom: 16rpx;
+  display: block;
 }
 
 .comment-list {
-  margin-bottom: 20rpx;
+  margin-bottom: 16rpx;
 }
 
 .comment-item {
   display: flex;
-  gap: 16rpx;
-  padding: 16rpx 0;
-  border-bottom: 1rpx solid #F1F5F9;
+  gap: 12rpx;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid rgba(79,84,92,0.08);
 }
-
 .comment-item:last-child {
   border-bottom: none;
 }
 
 .comment-avatar {
-  width: 56rpx;
-  height: 56rpx;
+  width: 52rpx;
+  height: 52rpx;
   border-radius: 50%;
-  background: #E3F2FD;
+  background: #F2F3F5;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24rpx;
+  font-size: 22rpx;
   flex-shrink: 0;
 }
 
 .comment-content {
   flex: 1;
+  min-width: 0;
 }
 
 .comment-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8rpx;
+  margin-bottom: 4rpx;
 }
 
 .comment-name {
   font-size: 24rpx;
   font-weight: 600;
-  color: #1A2B4A;
+  color: #313338;
 }
 
 .comment-time {
   font-size: 20rpx;
-  color: #94A3B8;
+  color: #80848E;
 }
 
 .comment-text {
   font-size: 26rpx;
-  color: #1A2B4A;
-  line-height: 1.5;
+  color: #313338;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 .comment-empty {
-  padding: 40rpx;
+  padding: 32rpx 0;
   text-align: center;
 }
 
 .empty-text {
   font-size: 24rpx;
-  color: #94A3B8;
+  color: #80848E;
 }
 
 .comment-input-wrap {
   display: flex;
-  gap: 12rpx;
-  padding-top: 16rpx;
-  border-top: 1rpx solid #F1F5F9;
+  gap: 10rpx;
+  padding-top: 12rpx;
+  border-top: 2rpx solid rgba(79,84,92,0.08);
 }
 
 .comment-input {
   flex: 1;
-  height: 72rpx;
-  background: #F8FAFE;
-  border: 2rpx solid #E2E8F0;
-  border-radius: 36rpx;
-  padding: 0 24rpx;
+  height: 68rpx;
+  background: #F2F3F5;
+  border: none;
+  border-radius: 20rpx;
+  padding: 0 20rpx;
   font-size: 26rpx;
+  color: #313338;
 }
 
 .send-btn {
-  padding: 0 24rpx;
-  height: 72rpx;
-  border-radius: 36rpx;
-  background: #E2E8F0;
+  padding: 0 20rpx;
+  height: 68rpx;
+  border-radius: 20rpx;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 26rpx;
-  color: #94A3B8;
-  transition: all .2s;
+  font-weight: 600;
+  color: #80848E;
+  transition: all 0.15s;
 }
 
 .send-btn.active {
-  background: linear-gradient(135deg, #2196F3, #00BCD4);
+  background: #5865F2;
   color: #FFFFFF;
+}
+.send-btn.active:active {
+  background: #4752C4;
 }
 </style>

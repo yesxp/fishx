@@ -4,26 +4,22 @@ import { useUserStore } from '@/stores/user'
 
 onLaunch(() => {
   console.log('App Launch')
-  
-  // 检查登录状态
   const userStore = useUserStore()
   const isLoggedIn = userStore.checkLogin()
-  
-  // 如果未登录，跳转到登录页
+  // #ifdef H5
   if (!isLoggedIn) {
-    // H5 模式下自动登录（开发用）
-    // #ifdef H5
     userStore.setLoginInfo('dev_token', {
       id: 'dev_user',
       nickname: '开发者',
       avatar: ''
     })
-    // #endif
-    
-    // #ifdef MP-WEIXIN
-    uni.navigateTo({ url: '/pages/login/index' })
-    // #endif
   }
+  // #endif
+  // #ifdef MP-WEIXIN
+  if (!isLoggedIn) {
+    uni.navigateTo({ url: '/pages/login/index' })
+  }
+  // #endif
 })
 
 onShow(() => {
@@ -37,7 +33,10 @@ onHide(() => {
 
 <style>
 page {
-  background-color: #F8FAFE;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', sans-serif;
+  background-color: #F2F3F5;
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 28rpx;
+  color: #313338;
+  -webkit-font-smoothing: antialiased;
 }
 </style>

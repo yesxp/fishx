@@ -5,7 +5,7 @@
     </view>
     <text class="empty-title">{{ title }}</text>
     <text class="empty-desc" v-if="desc">{{ desc }}</text>
-    <button class="empty-btn" v-if="btnText" @click="$emit('action')">
+    <button class="empty-btn" v-if="btnText" @click="$emit('action')" :class="{ 'is-danger': isDanger }">
       {{ btnText }}
     </button>
   </view>
@@ -17,6 +17,7 @@ defineProps<{
   title?: string
   desc?: string
   btnText?: string
+  isDanger?: boolean
 }>()
 
 defineEmits<{
@@ -34,8 +35,8 @@ defineEmits<{
 }
 
 .empty-icon {
-  width: 100rpx;
-  height: 100rpx;
+  width: 96rpx;
+  height: 96rpx;
   border-radius: 50%;
   background: rgba(88,101,242,0.08);
   display: flex;
@@ -44,12 +45,12 @@ defineEmits<{
   margin-bottom: 24rpx;
 }
 .empty-icon svg {
-  width: 48rpx;
-  height: 48rpx;
+  width: 44rpx;
+  height: 44rpx;
 }
 
 .empty-title {
-  font-size: 30rpx;
+  font-size: 28rpx;
   font-weight: 600;
   color: #313338;
   margin-bottom: 8rpx;
@@ -60,20 +61,28 @@ defineEmits<{
   color: #80848E;
   text-align: center;
   line-height: 1.5;
-  margin-bottom: 24rpx;
+  margin-bottom: 32rpx;
 }
 
 .empty-btn {
-  padding: 16rpx 40rpx;
-  border-radius: 24rpx;
+  padding: 12rpx 40rpx;
+  border-radius: 20rpx;
   background: #5865F2;
   color: #fff;
   font-size: 26rpx;
-  font-weight: 600;
+  font-weight: 500;
   border: none;
+  height: auto;
+  line-height: 1;
+  transition: background 0.15s;
 }
 .empty-btn:active {
   background: #4752C4;
-  transform: scale(0.97);
+}
+.empty-btn.is-danger {
+  background: #F23F43;
+}
+.empty-btn.is-danger:active {
+  background: #d13538;
 }
 </style>

@@ -1,15 +1,15 @@
 <template>
-  <view class="weather-mini" @click="goToWeather">
+  <view class="weather-mini dc-card" @click="goToWeather">
     <view class="mini-left">
       <text class="mini-score" :style="{ color: color }">{{ score }}</text>
       <view class="mini-info">
-        <text class="mini-label">钓鱼指数</text>
+        <text class="mini-label">Fishing Index</text>
         <text class="mini-level" :style="{ color: color }">{{ level }}</text>
       </view>
     </view>
     <view class="mini-right">
       <text class="mini-text">{{ text }}</text>
-      <svg class="mini-arrow" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </view>
   </view>
 </template>
@@ -33,10 +33,11 @@ function goToWeather() {
   align-items: center;
   justify-content: space-between;
   padding: 20rpx;
-  background: #FFFFFF;
-  border-radius: 12rpx;
   margin-bottom: 12rpx;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  transition: background 0.15s;
+}
+.weather-mini:active {
+  background: rgba(79,84,92,0.04);
 }
 
 .mini-left {
@@ -71,18 +72,12 @@ function goToWeather() {
 .mini-right {
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  gap: 6rpx;
 }
 
 .mini-text {
   font-size: 22rpx;
   color: #80848E;
-  max-width: 220rpx;
-}
-
-.mini-arrow {
-  width: 20rpx;
-  height: 20rpx;
-  flex-shrink: 0;
+  max-width: 200rpx;
 }
 </style>

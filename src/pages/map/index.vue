@@ -1,45 +1,47 @@
 <template>
-  <view class="container">
-    <view class="header">
-      <view class="header-row">
-        <text class="header-title">钓点</text>
-        <view class="header-actions">
-          <view class="action-btn" @click="locate">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+  <view class="page">
+    <view class="topbar">
+      <view class="topbar-inner">
+        <text class="brand-name">钓点</text>
+        <view class="topbar-status">
+          <text class="status-sub">Nearby Spots</text>
+        </view>
+        <view class="topbar-actions">
+          <view class="icon-btn" @click="locate">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
           </view>
         </view>
       </view>
-      <text class="header-sub">发现附近钓点</text>
     </view>
 
-    <!-- 搜索栏 -->
+    <!-- Search bar: Discord input style -->
     <view class="search-bar">
       <view class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input class="search-input" v-model="keyword" placeholder="搜索钓点" />
+        <input class="search-input" v-model="keyword" placeholder="Search spots..." @confirm="handleSearch" />
       </view>
     </view>
 
-    <!-- 地图 -->
+    <!-- Map -->
     <view class="map-container">
-      <view class="map-placeholder">
+      <view class="map-viewport">
         <view class="map-grid"></view>
         <view
           class="map-marker"
           v-for="spot in spotList"
           :key="spot.id"
           :style="{ left: getMarkerX(spot) + '%', top: getMarkerY(spot) + '%' }"
-          @click="showSpotCard(spot)"
+          @click="selectedSpot = spot"
         >
-          <view class="marker-dot" :class="{ active: selectedSpot?.id === spot.id }"></view>
-          <text class="marker-name">{{ spot.name }}</text>
+          <view class="marker-pin" :class="{ selected: selectedSpot?.id === spot.id }"></view>
         </view>
         <view class="map-center">
           <view class="center-dot"></view>
         </view>
       </view>
 
-      <view class="spot-card-wrap" v-if="selectedSpot">
+      <!-- Floating spot card -->
+      <view class="spot-float" v-if="selectedSpot">
         <SpotCard
           :id="selectedSpot.id"
           :name="selectedSpot.name"
@@ -73,8 +75,9 @@ function getMarkerY(spot: any) {
   return 20 + (31.5 - spot.lat) * 80
 }
 
-function showSpotCard(spot: any) {
-  selectedSpot.value = spot
+function handleSearch() {
+  if (!keyword.value) { spotStore.loadList(); return }
+  spotStore.spotList = spotList.filter(s => s.name.includes(keyword.value) || s.type.includes(keyword.value))
 }
 
 function locate() {
@@ -86,67 +89,69 @@ function locate() {
   })
 }
 
-function handleSearch() {
-  if (!keyword.value) { spotStore.loadList(); return }
-  spotStore.spotList = spotList.filter(s => s.name.includes(keyword.value) || s.type.includes(keyword.value))
-}
-
 onMounted(() => { spotStore.loadList() })
 </script>
 
 <style scoped>
-.container {
+.page {
   min-height: 100vh;
   background: #F2F3F5;
   display: flex;
   flex-direction: column;
 }
 
-.header {
+/* ===== Top Bar ===== */
+.topbar {
   background: #FFFFFF;
-  padding: 20rpx 24rpx 16rpx;
-  border-bottom: 1px solid rgba(79,84,92,0.12);
+  padding: 16rpx 24rpx;
+  border-bottom: 2rpx solid rgba(79,84,92,0.12);
 }
 
-.header-row {
+.topbar-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.header-title {
-  font-size: 36rpx;
+.brand-name {
+  font-size: 32rpx;
   font-weight: 700;
   color: #313338;
 }
 
-.header-sub {
-  font-size: 24rpx;
-  color: #5C5E66;
-  margin-top: 4rpx;
-}
-
-.header-actions {
+.topbar-status {
   display: flex;
-  gap: 12rpx;
+  align-items: center;
 }
 
-.action-btn {
-  width: 56rpx;
-  height: 56rpx;
+.status-sub {
+  font-size: 22rpx;
+  color: #5C5E66;
+}
+
+.icon-btn {
+  width: 52rpx;
+  height: 52rpx;
   border-radius: 50%;
   background: rgba(88,101,242,0.08);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.15s;
 }
-.action-btn:active { background: rgba(88,101,242,0.16); }
-.action-btn svg { width: 28rpx; height: 28rpx; }
+.icon-btn:active {
+  background: rgba(88,101,242,0.16);
+}
+.icon-btn svg {
+  width: 24rpx;
+  height: 24rpx;
+}
 
+/* ===== Search ===== */
 .search-bar {
   padding: 12rpx 20rpx;
   background: #FFFFFF;
-  border-bottom: 1px solid rgba(79,84,92,0.12);
+  border-bottom: 2rpx solid rgba(79,84,92,0.12);
 }
 
 .search-wrap {
@@ -154,21 +159,31 @@ onMounted(() => { spotStore.loadList() })
   align-items: center;
   gap: 10rpx;
   background: #F2F3F5;
-  border-radius: 8rpx;
+  border-radius: 4rpx;
   padding: 14rpx 16rpx;
 }
 
-.search-icon { width: 24rpx; height: 24rpx; flex-shrink: 0; }
+.search-icon {
+  width: 22rpx;
+  height: 22rpx;
+  flex-shrink: 0;
+}
 
 .search-input {
   flex: 1;
   font-size: 28rpx;
   color: #313338;
+  background: transparent;
+  border: none;
 }
 
-.map-container { flex: 1; position: relative; }
+/* ===== Map ===== */
+.map-container {
+  flex: 1;
+  position: relative;
+}
 
-.map-placeholder {
+.map-viewport {
   width: 100%;
   height: 100%;
   background: #E8F5E9;
@@ -188,11 +203,10 @@ onMounted(() => { spotStore.loadList() })
 .map-marker {
   position: absolute;
   transform: translate(-50%, -100%);
-  cursor: pointer;
   z-index: 10;
 }
 
-.marker-dot {
+.marker-pin {
   width: 36rpx;
   height: 36rpx;
   border-radius: 50%;
@@ -201,21 +215,9 @@ onMounted(() => { spotStore.loadList() })
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   transition: all 0.15s;
 }
-.marker-dot.active {
-  transform: scale(1.2);
+.marker-pin.selected {
   background: #5865F2;
-}
-
-.marker-name {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 18rpx;
-  white-space: nowrap;
-  color: #313338;
-  font-weight: 500;
-  margin-top: 4rpx;
+  transform: scale(1.15);
 }
 
 .map-center {
@@ -227,24 +229,19 @@ onMounted(() => { spotStore.loadList() })
 }
 
 .center-dot {
-  width: 18rpx;
-  height: 18rpx;
+  width: 16rpx;
+  height: 16rpx;
   border-radius: 50%;
   background: #5865F2;
   box-shadow: 0 0 0 6rpx rgba(88,101,242,0.2);
 }
 
-.spot-card-wrap {
+/* ===== Floating spot card ===== */
+.spot-float {
   position: absolute;
-  bottom: 120rpx;
+  bottom: 100rpx;
   left: 20rpx;
   right: 20rpx;
   z-index: 20;
-  animation: slideUp 0.2s ease;
-}
-
-@keyframes slideUp {
-  from { transform: translateY(16rpx); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
 }
 </style>
