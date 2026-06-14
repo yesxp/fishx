@@ -35,3 +35,14 @@ $radius-full: 100px;
 /* 阴影 */
 $shadow: 0 2px 12px rgba(26,43,74,.06);
 $shadow-lg: 0 8px 32px rgba(26,43,74,.08);
+
+/* Glass tokens (iOS glassmorphism) */
+$glass-bg: rgba(255,255,255,0.72);
+$glass-bg-heavy: rgba(255,255,255,0.85);
+$glass-border: rgba(255,255,255,0.5);
+$glass-blur: 20px;
+$glass-shadow: 0 8px 32px rgba(0,0,0,0.06);
+$glass-shadow-lg: 0 16px 48px rgba(0,0,0,0.08);
+
+/* 全局渐变背景 */
+$bg-gradient: linear-gradient(180deg, #EBF5FF 0%, #F0F9FF 50%, #F8FAFE 100%);

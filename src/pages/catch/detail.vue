@@ -144,7 +144,7 @@ onMounted(async () => {
 <style scoped>
 .container {
   min-height: 100vh;
-  background-color: #F8FAFE;
+  background: linear-gradient(180deg, #EBF5FF 0%, #F0F9FF 50%, #F8FAFE 100%);
 }
 
 .header {
@@ -152,8 +152,11 @@ onMounted(async () => {
   align-items: center;
   justify-content: space-between;
   padding: 20rpx 32rpx;
-  background: rgba(255,255,255,.88);
-  backdrop-filter: blur(24px);
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -217,11 +220,14 @@ onMounted(async () => {
 }
 
 .info-card {
-  background: #FFFFFF;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 20rpx;
   padding: 24rpx;
   margin-bottom: 16rpx;
-  box-shadow: 0 2px 12px rgba(26,43,74,.06);
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
 }
 
 .info-header {
@@ -280,11 +286,14 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 24rpx;
-  background: #FFFFFF;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 20rpx;
   padding: 20rpx 24rpx;
   margin-bottom: 16rpx;
-  box-shadow: 0 2px 12px rgba(26,43,74,.06);
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
 }
 
 .action-divider {

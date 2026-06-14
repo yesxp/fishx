@@ -35,9 +35,12 @@ function goToWeather() {
   align-items: center;
   justify-content: space-between;
   padding: 20rpx 24rpx;
-  background: #FFFFFF;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(26,43,74,.06);
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
   margin: 0 16rpx 16rpx;
 }
 

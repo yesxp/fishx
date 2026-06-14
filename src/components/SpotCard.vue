@@ -39,11 +39,13 @@ function goToDetail() {
 
 <style scoped>
 .spot-card {
-  background: rgba(255,255,255,.95);
+  background: rgba(255,255,255,0.72);
   backdrop-filter: blur(16px);
-  border-radius: 20rpx;
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 20px;
   padding: 20rpx;
-  box-shadow: 0 4px 20px rgba(0,0,0,.1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
 }
 
 .card-top {
@@ -113,7 +115,9 @@ function goToDetail() {
 .tag-item {
   padding: 4rpx 12rpx;
   border-radius: 100px;
-  background: #E3F2FD;
+  background: rgba(227,242,253,0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   font-size: 20rpx;
   color: #2196F3;
 }

@@ -158,7 +158,7 @@ onMounted(() => {
 <style scoped>
 .container {
   min-height: 100vh;
-  background-color: #F8FAFE;
+  background: linear-gradient(180deg, #EBF5FF 0%, #F0F9FF 50%, #F8FAFE 100%);
   position: relative;
 }
 
@@ -167,8 +167,11 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 20rpx 32rpx;
-  background: rgba(255,255,255,.88);
-  backdrop-filter: blur(24px);
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -239,11 +242,14 @@ onMounted(() => {
 }
 
 .stat-card {
-  background: #FFFFFF;
-  border-radius: 16px;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 20px;
   padding: 20rpx 12rpx;
   text-align: center;
-  box-shadow: 0 2px 12px rgba(26,43,74,.06);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
 }
 
 .stat-icon {
@@ -274,11 +280,13 @@ onMounted(() => {
   gap: 4rpx;
   padding: 12rpx 24rpx;
   border-radius: 100px;
-  background: #FFFFFF;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: #6B7A99;
   font-size: 24rpx;
   margin-right: 12rpx;
-  box-shadow: 0 2px 8px rgba(26,43,74,.04);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
 }
 
 .tag.active {

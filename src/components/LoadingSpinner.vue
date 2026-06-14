@@ -52,5 +52,10 @@ defineProps<{
 .spinner-text {
   font-size: 26rpx;
   color: #6B7A99;
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 4rpx 16rpx;
+  border-radius: 100px;
 }
 </style>

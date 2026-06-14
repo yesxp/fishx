@@ -55,38 +55,38 @@
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "鱼渔娱",
-    "navigationBarBackgroundColor": "#f5f7fa",
-    "backgroundColor": "#f5f7fa"
+    "navigationBarBackgroundColor": "rgba(235,245,255,0.72)",
+    "backgroundColor": "#EBF5FF"
   },
   "tabBar": {
     "color": "#6B7A99",
     "selectedColor": "#2196F3",
-    "backgroundColor": "#FFFFFF",
+    "backgroundColor": "rgba(255,255,255,0.72)",
     "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/index/index",
         "text": "首页",
-        "iconPath": "static/tab/home.png",
-        "selectedIconPath": "static/tab/home-active.png"
+        "iconPath": "static/tab/home.svg",
+        "selectedIconPath": "static/tab/home-active.svg"
       },
       {
         "pagePath": "pages/weather/index",
         "text": "天时",
-        "iconPath": "static/tab/weather.png",
-        "selectedIconPath": "static/tab/weather-active.png"
+        "iconPath": "static/tab/weather.svg",
+        "selectedIconPath": "static/tab/weather-active.svg"
       },
       {
         "pagePath": "pages/map/index",
         "text": "钓点",
-        "iconPath": "static/tab/map.png",
-        "selectedIconPath": "static/tab/map-active.png"
+        "iconPath": "static/tab/map.svg",
+        "selectedIconPath": "static/tab/map-active.svg"
       },
       {
         "pagePath": "pages/mine/index",
         "text": "我的",
-        "iconPath": "static/tab/mine.png",
-        "selectedIconPath": "static/tab/mine-active.png"
+        "iconPath": "static/tab/mine.svg",
+        "selectedIconPath": "static/tab/mine-active.svg"
       }
     ]
   }

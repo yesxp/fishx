@@ -21,6 +21,10 @@ defineProps<{
   gap: 4rpx;
   padding: 4rpx 12rpx;
   border-radius: 100px;
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.4);
   font-size: 20rpx;
   font-weight: 500;
 }

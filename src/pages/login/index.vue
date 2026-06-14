@@ -174,7 +174,7 @@ async function handlePhoneLogin() {
 <style scoped>
 .login-page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #E3F2FD 0%, #F8FAFE 40%);
+  background: linear-gradient(180deg, #EBF5FF 0%, #F0F9FF 50%, #F8FAFE 100%);
   padding: 0 40rpx;
 }
 
@@ -233,10 +233,12 @@ async function handlePhoneLogin() {
 }
 
 .tab-item.active {
-  background: #FFFFFF;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   color: #1A2B4A;
   font-weight: 600;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,.06);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
 }
 
 .login-form {
@@ -289,8 +291,10 @@ async function handlePhoneLogin() {
 .input-field {
   width: 100%;
   height: 96rpx;
-  background: #FFFFFF;
-  border: 2rpx solid #E2E8F0;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.5);
   border-radius: 16rpx;
   padding: 0 24rpx;
   font-size: 30rpx;

@@ -74,10 +74,13 @@ function goToDetail() {
 
 <style scoped>
 .catch-card {
-  background: #FFFFFF;
-  border-radius: 16px;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(26,43,74,.06);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
   margin-bottom: 16rpx;
 }
 
@@ -87,6 +90,7 @@ function goToDetail() {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(255,255,255,0.35);
 }
 
 .photo-emoji {
