@@ -2,7 +2,7 @@
   <view class="container">
     <view class="header">
       <view class="header-left">
-        <view class="logo">📍</view>
+        <view class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#2196F3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></view>
         <view class="info">
           <text class="title">钓点</text>
           <text class="subtitle">发现附近钓点</text>
@@ -137,7 +137,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx 32rpx;
+  padding: 16rpx 28rpx;
   background: rgba(255,255,255,0.72);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -151,18 +151,23 @@ onMounted(() => {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 24rpx;
+  gap: 16rpx;
 }
 
 .logo {
-  width: 68rpx;
-  height: 68rpx;
-  border-radius: 20rpx;
-  background: linear-gradient(135deg, #2196F3, #00BCD4);
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 12rpx;
+  background: rgba(33,150,243,0.1);
+  border: 1px solid rgba(33,150,243,0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
+  flex-shrink: 0;
+}
+.logo svg {
+  width: 24rpx;
+  height: 24rpx;
 }
 
 .info {
@@ -189,20 +194,19 @@ onMounted(() => {
 }
 
 .btn-locate, .btn-camera {
-  width: 68rpx;
-  height: 68rpx;
-  border-radius: 20rpx;
-  background: rgba(33,150,243,.08);
-  font-size: 28rpx;
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 12rpx;
+  background: rgba(33,150,243,0.1);
+  font-size: 24rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
+  border: 1px solid rgba(33,150,243,0.2);
 }
 
 .btn-camera {
-  background: linear-gradient(135deg, #2196F3, #00BCD4);
-  color: #fff;
+  color: #2196F3;
 }
 
 .search-bar {
