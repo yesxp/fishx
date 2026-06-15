@@ -303,72 +303,65 @@
             </view>
           </view>
           <view class="typhoon-tip">
-            <text class="tide-tip-text">⚠️ 台风期间不建议出海作钓，注意安全</text>
-          </view>
-        </view>
-        <view class="card typhoon-card" v-else-if="!weatherStore.loading && activeTyphoon" @tap="goTyphoon">
-          <view class="typhoon-header">
-            <view class="typhoon-header-left">
-              <text class="card-title">🌀 台风「{{ activeTyphoon.name }}」</text>
-              <view class="typhoon-level-badge" :class="'typhoon-level--' + activeTyphoon.levelClass">
-                <text class="typhoon-level-text">{{ activeTyphoon.level }}</text>
+            <view class="card typhoon-card" v-else-if="!weatherStore.loading && activeTyphoon" @tap="goTyphoon">
+              <view class="card-title-row">
+                <text class="card-title">🌀 台风「{{ activeTyphoon.name }}」</text>
+                <view class="typhoon-level-badge" :class="'typhoon-level--' + activeTyphoon.levelClass">
+                  <text class="typhoon-level-text">{{ activeTyphoon.level }}</text>
+                </view>
+              </view>
+              <!-- 路径迷你图 -->
+              <view class="typhoon-mini-map">
+                <svg viewBox="0 0 340 120" width="100%" height="120">
+                  <rect x="0" y="0" width="340" height="120" fill="#F2F3F5" rx="8"/>
+                  <!-- 已过路径（灰色实线） -->
+                  <polyline points="20,70 80,65 130,58 170,52" fill="none" stroke="#80848E" stroke-width="1.5"/>
+                  <!-- 已过路径点 -->
+                  <circle cx="20" cy="70" r="2.5" fill="#80848E"/>
+                  <circle cx="80" cy="65" r="2.5" fill="#80848E"/>
+                  <circle cx="130" cy="58" r="2.5" fill="#80848E"/>
+                  <!-- 当前位置风圈 -->
+                  <circle cx="200" cy="50" r="18" fill="#F23F43" opacity="0.08"/>
+                  <circle cx="200" cy="50" r="12" fill="#F23F43" opacity="0.15"/>
+                  <circle cx="200" cy="50" r="7" fill="#F23F43"/>
+                  <!-- 预测路径（橙色虚线） -->
+                  <polyline points="200,50 240,42 270,30 300,18" fill="none" stroke="#F0B232" stroke-width="1.5" stroke-dasharray="6,4"/>
+                  <!-- 预测点 -->
+                  <circle cx="240" cy="42" r="2.5" fill="#F0B232"/>
+                  <circle cx="270" cy="30" r="2.5" fill="#F0B232"/>
+                  <circle cx="300" cy="18" r="2.5" fill="#F0B232"/>
+                  <!-- 预测范围 -->
+                  <path d="M200,50 L330,0 L330,20 Z" fill="#F0B232" opacity="0.06"/>
+                  <path d="M200,50 L330,20 L330,40 Z" fill="#F0B232" opacity="0.04"/>
+                  <!-- 广州标注 -->
+                  <circle cx="160" cy="48" r="3" fill="#5865F2"/>
+                  <text x="160" y="42" text-anchor="middle" font-size="9" fill="#5865F2" font-weight="500">广州</text>
+                </svg>
+              </view>
+              <!-- 数据摘要 -->
+              <view class="typhoon-info-grid">
+                <view class="typhoon-info-item">
+                  <text class="typhoon-info-label">风速</text>
+                  <text class="typhoon-info-value">{{ activeTyphoon.windSpeed }}</text>
+                </view>
+                <view class="typhoon-info-item">
+                  <text class="typhoon-info-label">移向</text>
+                  <text class="typhoon-info-value">{{ activeTyphoon.moveDir }}</text>
+                </view>
+                <view class="typhoon-info-item">
+                  <text class="typhoon-info-label">移速</text>
+                  <text class="typhoon-info-value">{{ activeTyphoon.moveSpeed }}</text>
+                </view>
+                <view class="typhoon-info-item">
+                  <text class="typhoon-info-label">距离</text>
+                  <text class="typhoon-info-value">{{ activeTyphoon.distance }}</text>
+                </view>
+              </view>
+              <view class="typhoon-impact">
+                <view class="typhoon-impact-icon">⚠️</view>
+                <text class="typhoon-impact-text">{{ activeTyphoon.impact }}</text>
               </view>
             </view>
-            <text class="typhoon-link">详情 →</text>
-          </view>
-          <!-- 路径迷你图 -->
-          <view class="typhoon-mini-map">
-            <svg viewBox="0 0 340 140" width="100%" height="140">
-              <rect x="0" y="0" width="340" height="140" fill="#F2F3F5" rx="8"/>
-              <!-- 已过路径（灰色实线） -->
-              <polyline points="20,80 60,75 100,68 140,60 170,55" fill="none" stroke="#80848E" stroke-width="1.5"/>
-              <!-- 已过路径点 -->
-              <circle cx="20" cy="80" r="2.5" fill="#80848E"/>
-              <circle cx="60" cy="75" r="2.5" fill="#80848E"/>
-              <circle cx="100" cy="68" r="2.5" fill="#80848E"/>
-              <circle cx="140" cy="60" r="2.5" fill="#80848E"/>
-              <!-- 当前位置风圈 -->
-              <circle cx="190" cy="52" r="20" fill="#F23F43" opacity="0.08"/>
-              <circle cx="190" cy="52" r="14" fill="#F23F43" opacity="0.15"/>
-              <circle cx="190" cy="52" r="9" fill="#F23F43"/>
-              <!-- 预测路径（橙色虚线） -->
-              <polyline points="190,52 230,44 265,32 300,18" fill="none" stroke="#F0B232" stroke-width="1.5" stroke-dasharray="6,4"/>
-              <!-- 预测点 -->
-              <circle cx="230" cy="44" r="2.5" fill="#F0B232"/>
-              <circle cx="265" cy="32" r="2.5" fill="#F0B232"/>
-              <circle cx="300" cy="18" r="2.5" fill="#F0B232"/>
-              <!-- 预测范围（浅色扇形） -->
-              <path d="M190,52 L330,0 L330,25 Z" fill="#F0B232" opacity="0.06"/>
-              <path d="M190,52 L330,25 L330,50 Z" fill="#F0B232" opacity="0.04"/>
-              <!-- 广州标注 -->
-              <circle cx="150" cy="50" r="3" fill="#5865F2"/>
-              <text x="150" y="42" text-anchor="middle" font-size="9" fill="#5865F2" font-weight="500">广州</text>
-            </svg>
-          </view>
-          <!-- 数据摘要 -->
-          <view class="typhoon-info-grid">
-            <view class="typhoon-info-item">
-              <text class="typhoon-info-label">风速</text>
-              <text class="typhoon-info-value">{{ activeTyphoon.windSpeed }}</text>
-            </view>
-            <view class="typhoon-info-item">
-              <text class="typhoon-info-label">移向</text>
-              <text class="typhoon-info-value">{{ activeTyphoon.moveDir }}</text>
-            </view>
-            <view class="typhoon-info-item">
-              <text class="typhoon-info-label">移速</text>
-              <text class="typhoon-info-value">{{ activeTyphoon.moveSpeed }}</text>
-            </view>
-            <view class="typhoon-info-item">
-              <text class="typhoon-info-label">距离</text>
-              <text class="typhoon-info-value">{{ activeTyphoon.distance }}</text>
-            </view>
-          </view>
-          <view class="typhoon-impact">
-            <view class="typhoon-impact-icon">⚠️</view>
-            <text class="typhoon-impact-text">{{ activeTyphoon.impact }}</text>
-          </view>
-        </view>
         <view class="card" v-else-if="!weatherStore.loading">
           <view class="card-title-row">
             <text class="card-title">🌀 台风路径</text>
@@ -995,7 +988,7 @@ $danger: #F23F43;
 }
 
 .typhoon-level-badge {
-  padding: 1px 6px;
+  padding: 2px 8px;
   border-radius: 3px;
 }
 
@@ -1005,7 +998,7 @@ $danger: #F23F43;
 .typhoon-level--weak { background: rgba($text-muted, 0.12); }
 
 .typhoon-level-text {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   color: $danger;
   .typhoon-level--strong & { color: $warning; }
