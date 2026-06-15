@@ -74,9 +74,13 @@ export const useWeatherStore = defineStore('weather', () => {
           icon: h.icon,
           text: h.text,
           windDir: h.windDir,
+          windSpeed: h.windSpeed,
           windScale: h.windScale,
           humidity: h.humidity,
-          pop: h.pop
+          pressure: h.pressure,
+          cloud: h.cloud,
+          pop: h.pop,
+          dewPoint: h.dew
         }))
       }
       
