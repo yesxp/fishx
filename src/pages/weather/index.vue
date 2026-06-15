@@ -995,8 +995,8 @@ $danger: #F23F43;
 }
 
 .typhoon-level-badge {
-  padding: 2px 10px;
-  border-radius: 100px;
+  padding: 1px 6px;
+  border-radius: 3px;
 }
 
 .typhoon-level--super { background: rgba($danger, 0.12); }
@@ -1005,8 +1005,8 @@ $danger: #F23F43;
 .typhoon-level--weak { background: rgba($text-muted, 0.12); }
 
 .typhoon-level-text {
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 600;
   color: $danger;
   .typhoon-level--strong & { color: $warning; }
   .typhoon-level--medium & { color: $brand; }
