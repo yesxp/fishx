@@ -22,7 +22,7 @@
     </view>
 
     <!-- Content -->
-    <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
+    <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false" :style="{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }">
       <!-- Map Placeholder -->
       <view class="map-placeholder">
         <view class="map-inner">
