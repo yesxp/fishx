@@ -306,43 +306,7 @@
             <text class="tide-tip-text">⚠️ 台风期间不建议出海作钓，注意安全</text>
           </view>
         </view>
-        <view class="card" v-else-if="!weatherStore.loading">
-          <view class="card-title-row">
-            <text class="card-title">🌀 台风路径</text>
-          </view>
-          <view class="typhoon-empty">
-            <text class="typhoon-empty-icon">✅</text>
-            <text class="typhoon-empty-text">当前无活跃台风</text>
-          </view>
-        </view>
-
-        <!-- ===== 鱼口预测 ===== -->
-        <view class="card">
-          <view class="card-title-row">
-            <text class="card-title">🐟 鱼口预测</text>
-            <text class="card-subtitle">基于天气 + 潮汐</text>
-          </view>
-          <view class="fish-list">
-            <view v-for="fish in fishPredictions" :key="fish.name" class="fish-row">
-              <view class="fish-left">
-                <text class="fish-emoji">{{ fish.emoji }}</text>
-                <view>
-                  <text class="fish-name">{{ fish.name }}</text>
-                  <text class="fish-desc">{{ fish.desc }}</text>
-                </view>
-              </view>
-              <view class="fish-right">
-                <view class="fish-badge" :class="'fish-badge--' + fish.variant">
-                  <text class="fish-badge-text">{{ fish.status }}</text>
-                </view>
-                <text class="fish-trend">{{ fish.trend }}</text>
-              </view>
-            </view>
-          </view>
-        </view>
-
-        <!-- ===== 台风卡片（有台风时显示） ===== -->
-        <view class="card typhoon-card" v-if="activeTyphoon">
+        <view class="card typhoon-card" v-else-if="!weatherStore.loading && activeTyphoon">
           <view class="typhoon-header">
             <view class="typhoon-header-left">
               <text class="card-title">🌀 {{ activeTyphoon.name }}</text>
@@ -375,6 +339,40 @@
           <view class="typhoon-impact">
             <view class="typhoon-impact-icon">⚠️</view>
             <text class="typhoon-impact-text">{{ activeTyphoon.impact }}</text>
+          </view>
+        </view>
+        <view class="card" v-else-if="!weatherStore.loading">
+          <view class="card-title-row">
+            <text class="card-title">🌀 台风路径</text>
+          </view>
+          <view class="typhoon-empty">
+            <text class="typhoon-empty-icon">✅</text>
+            <text class="typhoon-empty-text">当前无活跃台风</text>
+          </view>
+        </view>
+
+        <!-- ===== 鱼口预测 ===== -->
+        <view class="card">
+          <view class="card-title-row">
+            <text class="card-title">🐟 鱼口预测</text>
+            <text class="card-subtitle">基于天气 + 潮汐</text>
+          </view>
+          <view class="fish-list">
+            <view v-for="fish in fishPredictions" :key="fish.name" class="fish-row">
+              <view class="fish-left">
+                <text class="fish-emoji">{{ fish.emoji }}</text>
+                <view>
+                  <text class="fish-name">{{ fish.name }}</text>
+                  <text class="fish-desc">{{ fish.desc }}</text>
+                </view>
+              </view>
+              <view class="fish-right">
+                <view class="fish-badge" :class="'fish-badge--' + fish.variant">
+                  <text class="fish-badge-text">{{ fish.status }}</text>
+                </view>
+                <text class="fish-trend">{{ fish.trend }}</text>
+              </view>
+            </view>
           </view>
         </view>
 
