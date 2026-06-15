@@ -4,7 +4,7 @@
     <view class="header">
       <view class="header-top">
         <view class="header-logo">
-          <view class="logo-icon">📍</view>
+          <view class="logo-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></view>
           <view>
             <text class="header-title">钓点</text>
             <text class="header-subtitle">钓点·钓场</text>
@@ -12,10 +12,10 @@
         </view>
         <view class="header-actions">
           <view class="header-btn">
-            <text class="icon-text">🔍</text>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </view>
           <view class="header-btn">
-            <text class="icon-text">🔔</text>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           </view>
         </view>
       </view>
@@ -26,7 +26,7 @@
       <!-- Map Placeholder -->
       <view class="map-placeholder">
         <view class="map-inner">
-          <text class="map-pin">📍</text>
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#5865F2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           <text class="map-label">地图区域</text>
         </view>
       </view>

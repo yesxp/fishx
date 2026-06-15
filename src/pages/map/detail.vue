@@ -16,7 +16,7 @@
       <!-- Map Preview -->
       <view class="map-preview">
         <view class="map-inner">
-          <text class="map-pin">📍</text>
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#5865F2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           <text class="map-name">{{ spot?.name || '加载中...' }}</text>
         </view>
       </view>
@@ -48,7 +48,7 @@
       <!-- Action Buttons -->
       <view class="actions">
         <view class="action-btn action-btn--primary" @tap="onCheckIn">
-          <text class="action-btn-text">📍 打卡</text>
+          <text class="action-btn-text">打卡</text>
         </view>
         <view class="action-btn" @tap="onNavigate">
           <text class="action-btn-text--outline">🧭 导航</text>
