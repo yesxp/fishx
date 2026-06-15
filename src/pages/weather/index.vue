@@ -308,12 +308,7 @@
         </view>
         <view class="card typhoon-card" v-else-if="!weatherStore.loading && activeTyphoon" @tap="goTyphoon">
           <view class="typhoon-header">
-            <view class="typhoon-header-left">
-              <text class="card-title">🌀 台风路径</text>
-              <view class="typhoon-level-badge" :class="'typhoon-level--' + activeTyphoon.levelClass">
-                <text class="typhoon-level-text">{{ activeTyphoon.level }}</text>
-              </view>
-            </view>
+            <text class="card-title">🌀 台风路径</text>
             <text class="typhoon-link">详情 →</text>
           </view>
           <!-- 路径迷你图 -->
@@ -321,30 +316,32 @@
             <svg viewBox="0 0 340 140" width="100%" height="140">
               <rect x="0" y="0" width="340" height="140" fill="#F2F3F5" rx="8"/>
               <!-- 已过路径（灰色实线） -->
-              <polyline points="20,70 80,65 140,55 200,50" fill="none" stroke="#80848E" stroke-width="1.5"/>
+              <polyline points="20,80 60,75 100,68 140,60 170,55" fill="none" stroke="#80848E" stroke-width="1.5"/>
               <!-- 已过路径点 -->
-              <circle cx="20" cy="70" r="2.5" fill="#80848E"/>
-              <circle cx="80" cy="65" r="2.5" fill="#80848E"/>
-              <circle cx="140" cy="55" r="2.5" fill="#80848E"/>
-              <!-- 当前位置（红色台风图标） -->
-              <circle cx="200" cy="50" r="14" fill="none" stroke="#F23F43" stroke-width="1" stroke-dasharray="3,2" opacity="0.4"/>
-              <circle cx="200" cy="50" r="9" fill="#F23F43"/>
-              <text x="200" y="53" text-anchor="middle" font-size="7" fill="white" font-weight="bold">{{ activeTyphoon.name }}</text>
+              <circle cx="20" cy="80" r="2.5" fill="#80848E"/>
+              <circle cx="60" cy="75" r="2.5" fill="#80848E"/>
+              <circle cx="100" cy="68" r="2.5" fill="#80848E"/>
+              <circle cx="140" cy="60" r="2.5" fill="#80848E"/>
+              <!-- 当前位置风圈 -->
+              <circle cx="190" cy="52" r="20" fill="#F23F43" opacity="0.08"/>
+              <circle cx="190" cy="52" r="14" fill="#F23F43" opacity="0.15"/>
+              <circle cx="190" cy="52" r="9" fill="#F23F43"/>
+              <!-- 台风名称 + 等级标签（在风圈右侧） -->
+              <rect x="206" y="40" width="52" height="22" rx="4" fill="white" stroke="#F23F43" stroke-width="0.8"/>
+              <text x="210" y="49" font-size="11" fill="#F23F43" font-weight="700">{{ activeTyphoon.name }}</text>
+              <text x="210" y="57" font-size="7" fill="#F23F43">{{ activeTyphoon.level }}</text>
               <!-- 预测路径（橙色虚线） -->
-              <polyline points="200,50 240,42 270,30 300,15" fill="none" stroke="#F0B232" stroke-width="1.5" stroke-dasharray="6,4"/>
+              <polyline points="190,52 230,44 265,32 300,18" fill="none" stroke="#F0B232" stroke-width="1.5" stroke-dasharray="6,4"/>
               <!-- 预测点 -->
-              <circle cx="240" cy="42" r="2.5" fill="#F0B232"/>
-              <circle cx="270" cy="30" r="2.5" fill="#F0B232"/>
-              <circle cx="300" cy="15" r="2.5" fill="#F0B232"/>
+              <circle cx="230" cy="44" r="2.5" fill="#F0B232"/>
+              <circle cx="265" cy="32" r="2.5" fill="#F0B232"/>
+              <circle cx="300" cy="18" r="2.5" fill="#F0B232"/>
               <!-- 预测范围（浅色扇形） -->
-              <path d="M200,50 L320,0 L320,30 Z" fill="#F0B232" opacity="0.08"/>
-              <path d="M200,50 L320,30 L320,60 Z" fill="#F0B232" opacity="0.05"/>
+              <path d="M190,52 L330,0 L330,25 Z" fill="#F0B232" opacity="0.06"/>
+              <path d="M190,52 L330,25 L330,50 Z" fill="#F0B232" opacity="0.04"/>
               <!-- 广州标注 -->
-              <circle cx="155" cy="45" r="3" fill="#5865F2"/>
-              <text x="155" y="38" text-anchor="middle" font-size="9" fill="#5865F2" font-weight="500">广州</text>
-              <!-- 距离标注 -->
-              <line x1="158" y1="45" x2="192" y2="50" stroke="#F23F43" stroke-width="0.8" stroke-dasharray="2,2"/>
-              <text x="175" y="42" text-anchor="middle" font-size="8" fill="#F23F43">{{ activeTyphoon.distance }}</text>
+              <circle cx="150" cy="50" r="3" fill="#5865F2"/>
+              <text x="150" y="42" text-anchor="middle" font-size="9" fill="#5865F2" font-weight="500">广州</text>
             </svg>
           </view>
           <!-- 数据摘要 -->
