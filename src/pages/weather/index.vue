@@ -91,16 +91,7 @@
             </view>
           </view>
           <view class="hourly-chart-wrap" v-if="weatherStore.hourly.length > 0">
-            <!-- #ifdef H5 -->
-            <view class="hourly-echart-container">
-              <div ref="hourlyChartRef" style="width:100%;height:240px"></div>
-            </view>
-            <!-- #endif -->
-            <!-- #ifndef H5 -->
-            <view class="hourly-echart-container">
-              <canvas canvas-id="hourlyChart" id="hourlyChart" style="width:100%;height:240px"></canvas>
-            </view>
-            <!-- #endif -->
+            <uni-echarts custom-class="hourly-chart" :option="hourlyChartOption" />
           </view>
         </view>
 
@@ -446,10 +437,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, nextTick, onBeforeUnmount, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useWeatherStore } from '@/stores/weather'
+import * as echarts from 'echarts/core'
+import { LineChart } from 'echarts/charts'
+import { GridComponent, TooltipComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+import { provideEcharts } from 'uni-echarts/shared'
 
 const weatherStore = useWeatherStore()
+provideEcharts(echarts)
+echarts.use([LineChart, GridComponent, TooltipComponent, CanvasRenderer])
 
 // ===== 台风模拟数据（有台风时显示） =====
 // 设为 null 则不显示台风卡片，设为对象则显示
@@ -884,62 +882,7 @@ const fishingTips = computed(() => {
 
 const isRising = computed(() => tideStatus.value.text === '涨潮中')
 
-// ===== ECharts 直接初始化 =====
-const hourlyChartRef = ref<HTMLElement>()
-let echartsInstance: any = null
-let echartsLib: any = null
 
-async function initHourlyChart() {
-  // #ifdef H5
-  console.log('[EChart] initHourlyChart called, ref:', !!hourlyChartRef.value)
-  if (!hourlyChartRef.value) {
-    console.log('[EChart] ref is null, will retry via watch')
-    return
-  }
-  if (echartsInstance) {
-    console.log('[EChart] already has instance, skip init')
-    return
-  }
-  console.log('[EChart] loading echarts...')
-  echartsLib = await import('echarts/core')
-  const { LineChart } = await import('echarts/charts')
-  const { GridComponent, TooltipComponent } = await import('echarts/components')
-  const { CanvasRenderer } = await import('echarts/renderers')
-  echartsLib.use([LineChart, GridComponent, TooltipComponent, CanvasRenderer])
-  console.log('[EChart] modules OK, dom:', hourlyChartRef.value.offsetWidth, 'x', hourlyChartRef.value.offsetHeight)
-  echartsInstance = echartsLib.init(hourlyChartRef.value)
-  console.log('[EChart] instance:', !!echartsInstance)
-  // #endif
-}
-
-function updateChart() {
-  if (echartsInstance) {
-    const opt = hourlyChartOption.value
-    if (opt && Object.keys(opt).length > 0) {
-      echartsInstance.setOption(opt, true)
-      console.log('[EChart] setOption done, keys:', Object.keys(opt))
-    }
-  }
-}
-
-// 数据到了就尝试 init + update
-watch(() => weatherStore.hourly.length, async (len) => {
-  console.log('[EChart] watch hourly.length:', len)
-  if (len > 0) {
-    await nextTick()
-    await nextTick()  // 双重 nextTick 确保 DOM 更新
-    console.log('[EChart] ref now:', !!hourlyChartRef.value)
-    await initHourlyChart()
-    updateChart()
-  }
-}, { immediate: true })
-
-onBeforeUnmount(() => {
-  if (echartsInstance) {
-    echartsInstance.dispose()
-    echartsInstance = null
-  }
-})
 
 onMounted(() => {
   weatherStore.loadWeather()
@@ -1027,7 +970,7 @@ $danger: #F23F43;
 
 /* Hourly Chart */
 .hourly-chart-wrap { margin-top: 8px; }
-.hourly-echart-container { width: 100%; height: 240px; }
+.hourly-chart { width: 100%; height: 240px; }
 .hourly-chart-inner { min-height: 200px; }
 .hourly-svg { display: block; }
 
