@@ -331,8 +331,9 @@
               <circle cx="190" cy="52" r="20" fill="#F23F43" opacity="0.08"/>
               <circle cx="190" cy="52" r="14" fill="#F23F43" opacity="0.15"/>
               <circle cx="190" cy="52" r="9" fill="#F23F43"/>
-              <!-- 台风名称（风圈中心） -->
-              <text x="190" y="56" text-anchor="middle" font-size="9" fill="white" font-weight="700">{{ activeTyphoon.name }}</text>
+              <!-- 台风名称（风圈上方醒目位置） -->
+              <rect x="163" y="8" width="54" height="20" rx="4" fill="white" stroke="#F23F43" stroke-width="1"/>
+              <text x="190" y="22" text-anchor="middle" font-size="12" fill="#F23F43" font-weight="700">{{ activeTyphoon.name }}</text>
               <!-- 预测路径（橙色虚线） -->
               <polyline points="190,52 230,44 265,32 300,18" fill="none" stroke="#F0B232" stroke-width="1.5" stroke-dasharray="6,4"/>
               <!-- 预测点 -->
