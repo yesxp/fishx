@@ -306,7 +306,7 @@
             <text class="tide-tip-text">⚠️ 台风期间不建议出海作钓，注意安全</text>
           </view>
         </view>
-        <view class="card typhoon-card" v-else-if="!weatherStore.loading && activeTyphoon">
+        <view class="card typhoon-card" v-else-if="!weatherStore.loading && activeTyphoon" @tap="goTyphoon">
           <view class="typhoon-header">
             <view class="typhoon-header-left">
               <text class="card-title">🌀 {{ activeTyphoon.name }}</text>
@@ -314,21 +314,53 @@
                 <text class="typhoon-level-text">{{ activeTyphoon.level }}</text>
               </view>
             </view>
-            <view class="typhoon-header-right" @tap="goTyphoon">
-              <text class="typhoon-link">路径详情 →</text>
-            </view>
+            <text class="typhoon-link">详情 →</text>
           </view>
+          <!-- 路径迷你图 -->
+          <view class="typhoon-mini-map">
+            <svg viewBox="0 0 340 140" width="100%" height="140">
+              <rect x="0" y="0" width="340" height="140" fill="#F2F3F5" rx="8"/>
+              <!-- 已过路径（灰色实线） -->
+              <polyline points="20,70 80,65 140,55 200,50" fill="none" stroke="#80848E" stroke-width="1.5"/>
+              <!-- 已过路径点 -->
+              <circle cx="20" cy="70" r="2.5" fill="#80848E"/>
+              <circle cx="80" cy="65" r="2.5" fill="#80848E"/>
+              <circle cx="140" cy="55" r="2.5" fill="#80848E"/>
+              <!-- 当前位置（红色台风图标） -->
+              <circle cx="200" cy="50" r="12" fill="none" stroke="#F23F43" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+              <circle cx="200" cy="50" r="8" fill="#F23F43"/>
+              <text x="200" y="54" text-anchor="middle" font-size="10" fill="white" font-weight="bold">🌀</text>
+              <!-- 台风名称标注 -->
+              <text x="200" y="35" text-anchor="middle" font-size="10" fill="#F23F43" font-weight="600">{{ activeTyphoon.name }}</text>
+              <!-- 预测路径（橙色虚线） -->
+              <polyline points="200,50 240,42 270,30 300,15" fill="none" stroke="#F0B232" stroke-width="1.5" stroke-dasharray="6,4"/>
+              <!-- 预测点 -->
+              <circle cx="240" cy="42" r="2.5" fill="#F0B232"/>
+              <circle cx="270" cy="30" r="2.5" fill="#F0B232"/>
+              <circle cx="300" cy="15" r="2.5" fill="#F0B232"/>
+              <!-- 预测范围（浅色扇形） -->
+              <path d="M200,50 L320,0 L320,30 Z" fill="#F0B232" opacity="0.08"/>
+              <path d="M200,50 L320,30 L320,60 Z" fill="#F0B232" opacity="0.05"/>
+              <!-- 广州标注 -->
+              <circle cx="155" cy="45" r="3" fill="#5865F2"/>
+              <text x="155" y="38" text-anchor="middle" font-size="9" fill="#5865F2" font-weight="500">广州</text>
+              <!-- 距离标注 -->
+              <line x1="158" y1="45" x2="192" y2="50" stroke="#F23F43" stroke-width="0.8" stroke-dasharray="2,2"/>
+              <text x="175" y="42" text-anchor="middle" font-size="8" fill="#F23F43">{{ activeTyphoon.distance }}</text>
+            </svg>
+          </view>
+          <!-- 数据摘要 -->
           <view class="typhoon-info-grid">
             <view class="typhoon-info-item">
-              <text class="typhoon-info-label">中心风速</text>
+              <text class="typhoon-info-label">风速</text>
               <text class="typhoon-info-value">{{ activeTyphoon.windSpeed }}</text>
             </view>
             <view class="typhoon-info-item">
-              <text class="typhoon-info-label">移动方向</text>
+              <text class="typhoon-info-label">移向</text>
               <text class="typhoon-info-value">{{ activeTyphoon.moveDir }}</text>
             </view>
             <view class="typhoon-info-item">
-              <text class="typhoon-info-label">移动速度</text>
+              <text class="typhoon-info-label">移速</text>
               <text class="typhoon-info-value">{{ activeTyphoon.moveSpeed }}</text>
             </view>
             <view class="typhoon-info-item">
@@ -991,6 +1023,12 @@ $danger: #F23F43;
   font-size: 12px;
   color: $brand;
   font-weight: 500;
+}
+
+.typhoon-mini-map {
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .typhoon-info-grid {
