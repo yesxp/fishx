@@ -891,32 +891,58 @@ let echartsLib: any = null
 let chartInited = false
 
 async function initHourlyChart() {
-  if (chartInited || !hourlyChartRef.value) return
+  if (chartInited) {
+    console.log('[EChart] already inited, skip')
+    return
+  }
+  console.log('[EChart] hourlyChartRef:', hourlyChartRef.value)
+  if (!hourlyChartRef.value) {
+    console.log('[EChart] ref is null, DOM not ready')
+    return
+  }
   // #ifdef H5
+  console.log('[EChart] loading echarts/core...')
   echartsLib = await import('echarts/core')
+  console.log('[EChart] echarts/core loaded:', !!echartsLib)
   const { LineChart } = await import('echarts/charts')
   const { GridComponent, TooltipComponent } = await import('echarts/components')
   const { CanvasRenderer } = await import('echarts/renderers')
   echartsLib.use([LineChart, GridComponent, TooltipComponent, CanvasRenderer])
+  console.log('[EChart] modules registered')
 
-  echartsInstance = echartsLib.init(hourlyChartRef.value)
+  const dom = hourlyChartRef.value
+  console.log('[EChart] dom dimensions:', dom.offsetWidth, 'x', dom.offsetHeight)
+  console.log('[EChart] dom computed style:', window.getComputedStyle(dom).width, window.getComputedStyle(dom).height)
+
+  echartsInstance = echartsLib.init(dom)
   chartInited = true
+  console.log('[EChart] instance created:', !!echartsInstance)
+
   const opt = hourlyChartOption.value
+  console.log('[EChart] option keys:', opt ? Object.keys(opt) : 'null')
   if (opt && Object.keys(opt).length > 0) {
     echartsInstance.setOption(opt)
+    console.log('[EChart] setOption done')
   }
   // #endif
 }
 
 // 数据加载完后更新图表
 watch(() => weatherStore.hourly.length, async (len) => {
+  console.log('[EChart] hourly.length changed:', len)
   if (len > 0) {
     await nextTick()
+    console.log('[EChart] after nextTick, ref:', !!hourlyChartRef.value)
     if (!echartsInstance) {
+      console.log('[EChart] no instance, calling initHourlyChart...')
       await initHourlyChart()
     }
     if (echartsInstance) {
+      console.log('[EChart] updating option...')
       echartsInstance.setOption(hourlyChartOption.value, true)
+      console.log('[EChart] option updated')
+    } else {
+      console.log('[EChart] still no instance after init')
     }
   }
 })
