@@ -308,13 +308,13 @@
         </view>
         <view class="card typhoon-card" v-else-if="!weatherStore.loading && activeTyphoon" @tap="goTyphoon">
           <view class="typhoon-header">
-            <text class="card-title">🌀 台风路径</text>
-            <view class="typhoon-header-right">
+            <view class="typhoon-header-left">
+              <text class="card-title">🌀 台风路径</text>
               <view class="typhoon-level-badge" :class="'typhoon-level--' + activeTyphoon.levelClass">
-                <text class="typhoon-level-text">{{ activeTyphoon.level }}</text>
+                <text class="typhoon-level-text">{{ activeTyphoon.name }}</text>
               </view>
-              <text class="typhoon-link">详情 →</text>
             </view>
+            <text class="typhoon-link">详情 →</text>
           </view>
           <!-- 路径迷你图 -->
           <view class="typhoon-mini-map">
@@ -331,9 +331,6 @@
               <circle cx="190" cy="52" r="20" fill="#F23F43" opacity="0.08"/>
               <circle cx="190" cy="52" r="14" fill="#F23F43" opacity="0.15"/>
               <circle cx="190" cy="52" r="9" fill="#F23F43"/>
-              <!-- 台风名称（风圈上方醒目位置） -->
-              <rect x="163" y="8" width="54" height="20" rx="4" fill="white" stroke="#F23F43" stroke-width="1"/>
-              <text x="190" y="22" text-anchor="middle" font-size="12" fill="#060607" font-weight="700">{{ activeTyphoon.name }}</text>
               <!-- 预测路径（橙色虚线） -->
               <polyline points="190,52 230,44 265,32 300,18" fill="none" stroke="#F0B232" stroke-width="1.5" stroke-dasharray="6,4"/>
               <!-- 预测点 -->
@@ -998,7 +995,7 @@ $danger: #F23F43;
 }
 
 .typhoon-level-badge {
-  padding: 2px 8px;
+  padding: 2px 10px;
   border-radius: 100px;
 }
 
@@ -1008,8 +1005,8 @@ $danger: #F23F43;
 .typhoon-level--weak { background: rgba($text-muted, 0.12); }
 
 .typhoon-level-text {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   color: $danger;
   .typhoon-level--strong & { color: $warning; }
   .typhoon-level--medium & { color: $brand; }
