@@ -1,14 +1,6 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
-import { provideEcharts } from 'uni-echarts/shared'
-import * as echarts from 'echarts/core'
-import { LineChart } from 'echarts/charts'
-import { GridComponent, TooltipComponent, MarkLineComponent } from 'echarts/components'
-import { CanvasRenderer } from 'echarts/renderers'
-
-echarts.use([LineChart, GridComponent, TooltipComponent, MarkLineComponent, CanvasRenderer])
-provideEcharts(echarts)
 
 onLaunch(() => {
   console.log('App Launch')
