@@ -27,7 +27,7 @@
       <view class="hero">
         <view class="hero-top">
           <view>
-            <text class="hero-city">厦门</text>
+            <text class="hero-city">杭州</text>
             <view class="hero-score-row">
               <text class="hero-score">{{ weatherStore.indexResult.score }}</text>
               <text class="hero-score-unit">分</text>

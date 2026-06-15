@@ -3,12 +3,13 @@
  * 文档: https://dev.qweather.com/docs/api/
  */
 
-// API配置 (独立Host)
+// API配置 (开发者专属Host)
 const QWEATHER_API = 'https://pa3qqtg6ym.re.qweatherapi.com/v7'
+const QWEATHER_GEO = 'https://pa3qqtg6ym.re.qweatherapi.com/geo/v2' // 地理位置API
 const QWEATHER_KEY = '26dffedc888848e0a69978a8d0fe04f2'
 
-// 默认城市 (厦门)
-const DEFAULT_LOCATION = '101230201'
+// 默认城市 - 先用杭州测试
+const DEFAULT_LOCATION = '101210101' // 杭州
 
 /**
  * 获取实时天气
