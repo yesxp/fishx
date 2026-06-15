@@ -19,6 +19,8 @@ export const useWeatherStore = defineStore('weather', () => {
   const daily = ref<any[]>([])
   // 钓鱼生活指数
   const fishIndex = ref<any>(null)
+  // 生活指数 (运动、晾晒、洗车、紫外线等)
+  const indices = ref<any[]>([])
   // 最佳时段
   const bestTimes = ref(getBestTimes())
   // 加载状态
@@ -29,12 +31,17 @@ export const useWeatherStore = defineStore('weather', () => {
     loading.value = true
     
     try {
-      // 并行请求
-      const [nowRes, hourlyRes, dailyRes, fishRes] = await Promise.all([
+      // 并行请求: 实时天气、24h、7天
+      const [nowRes, hourlyRes, dailyRes] = await Promise.all([
         getWeatherNow(),
         getWeather24h(),
-        getWeather7d(),
-        getIndices('101280101', '4') // 钓鱼指数，广州
+        getWeather7d()
+      ])
+      
+      // 并行请求: 生活指数 (1=运动,2=洗车,3=紫外线,4=钓鱼,9=晾晒)
+      const [indicesRes, fishRes] = await Promise.all([
+        getIndices('101280101', '1,2,3,9'),
+        getIndices('101280101', '4')
       ])
       
       // 实时天气
@@ -52,21 +59,23 @@ export const useWeatherStore = defineStore('weather', () => {
         indexResult.value = calculateIndex(weatherData)
       }
       
-      // 24小时逐时
+      // 24小时逐时 (增加 humidity, windSpeed, cloud)
       if (hourlyRes.code === '200' && hourlyRes.hourly) {
         hourly.value = hourlyRes.hourly.map((h: any) => ({
-          time: h.fxTime.slice(11, 16), // HH:mm
+          time: h.fxTime.slice(11, 16),
           temp: h.temp,
           icon: h.icon,
           text: h.text,
           windDir: h.windDir,
           windScale: h.windScale,
           humidity: h.humidity,
-          pop: h.pop // 降水概率
+          pop: h.pop,
+          cloud: h.cloud,
+          dew: h.dew
         }))
       }
       
-      // 7天预报
+      // 7天预报 (增加日出日落、月相、湿度、夜间风向)
       if (dailyRes.code === '200' && dailyRes.daily) {
         daily.value = dailyRes.daily.map((d: any) => ({
           date: d.fxDate,
@@ -77,10 +86,24 @@ export const useWeatherStore = defineStore('weather', () => {
           iconNight: d.iconNight,
           textDay: d.textDay,
           textNight: d.textNight,
-          humidity: d.humidity,
+          humidityDay: d.humidityDay,
+          humidityNight: d.humidityNight,
           windDirDay: d.windDirDay,
-          windScaleDay: d.windScaleDay
+          windScaleDay: d.windScaleDay,
+          windDirNight: d.windDirNight,
+          windScaleNight: d.windScaleNight,
+          sunrise: d.sunrise,
+          sunset: d.sunset,
+          moonrise: d.moonrise,
+          moonset: d.moonset,
+          moonPhase: d.moonPhase,
+          uvIndex: d.uvIndex
         }))
+      }
+      
+      // 生活指数 (运动、晾晒、洗车、紫外线)
+      if (indicesRes.code === '200' && indicesRes.daily) {
+        indices.value = indicesRes.daily
       }
       
       // 钓鱼生活指数
@@ -108,6 +131,7 @@ export const useWeatherStore = defineStore('weather', () => {
     hourly,
     daily,
     fishIndex,
+    indices,
     bestTimes,
     loading,
     loadWeather

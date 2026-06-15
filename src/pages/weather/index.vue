@@ -90,13 +90,64 @@
                 <view class="hourly-bar-wrap">
                   <view class="hourly-bar" :style="{ height: getBarHeight(h.temp) + 'px' }" />
                 </view>
-                <text class="hourly-pop" v-if="Number(h.pop) > 0">{{ h.pop }}%</text>
+                <text class="hourly-pop" v-if="Number(h.pop) > 0">💧{{ h.pop }}%</text>
               </view>
             </view>
           </scroll-view>
         </view>
 
-        <!-- 7-day Forecast -->
+        <!-- 日出日落 + 月相 -->
+        <view class="card-row">
+          <!-- 日出日落 -->
+          <view class="card card--half">
+            <view class="card-title-row">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#F0B232" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+              </svg>
+              <text class="card-title card-title--sm">日出日落</text>
+            </view>
+            <view class="sun-arc">
+              <view class="sun-arc-bg" />
+              <view class="sun-arc-fill" :style="{ clipPath: sunClipPath }" />
+              <view class="sun-dot" :style="{ left: sunPosition.left + '%', bottom: sunPosition.bottom + 'px' }">
+                <text class="sun-dot-icon">☀️</text>
+              </view>
+            </view>
+            <view class="sun-times">
+              <view class="sun-time-item">
+                <text class="sun-time-label">🌅 日出</text>
+                <text class="sun-time-val">{{ today?.sunrise || '--:--' }}</text>
+              </view>
+              <view class="sun-time-item">
+                <text class="sun-time-label">🌇 日落</text>
+                <text class="sun-time-val">{{ today?.sunset || '--:--' }}</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 月相 -->
+          <view class="card card--half">
+            <view class="card-title-row">
+              <text class="card-title card-title--sm">🌙 月相</text>
+            </view>
+            <view class="moon-display">
+              <text class="moon-icon">{{ moonPhaseIcon }}</text>
+              <text class="moon-phase-text">{{ today?.moonPhase || '未知' }}</text>
+            </view>
+            <view class="sun-times">
+              <view class="sun-time-item">
+                <text class="sun-time-label">月出</text>
+                <text class="sun-time-val">{{ today?.moonrise || '--:--' }}</text>
+              </view>
+              <view class="sun-time-item">
+                <text class="sun-time-label">月落</text>
+                <text class="sun-time-val">{{ today?.moonset || '--:--' }}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 7天预报 -->
         <view class="card">
           <view class="card-title-row">
             <text class="card-title">7天预报</text>
@@ -122,7 +173,24 @@
           </view>
         </view>
 
-        <!-- Fish Predictions -->
+        <!-- 生活指数 -->
+        <view class="card" v-if="weatherStore.indices.length > 0">
+          <view class="card-title-row">
+            <text class="card-title">生活指数</text>
+          </view>
+          <view class="indices-grid">
+            <view v-for="idx in displayIndices" :key="idx.type" class="index-item">
+              <view class="index-icon-wrap" :class="'index-icon--' + getIndexColor(idx.type)">
+                <text class="index-icon-emoji">{{ getIndexEmoji(idx.type) }}</text>
+              </view>
+              <text class="index-name">{{ idx.name }}</text>
+              <text class="index-level">{{ idx.level }}</text>
+              <text class="index-category">{{ idx.category }}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 鱼口预测 -->
         <view class="card">
           <view class="card-title-row">
             <text class="card-title">鱼口预测</text>
@@ -147,7 +215,7 @@
           </view>
         </view>
 
-        <!-- Tide Placeholder -->
+        <!-- 潮汐 -->
         <view class="card">
           <view class="card-title-row">
             <text class="card-title">潮汐曲线</text>
@@ -173,7 +241,7 @@
           </view>
         </view>
 
-        <!-- Tips -->
+        <!-- 钓法建议 -->
         <view class="card">
           <view class="card-title-row">
             <text class="card-title">钓法建议</text>
@@ -189,7 +257,7 @@
             <view class="tip">
               <view class="tip-icon tip-icon--g">🐟</view>
               <view class="tip-content">
-                <text class="tip-target">目标鱼种</text>
+                <text class="tip-title">目标鱼种</text>
                 <text class="tip-text">{{ fishingTips.target }}</text>
               </view>
             </view>
@@ -271,7 +339,68 @@ const badgeClass = computed(() => {
   return s >= 70 ? 'badge--ok' : s >= 40 ? 'badge--mid' : 'badge--low'
 })
 
-// 鱼口预测 (动态)
+// 今天数据
+const today = computed(() => weatherStore.daily[0] || null)
+
+// 月相图标
+const moonPhaseIcon = computed(() => {
+  const phase = today.value?.moonPhase || ''
+  if (phase.includes('新月')) return '🌑'
+  if (phase.includes('峨眉月') || phase.includes('残月')) return '🌒'
+  if (phase.includes('上弦月')) return '🌓'
+  if (phase.includes('盈凸月')) return '🌔'
+  if (phase.includes('满月')) return '🌕'
+  if (phase.includes('亏凸月')) return '🌖'
+  if (phase.includes('下弦月')) return '🌗'
+  return '🌙'
+})
+
+// 日出日落弧线位置
+const sunPosition = computed(() => {
+  const now = new Date()
+  const sunrise = today.value?.sunrise
+  const sunset = today.value?.sunset
+  if (!sunrise || !sunset) return { left: 50, bottom: 20 }
+
+  const [sh, sm] = sunrise.split(':').map(Number)
+  const [eh, em] = sunset.split(':').map(Number)
+  const sunriseMin = sh * 60 + sm
+  const sunsetMin = eh * 60 + em
+  const nowMin = now.getHours() * 60 + now.getMinutes()
+
+  const total = sunsetMin - sunriseMin
+  const elapsed = nowMin - sunriseMin
+  const ratio = Math.max(0, Math.min(1, elapsed / total))
+
+  // 弧线: x = ratio*100%, y = sin(π*ratio) * height
+  return {
+    left: ratio * 100,
+    bottom: Math.sin(Math.PI * ratio) * 40 + 5
+  }
+})
+
+// 日出日落clipPath
+const sunClipPath = computed(() => {
+  const pos = sunPosition.value.left
+  return `polygon(0 100%, 0 ${100 - Math.sin(Math.PI * pos / 100) * 80}%, ${pos}% ${100 - Math.sin(Math.PI * pos / 100) * 80}%, ${pos}% 100%)`
+})
+
+// 生活指数展示
+const displayIndices = computed(() => {
+  return weatherStore.indices.slice(0, 4)
+})
+
+function getIndexEmoji(type: string) {
+  const map: Record<string, string> = { '1': '🏃', '2': '🚗', '3': '☁️', '9': '👕' }
+  return map[type] || '📊'
+}
+
+function getIndexColor(type: string) {
+  const map: Record<string, string> = { '1': 'green', '2': 'blue', '3': 'yellow', '9': 'orange' }
+  return map[type] || 'blue'
+}
+
+// 鱼口预测
 const fishPredictions = computed(() => {
   const score = weatherStore.indexResult.score
   if (score >= 70) {
@@ -298,7 +427,7 @@ const fishPredictions = computed(() => {
   }
 })
 
-// 钓法建议 (动态)
+// 钓法建议
 const fishingTips = computed(() => {
   const score = weatherStore.indexResult.score
   const temp = Number(weatherStore.weatherNow?.temp || 25)
@@ -561,6 +690,21 @@ $danger: #F23F43;
   border: 1px solid $divider;
 }
 
+.card--half {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.card-row .card {
+  margin-bottom: 0;
+}
+
 .card-title-row {
   display: flex;
   align-items: center;
@@ -574,6 +718,10 @@ $danger: #F23F43;
   color: $text-primary;
 }
 
+.card-title--sm {
+  font-size: 13px;
+}
+
 .card-subtitle {
   font-size: 11px;
   color: $text-muted;
@@ -585,32 +733,20 @@ $danger: #F23F43;
   border-radius: 100px;
 }
 
-.badge--ok {
-  background: rgba($success, 0.1);
-}
-.badge--mid {
-  background: rgba($brand, 0.1);
-}
-.badge--low {
-  background: rgba($text-muted, 0.1);
-}
-.badge--info {
-  background: rgba($brand, 0.06);
-}
+.badge--ok { background: rgba($success, 0.1); }
+.badge--mid { background: rgba($brand, 0.1); }
+.badge--low { background: rgba($text-muted, 0.1); }
+.badge--info { background: rgba($brand, 0.06); }
 
 .badge-text {
   font-size: 11px;
   font-weight: 500;
   color: $success;
 }
-.badge-text--info {
-  color: $text-muted;
-}
+.badge-text--info { color: $text-muted; }
 
 /* Hourly */
-.hourly-scroll {
-  white-space: nowrap;
-}
+.hourly-scroll { white-space: nowrap; }
 
 .hourly-list {
   display: inline-flex;
@@ -628,32 +764,13 @@ $danger: #F23F43;
   border-radius: 10px;
 }
 
-.hourly-item--now {
-  background: rgba($brand, 0.08);
-}
+.hourly-item--now { background: rgba($brand, 0.08); }
 
-.hourly-time {
-  font-size: 11px;
-  color: $text-muted;
-  font-weight: 500;
-}
+.hourly-time { font-size: 11px; color: $text-muted; font-weight: 500; }
+.hourly-icon { font-size: 22px; }
+.hourly-temp { font-size: 14px; font-weight: 600; color: $text-primary; }
 
-.hourly-icon {
-  font-size: 22px;
-}
-
-.hourly-temp {
-  font-size: 14px;
-  font-weight: 600;
-  color: $text-primary;
-}
-
-.hourly-bar-wrap {
-  height: 60px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
+.hourly-bar-wrap { height: 60px; display: flex; align-items: flex-end; justify-content: center; }
 
 .hourly-bar {
   width: 20px;
@@ -661,17 +778,79 @@ $danger: #F23F43;
   border-radius: 4px 4px 0 0;
 }
 
-.hourly-pop {
-  font-size: 10px;
-  color: $brand;
-  font-weight: 500;
+.hourly-pop { font-size: 10px; color: $brand; font-weight: 500; }
+
+/* Sun Arc */
+.sun-arc {
+  height: 60px;
+  position: relative;
+  margin: 8px 0;
+  display: flex;
+  align-items: flex-end;
 }
 
-/* 7-day */
-.day-rows {
-  display: flex;
-  flex-direction: column;
+.sun-arc-bg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  border-top: 2px dashed rgba($brand, 0.15);
+  border-radius: 50% 50% 0 0;
 }
+
+.sun-arc-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  border-top: 2px solid $warning;
+  border-radius: 50% 50% 0 0;
+}
+
+.sun-dot {
+  position: absolute;
+  transition: all 0.3s;
+}
+
+.sun-dot-icon { font-size: 16px; }
+
+.sun-times {
+  display: flex;
+  gap: 8px;
+}
+
+.sun-time-item {
+  flex: 1;
+  text-align: center;
+}
+
+.sun-time-label {
+  font-size: 10px;
+  color: $text-muted;
+  display: block;
+}
+
+.sun-time-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-primary;
+  display: block;
+  margin-top: 2px;
+}
+
+/* Moon */
+.moon-display {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.moon-icon { font-size: 36px; }
+.moon-phase-text { font-size: 12px; color: $text-muted; display: block; margin-top: 4px; }
+
+/* 7-day */
+.day-rows { display: flex; flex-direction: column; }
 
 .day-row {
   display: flex;
@@ -679,31 +858,14 @@ $danger: #F23F43;
   padding: 10px 0;
   border-bottom: 1px solid $divider;
   gap: 12px;
-
   &:last-child { border-bottom: none; }
 }
 
-.day-row--today {
-  .day-label { color: $brand; font-weight: 600; }
-}
+.day-row--today .day-label { color: $brand; font-weight: 600; }
 
-.day-left {
-  width: 50px;
-  flex-shrink: 0;
-}
-
-.day-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: $text-primary;
-  display: block;
-}
-
-.day-date {
-  font-size: 10px;
-  color: $text-muted;
-  display: block;
-}
+.day-left { width: 50px; flex-shrink: 0; }
+.day-label { font-size: 13px; font-weight: 500; color: $text-primary; display: block; }
+.day-date { font-size: 10px; color: $text-muted; display: block; }
 
 .day-weather {
   display: flex;
@@ -713,37 +875,12 @@ $danger: #F23F43;
   flex-shrink: 0;
 }
 
-.day-icon {
-  font-size: 20px;
-}
+.day-icon { font-size: 20px; }
+.day-text { font-size: 12px; color: $text-secondary; }
 
-.day-text {
-  font-size: 12px;
-  color: $text-secondary;
-}
-
-.day-temp-bar {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.day-temp-lo {
-  font-size: 12px;
-  color: $text-muted;
-  width: 28px;
-  text-align: right;
-  flex-shrink: 0;
-}
-
-.day-temp-hi {
-  font-size: 12px;
-  font-weight: 600;
-  color: $text-primary;
-  width: 28px;
-  flex-shrink: 0;
-}
+.day-temp-bar { flex: 1; display: flex; align-items: center; gap: 8px; }
+.day-temp-lo { font-size: 12px; color: $text-muted; width: 28px; text-align: right; flex-shrink: 0; }
+.day-temp-hi { font-size: 12px; font-weight: 600; color: $text-primary; width: 28px; flex-shrink: 0; }
 
 .day-temp-track {
   flex: 1;
@@ -762,6 +899,40 @@ $danger: #F23F43;
   border-radius: 2px;
 }
 
+/* Indices */
+.indices-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.index-item {
+  background: $tag-bg;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+
+.index-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 6px;
+}
+
+.index-icon--green { background: rgba($success, 0.12); }
+.index-icon--blue { background: rgba($brand, 0.12); }
+.index-icon--yellow { background: rgba($warning, 0.12); }
+.index-icon--orange { background: rgba(255, 140, 50, 0.12); }
+
+.index-icon-emoji { font-size: 18px; }
+.index-name { font-size: 11px; color: $text-muted; display: block; }
+.index-level { font-size: 13px; font-weight: 600; color: $text-primary; display: block; margin-top: 2px; }
+.index-category { font-size: 10px; color: $text-muted; display: block; margin-top: 1px; }
+
 /* Tide */
 .tide-placeholder {
   background: rgba($brand, 0.03);
@@ -771,35 +942,17 @@ $danger: #F23F43;
   margin-bottom: 12px;
 }
 
-.tide-placeholder-text {
-  font-size: 12px;
-  color: $text-muted;
-  margin-top: 8px;
-  display: block;
-}
+.tide-placeholder-text { font-size: 12px; color: $text-muted; margin-top: 8px; display: block; }
 
-.tide-phases {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
+.tide-phases { display: flex; gap: 6px; flex-wrap: wrap; }
 
-.tide-phase-tag {
-  padding: 4px 10px;
-  border-radius: 100px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
+.tide-phase-tag { padding: 4px 10px; border-radius: 100px; font-size: 12px; font-weight: 500; }
 .tide-phase-tag--spring { background: rgba($brand, 0.1); color: $brand; }
 .tide-phase-tag--rising { background: rgba($success, 0.1); color: $success; }
 .tide-phase-tag--flood { background: rgba($brand, 0.1); color: $brand; }
 
 /* Fish */
-.fish-list {
-  display: flex;
-  flex-direction: column;
-}
+.fish-list { display: flex; flex-direction: column; }
 
 .fish-row {
   display: flex;
@@ -807,43 +960,19 @@ $danger: #F23F43;
   justify-content: space-between;
   padding: 10px 0;
   border-bottom: 1px solid $divider;
-
   &:last-child { border-bottom: none; }
 }
 
-.fish-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+.fish-left { display: flex; align-items: center; gap: 10px; }
+.fish-emoji { font-size: 24px; }
+.fish-name { font-size: 14px; font-weight: 600; color: $text-primary; display: block; }
+.fish-desc { font-size: 11px; color: $text-muted; display: block; }
 
-.fish-emoji {
-  font-size: 24px;
-}
-
-.fish-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: $text-primary;
-  display: block;
-}
-
-.fish-desc {
-  font-size: 11px;
-  color: $text-muted;
-  display: block;
-}
-
-.fish-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+.fish-right { display: flex; align-items: center; gap: 8px; }
 
 .fish-badge {
   padding: 3px 10px;
   border-radius: 100px;
-
   &--open { background: rgba($success, 0.1); }
   &--normal { background: rgba($brand, 0.1); }
   &--slow { background: rgba(128, 132, 142, 0.1); }
@@ -857,18 +986,10 @@ $danger: #F23F43;
   .fish-badge--slow & { color: $text-muted; }
 }
 
-.fish-trend {
-  font-size: 16px;
-  color: $text-muted;
-  width: 20px;
-  text-align: center;
-}
+.fish-trend { font-size: 16px; color: $text-muted; width: 20px; text-align: center; }
 
 /* Tips */
-.tips {
-  display: flex;
-  flex-direction: column;
-}
+.tips { display: flex; flex-direction: column; }
 
 .tip {
   display: flex;
@@ -876,7 +997,6 @@ $danger: #F23F43;
   gap: 10px;
   padding: 10px 0;
   border-bottom: 1px solid $divider;
-
   &:last-child { border-bottom: none; }
 }
 
@@ -896,11 +1016,9 @@ $danger: #F23F43;
 .tip-icon--o { background: rgba($warning, 0.1); }
 .tip-icon--p { background: rgba($danger, 0.08); }
 
-.tip-content {
-  flex: 1;
-}
+.tip-content { flex: 1; }
 
-.tip-title, .tip-target {
+.tip-title {
   font-size: 13px;
   font-weight: 600;
   color: $text-primary;
