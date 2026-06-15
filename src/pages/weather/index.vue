@@ -309,9 +309,9 @@
         <view class="card typhoon-card" v-else-if="!weatherStore.loading && activeTyphoon" @tap="goTyphoon">
           <view class="typhoon-header">
             <view class="typhoon-header-left">
-              <text class="card-title">🌀 台风路径</text>
+              <text class="card-title">🌀 台风「{{ activeTyphoon.name }}」</text>
               <view class="typhoon-level-badge" :class="'typhoon-level--' + activeTyphoon.levelClass">
-                <text class="typhoon-level-text">{{ activeTyphoon.name }}</text>
+                <text class="typhoon-level-text">{{ activeTyphoon.level }}</text>
               </view>
             </view>
             <text class="typhoon-link">详情 →</text>
