@@ -341,6 +341,43 @@
           </view>
         </view>
 
+        <!-- ===== 台风卡片（有台风时显示） ===== -->
+        <view class="card typhoon-card" v-if="activeTyphoon">
+          <view class="typhoon-header">
+            <view class="typhoon-header-left">
+              <text class="card-title">🌀 {{ activeTyphoon.name }}</text>
+              <view class="typhoon-level-badge" :class="'typhoon-level--' + activeTyphoon.levelClass">
+                <text class="typhoon-level-text">{{ activeTyphoon.level }}</text>
+              </view>
+            </view>
+            <view class="typhoon-header-right" @tap="goTyphoon">
+              <text class="typhoon-link">路径详情 →</text>
+            </view>
+          </view>
+          <view class="typhoon-info-grid">
+            <view class="typhoon-info-item">
+              <text class="typhoon-info-label">中心风速</text>
+              <text class="typhoon-info-value">{{ activeTyphoon.windSpeed }}</text>
+            </view>
+            <view class="typhoon-info-item">
+              <text class="typhoon-info-label">移动方向</text>
+              <text class="typhoon-info-value">{{ activeTyphoon.moveDir }}</text>
+            </view>
+            <view class="typhoon-info-item">
+              <text class="typhoon-info-label">移动速度</text>
+              <text class="typhoon-info-value">{{ activeTyphoon.moveSpeed }}</text>
+            </view>
+            <view class="typhoon-info-item">
+              <text class="typhoon-info-label">距离</text>
+              <text class="typhoon-info-value">{{ activeTyphoon.distance }}</text>
+            </view>
+          </view>
+          <view class="typhoon-impact">
+            <view class="typhoon-impact-icon">⚠️</view>
+            <text class="typhoon-impact-text">{{ activeTyphoon.impact }}</text>
+          </view>
+        </view>
+
         <!-- ===== 钓法建议 ===== -->
         <view class="card">
           <view class="card-title-row">
@@ -385,10 +422,31 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useWeatherStore } from '@/stores/weather'
 
 const weatherStore = useWeatherStore()
+
+// ===== 台风模拟数据（有台风时显示） =====
+// 设为 null 则不显示台风卡片，设为对象则显示
+const activeTyphoon = ref<{
+  name: string; level: string; levelClass: string;
+  windSpeed: string; moveDir: string; moveSpeed: string;
+  distance: string; impact: string
+} | null>({
+  name: '蝴蝶',
+  level: '超强台风',
+  levelClass: 'super',
+  windSpeed: '62m/s',
+  moveDir: '西北偏北',
+  moveSpeed: '15km/h',
+  distance: '约680km',
+  impact: '预计24小时内影响华南沿海，带来强风暴雨。建议暂停出海及水库垂钓，沿海钓点注意安全。'
+})
+
+function goTyphoon() {
+  uni.navigateTo({ url: '/pages/typhoon/index' })
+}
 
 // 和风天气图标映射
 const weatherIconMap: Record<string, string> = {
@@ -893,4 +951,93 @@ $danger: #F23F43;
 .tip-content { flex: 1; }
 .tip-title { font-size: 13px; font-weight: 600; color: $text-primary; display: block; margin-bottom: 2px; }
 .tip-text { font-size: 12px; color: $text-secondary; line-height: 1.5; }
+
+/* Typhoon Card */
+.typhoon-card {
+  border-left: 3px solid $danger;
+}
+
+.typhoon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.typhoon-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.typhoon-level-badge {
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.typhoon-level--super { background: rgba($danger, 0.12); }
+.typhoon-level--strong { background: rgba($warning, 0.12); }
+.typhoon-level--medium { background: rgba($brand, 0.12); }
+.typhoon-level--weak { background: rgba($text-muted, 0.12); }
+
+.typhoon-level-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: $danger;
+  .typhoon-level--strong & { color: $warning; }
+  .typhoon-level--medium & { color: $brand; }
+  .typhoon-level--weak & { color: $text-muted; }
+}
+
+.typhoon-link {
+  font-size: 12px;
+  color: $brand;
+  font-weight: 500;
+}
+
+.typhoon-info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.typhoon-info-item {
+  text-align: center;
+}
+
+.typhoon-info-label {
+  font-size: 10px;
+  color: $text-muted;
+  display: block;
+}
+
+.typhoon-info-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-primary;
+  display: block;
+  margin-top: 2px;
+}
+
+.typhoon-impact {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px;
+  background: rgba($danger, 0.04);
+  border-radius: 8px;
+}
+
+.typhoon-impact-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.typhoon-impact-text {
+  font-size: 12px;
+  color: $text-secondary;
+  line-height: 1.5;
+  flex: 1;
+}
 </style>
