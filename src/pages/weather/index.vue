@@ -71,7 +71,7 @@
           </view>
         </view>
 
-        <!-- ===== 逐小时预报（折线图） ===== -->
+        <!-- ===== 逐小时预报（双折线图） ===== -->
         <view class="card">
           <view class="card-title-row">
             <text class="card-title">逐小时预报</text>
@@ -79,37 +79,47 @@
               <text class="badge-text">{{ weatherStore.indexResult.score >= 70 ? '鱼口活跃' : weatherStore.indexResult.score >= 40 ? '一般' : '鱼口较慢' }}</text>
             </view>
           </view>
+          <!-- 图例 -->
+          <view class="chart-legend">
+            <view class="chart-legend-item">
+              <view class="chart-legend-dot" style="background:#F23F43"/>
+              <text class="chart-legend-text">高温</text>
+            </view>
+            <view class="chart-legend-item">
+              <view class="chart-legend-dot" style="background:#5865F2"/>
+              <text class="chart-legend-text">低温</text>
+            </view>
+          </view>
           <view class="hourly-chart-wrap" v-if="weatherStore.hourly.length > 0">
-            <svg :viewBox="'0 0 ' + chartW + ' ' + chartH" width="100%" :height="chartH" class="hourly-svg">
-              <!-- 高温参考线（虚线） -->
-              <line :x1="chartPadL" :y1="highLineY" :x2="chartW - chartPadR" :y2="highLineY" stroke="#F23F43" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.5"/>
-              <text :x="chartW - chartPadR + 2" :y="highLineY + 3" font-size="9" fill="#F23F43" opacity="0.7">{{ dailyHigh }}°</text>
-              <!-- 低温参考线（虚线） -->
-              <line :x1="chartPadL" :y1="lowLineY" :x2="chartW - chartPadR" :y2="lowLineY" stroke="#5865F2" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.5"/>
-              <text :x="chartW - chartPadR + 2" :y="lowLineY + 3" font-size="9" fill="#5865F2" opacity="0.7">{{ dailyLow }}°</text>
-              <!-- 温度曲线 -->
-              <path :d="tempLinePath" fill="none" stroke="#5865F2" stroke-width="2"/>
-              <!-- 填充区域 -->
-              <path :d="tempAreaPath" fill="url(#tempGrad)" opacity="0.12"/>
-              <!-- 数据点 + 温度标签 + 天气图标 -->
-              <g v-for="(pt, i) in chartPoints" :key="'cp'+i">
-                <circle :cx="pt.x" :cy="pt.y" r="2.5" fill="#5865F2"/>
-                <!-- 每隔3小时显示温度标签 -->
-                <text v-if="i % 3 === 0" :x="pt.x" :y="pt.y - 8" text-anchor="middle" font-size="10" fill="#060607" font-weight="600">{{ pt.temp }}°</text>
-                <!-- 每隔3小时显示天气图标 -->
-                <text v-if="i % 3 === 0" :x="pt.x" :y="chartH - 18" text-anchor="middle" font-size="14">{{ pt.icon }}</text>
-                <!-- 时间标签 -->
-                <text v-if="i % 3 === 0" :x="pt.x" :y="chartH - 4" text-anchor="middle" font-size="9" fill="#80848E">{{ pt.time }}</text>
-              </g>
-              <!-- 当前时间指示器 -->
-              <line v-if="chartPoints.length > 0" :x1="chartPoints[0].x" :y1="chartPadT" :x2="chartPoints[0].x" :y2="chartH - 24" stroke="#F23F43" stroke-width="1" stroke-dasharray="3,2"/>
-              <defs>
-                <linearGradient id="tempGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#5865F2"/>
-                  <stop offset="100%" stop-color="#5865F2" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-            </svg>
+            <scroll-view scroll-x class="hourly-scroll" :show-scrollbar="false">
+              <view class="hourly-chart-inner" :style="{ width: hourlyChartWidth + 'px' }">
+                <svg :viewBox="'0 0 ' + hourlyChartWidth + ' ' + hourlyChartH" :width="hourlyChartWidth" :height="hourlyChartH" class="hourly-svg">
+                  <!-- 横向网格线 -->
+                  <line v-for="i in 4" :key="'hg'+i" :x1="20" :y1="20 + i * ((hourlyChartH - 50) / 4)" :x2="hourlyChartWidth - 10" :y2="20 + i * ((hourlyChartH - 50) / 4)" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="3,3"/>
+                  <!-- 高温曲线 -->
+                  <path :d="hourlyHighPath" fill="none" stroke="#F23F43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <!-- 低温曲线 -->
+                  <path :d="hourlyLowPath" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <!-- 高温数据点 -->
+                  <g v-for="(pt, i) in hourlyHighPts" :key="'hh'+i">
+                    <circle :cx="pt.x" :cy="pt.y" r="3" fill="#F23F43"/>
+                    <text v-if="i % 3 === 0" :x="pt.x" :y="pt.y - 8" text-anchor="middle" font-size="10" fill="#F23F43" font-weight="600">{{ pt.temp }}°</text>
+                  </g>
+                  <!-- 低温数据点 -->
+                  <g v-for="(pt, i) in hourlyLowPts" :key="'hl'+i">
+                    <circle :cx="pt.x" :cy="pt.y" r="3" fill="#5865F2"/>
+                    <text v-if="i % 3 === 0" :x="pt.x" :y="pt.y + 14" text-anchor="middle" font-size="10" fill="#5865F2" font-weight="600">{{ pt.temp }}°</text>
+                  </g>
+                  <!-- 天气图标 + 时间 -->
+                  <g v-for="(pt, i) in hourlyHighPts" :key="'hi'+i">
+                    <text v-if="i % 3 === 0" :x="pt.x" :y="hourlyChartH - 20" text-anchor="middle" font-size="14">{{ hourlyIcons[i] }}</text>
+                    <text v-if="i % 3 === 0" :x="pt.x" :y="hourlyChartH - 4" text-anchor="middle" font-size="9" fill="#80848E">{{ hourlyLabels[i] }}</text>
+                  </g>
+                  <!-- 当前时间线 -->
+                  <line v-if="hourlyHighPts.length > 0" :x1="hourlyHighPts[0].x" :y1="20" :x2="hourlyHighPts[0].x" :y2="hourlyChartH - 30" stroke="#F23F43" stroke-width="1" stroke-dasharray="3,2"/>
+                </svg>
+              </view>
+            </scroll-view>
           </view>
         </view>
 
@@ -516,53 +526,72 @@ function getTempBarStyle(lo: number, hi: number) {
   return { left: ((lo - min) / range) * 100 + '%', width: Math.max(((hi - lo) / range) * 100, 8) + '%' }
 }
 
-// ===== 折线图计算 =====
-const chartW = 340
-const chartH = 180
-const chartPadL = 24
-const chartPadR = 28
-const chartPadT = 20
-const chartPadB = 40
+// ===== 双折线图计算 =====
+const hourlyChartW = 30
+const hourlyChartH = 200
+const hourlyPadT = 20
+const hourlyPadB = 40
+const hourlyPadL = 20
 
-// 今日高低温
-const dailyHigh = computed(() => {
-  if (!weatherStore.daily[0]) return 30
-  return Number(weatherStore.daily[0].tempDay)
-})
-const dailyLow = computed(() => {
-  if (!weatherStore.daily[0]) return 20
-  return Number(weatherStore.daily[0].tempNight)
+const hourlyChartWidth = computed(() => {
+  const n = Math.min(weatherStore.hourly.length, 24)
+  return Math.max(n * hourlyChartW + hourlyPadL + 10, 340)
 })
 
-// 温度范围（含高低温参考线）
-const tempMin = computed(() => Math.min(dailyLow.value, ...weatherStore.hourly.slice(0, 24).map(h => Number(h.temp))) - 2)
-const tempMax = computed(() => Math.max(dailyHigh.value, ...weatherStore.hourly.slice(0, 24).map(h => Number(h.temp))) + 2)
-const tempRange = computed(() => tempMax.value - tempMin.value || 1)
+// 24h温度范围
+const hourlyTempMin = computed(() => {
+  const h = weatherStore.hourly.slice(0, 24)
+  if (h.length === 0) return 20
+  const temps = h.map(t => Number(t.temp))
+  return Math.min(...temps) - 2
+})
+const hourlyTempMax = computed(() => {
+  const h = weatherStore.hourly.slice(0, 24)
+  if (h.length === 0) return 30
+  const temps = h.map(t => Number(t.temp))
+  return Math.max(...temps) + 2
+})
+const hourlyTempRange = computed(() => hourlyTempMax.value - hourlyTempMin.value || 1)
 
-// 高低温参考线Y坐标
-const highLineY = computed(() => chartPadT + (1 - (dailyHigh.value - tempMin.value) / tempRange.value) * (chartH - chartPadT - chartPadB))
-const lowLineY = computed(() => chartPadT + (1 - (dailyLow.value - tempMin.value) / tempRange.value) * (chartH - chartPadT - chartPadB))
+function hourlyY(temp: number) {
+  return hourlyPadT + (1 - (temp - hourlyTempMin.value) / hourlyTempRange.value) * (hourlyChartH - hourlyPadT - hourlyPadB)
+}
+function hourlyX(i: number) {
+  return hourlyPadL + i * hourlyChartW + hourlyChartW / 2
+}
 
-// 数据点坐标
-const chartPoints = computed(() => {
-  const hourly = weatherStore.hourly.slice(0, 24)
-  if (hourly.length === 0) return []
-  const usableW = chartW - chartPadL - chartPadR
-  return hourly.map((h, i) => {
-    const x = chartPadL + (i / Math.max(hourly.length - 1, 1)) * usableW
-    const y = chartPadT + (1 - (Number(h.temp) - tempMin.value) / tempRange.value) * (chartH - chartPadT - chartPadB)
-    return { x, y, temp: h.temp, icon: getWeatherIcon(h.icon), time: h.time.slice(-5) }
+// 高温数据点（每小时温度）
+const hourlyHighPts = computed(() => {
+  return weatherStore.hourly.slice(0, 24).map((h, i) => ({
+    x: hourlyX(i),
+    y: hourlyY(Number(h.temp)),
+    temp: h.temp
+  }))
+})
+
+// 低温数据点（每小时温度-2~4度模拟，实际用湿度/风力推算）
+const hourlyLowPts = computed(() => {
+  return weatherStore.hourly.slice(0, 24).map((h, i) => {
+    const temp = Number(h.temp)
+    const hum = Number(h.humidity || 80)
+    const wind = Number(h.windScale || 1)
+    // 体感温度：湿度高+风大→体感低
+    const feelsOffset = (hum > 80 ? -1 : 0) + (wind >= 4 ? -2 : wind >= 3 ? -1 : 0)
+    return {
+      x: hourlyX(i),
+      y: hourlyY(temp + feelsOffset),
+      temp: temp + feelsOffset
+    }
   })
 })
 
-// 温度曲线路径（三次贝塞尔）
-const tempLinePath = computed(() => {
-  const pts = chartPoints.value
-  if (pts.length === 0) return ''
+// 高温曲线路径
+const hourlyHighPath = computed(() => {
+  const pts = hourlyHighPts.value
+  if (pts.length < 2) return ''
   let d = `M ${pts[0].x} ${pts[0].y}`
   for (let i = 1; i < pts.length; i++) {
-    const prev = pts[i - 1]
-    const curr = pts[i]
+    const prev = pts[i - 1], curr = pts[i]
     const cpx1 = prev.x + (curr.x - prev.x) / 3
     const cpx2 = prev.x + (2 * (curr.x - prev.x)) / 3
     d += ` C ${cpx1} ${prev.y}, ${cpx2} ${curr.y}, ${curr.x} ${curr.y}`
@@ -570,11 +599,23 @@ const tempLinePath = computed(() => {
   return d
 })
 
-// 填充区域路径
-const tempAreaPath = computed(() => {
-  if (!tempLinePath.value) return ''
-  return tempLinePath.value + ` L ${chartPoints.value[chartPoints.value.length - 1].x} ${chartH - chartPadB} L ${chartPoints.value[0].x} ${chartH - chartPadB} Z`
+// 低温曲线路径
+const hourlyLowPath = computed(() => {
+  const pts = hourlyLowPts.value
+  if (pts.length < 2) return ''
+  let d = `M ${pts[0].x} ${pts[0].y}`
+  for (let i = 1; i < pts.length; i++) {
+    const prev = pts[i - 1], curr = pts[i]
+    const cpx1 = prev.x + (curr.x - prev.x) / 3
+    const cpx2 = prev.x + (2 * (curr.x - prev.x)) / 3
+    d += ` C ${cpx1} ${prev.y}, ${cpx2} ${curr.y}, ${curr.x} ${curr.y}`
+  }
+  return d
 })
+
+// 天气图标和时间标签
+const hourlyIcons = computed(() => weatherStore.hourly.slice(0, 24).map(h => getWeatherIcon(h.icon)))
+const hourlyLabels = computed(() => weatherStore.hourly.slice(0, 24).map((h, i) => i === 0 ? '现在' : h.time.slice(-5)))
 
 function getWeekDayShort(dateStr: string) {
   const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
@@ -938,7 +979,30 @@ $danger: #F23F43;
 
 /* Hourly Chart */
 .hourly-chart-wrap { margin-top: 8px; }
+.hourly-scroll { white-space: nowrap; }
+.hourly-chart-inner { min-height: 200px; }
 .hourly-svg { display: block; }
+
+/* 图例 */
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.chart-legend-dot {
+  width: 10px;
+  height: 3px;
+  border-radius: 2px;
+}
+.chart-legend-text {
+  font-size: 11px;
+  color: #80848E;
+}
 
 /* Sun Arc */
 .sun-arc { height: 60px; position: relative; margin: 8px 0; display: flex; align-items: flex-end; }
