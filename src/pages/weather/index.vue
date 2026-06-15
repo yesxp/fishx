@@ -91,9 +91,16 @@
             </view>
           </view>
           <view class="hourly-chart-wrap" v-if="weatherStore.hourly.length > 0">
+            <!-- #ifdef H5 -->
             <view class="hourly-echart-container">
-              <LEchart :option="hourlyChartOption" width="100%" height="240px" />
+              <div ref="hourlyChartRef" style="width:100%;height:240px"></div>
             </view>
+            <!-- #endif -->
+            <!-- #ifndef H5 -->
+            <view class="hourly-echart-container">
+              <canvas canvas-id="hourlyChart" id="hourlyChart" style="width:100%;height:240px"></canvas>
+            </view>
+            <!-- #endif -->
           </view>
         </view>
 
@@ -439,9 +446,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, nextTick, onBeforeUnmount, watch } from 'vue'
 import { useWeatherStore } from '@/stores/weather'
-import LEchart from '@/components/LEchart.vue'
 
 const weatherStore = useWeatherStore()
 
@@ -878,10 +884,47 @@ const fishingTips = computed(() => {
 
 const isRising = computed(() => tideStatus.value.text === '涨潮中')
 
+// ===== ECharts 直接初始化 =====
+const hourlyChartRef = ref<HTMLElement>()
+let echartsInstance: any = null
+let echartsLib: any = null
+
+async function initHourlyChart() {
+  await nextTick()
+  // #ifdef H5
+  if (!hourlyChartRef.value) return
+  echartsLib = await import('echarts/core')
+  const { LineChart } = await import('echarts/charts')
+  const { GridComponent, TooltipComponent } = await import('echarts/components')
+  const { CanvasRenderer } = await import('echarts/renderers')
+  echartsLib.use([LineChart, GridComponent, TooltipComponent, CanvasRenderer])
+
+  echartsInstance = echartsLib.init(hourlyChartRef.value)
+  const opt = hourlyChartOption.value
+  if (opt && Object.keys(opt).length > 0) {
+    echartsInstance.setOption(opt)
+  }
+  // #endif
+}
+
+watch(() => hourlyChartOption.value, (opt) => {
+  if (echartsInstance && opt && Object.keys(opt).length > 0) {
+    echartsInstance.setOption(opt, true)
+  }
+}, { deep: true })
+
+onBeforeUnmount(() => {
+  if (echartsInstance) {
+    echartsInstance.dispose()
+    echartsInstance = null
+  }
+})
+
 onMounted(() => {
   weatherStore.loadWeather()
   weatherStore.loadTideCalendar()
   weatherStore.loadTyphoons()
+  initHourlyChart()
 })
 </script>
 
