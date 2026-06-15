@@ -309,7 +309,12 @@
         <view class="card typhoon-card" v-else-if="!weatherStore.loading && activeTyphoon" @tap="goTyphoon">
           <view class="typhoon-header">
             <text class="card-title">🌀 台风路径</text>
-            <text class="typhoon-link">详情 →</text>
+            <view class="typhoon-header-right">
+              <view class="typhoon-level-badge" :class="'typhoon-level--' + activeTyphoon.levelClass">
+                <text class="typhoon-level-text">{{ activeTyphoon.level }}</text>
+              </view>
+              <text class="typhoon-link">详情 →</text>
+            </view>
           </view>
           <!-- 路径迷你图 -->
           <view class="typhoon-mini-map">
@@ -326,10 +331,8 @@
               <circle cx="190" cy="52" r="20" fill="#F23F43" opacity="0.08"/>
               <circle cx="190" cy="52" r="14" fill="#F23F43" opacity="0.15"/>
               <circle cx="190" cy="52" r="9" fill="#F23F43"/>
-              <!-- 台风名称 + 等级标签（在风圈右侧） -->
-              <rect x="206" y="40" width="52" height="22" rx="4" fill="white" stroke="#F23F43" stroke-width="0.8"/>
-              <text x="210" y="49" font-size="11" fill="#F23F43" font-weight="700">{{ activeTyphoon.name }}</text>
-              <text x="210" y="57" font-size="7" fill="#F23F43">{{ activeTyphoon.level }}</text>
+              <!-- 台风名称（风圈中心） -->
+              <text x="190" y="56" text-anchor="middle" font-size="9" fill="white" font-weight="700">{{ activeTyphoon.name }}</text>
               <!-- 预测路径（橙色虚线） -->
               <polyline points="190,52 230,44 265,32 300,18" fill="none" stroke="#F0B232" stroke-width="1.5" stroke-dasharray="6,4"/>
               <!-- 预测点 -->
