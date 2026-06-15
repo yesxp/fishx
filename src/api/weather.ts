@@ -3,7 +3,7 @@
  * 文档: https://dev.qweather.com/docs/api/
  */
 
-// BFF代理地址（Vercel Serverless Function）
+// BFF代理地址
 const API_BASE = '/api/weather'
 
 // 默认城市 - 广州
@@ -44,17 +44,9 @@ export async function getWeather7d(location = DEFAULT_LOCATION) {
 
 /**
  * 获取生活指数
- * @param type 指数类型: 1=运动, 2=洗车, 3=紫外线, 5=穿衣, 6=防晒, 9=晾晒, 14=钓鱼
  */
-export async function getIndices(location = DEFAULT_LOCATION, type = '1,2,3,9,14') {
+export async function getIndices(location = DEFAULT_LOCATION, type = '14') {
   return qweatherFetch('/v7/indices/1d', { location, type })
-}
-
-/**
- * 获取月相和日出日落
- */
-export async function getAstronomy(location = DEFAULT_LOCATION) {
-  return qweatherFetch('/v7/astronomy/sun', { location })
 }
 
 /**
@@ -63,4 +55,32 @@ export async function getAstronomy(location = DEFAULT_LOCATION) {
  */
 export async function getTide(date: string) {
   return qweatherFetch('/v7/ocean/tide', { location: TIDE_LOCATION, date })
+}
+
+/**
+ * 获取多天潮汐数据（用于潮汐日历）
+ * @param dates 日期数组
+ */
+export async function getTideMultiDay(dates: string[]) {
+  const results = await Promise.allSettled(dates.map(d => getTide(d)))
+  return results.map((r, i) => ({
+    date: dates[i],
+    data: r.status === 'fulfilled' ? r.value : null
+  }))
+}
+
+/**
+ * 获取台风列表
+ * @param year 年份
+ */
+export async function getTyphoonList(year: number) {
+  return qweatherFetch('/v7/tropical/storm-list', { basin: 'NP', year: String(year) })
+}
+
+/**
+ * 获取台风路径
+ * @param stormId 台风ID
+ */
+export async function getTyphoonTrack(stormId: string) {
+  return qweatherFetch('/v7/tropical/storm-track', { stormid: stormId })
 }
