@@ -1,85 +1,80 @@
-// 天气相关 API（和风天气）
+/**
+ * 和风天气API封装
+ * 文档: https://dev.qweather.com/docs/api/
+ */
 
-const API_KEY = '' // 需要填写和风天气 API Key
-const BASE_URL = 'https://devapi.qweather.com'
+// API配置
+const QWEATHER_API = 'https://devapi.qweather.com/v7'
+const QWEATHER_KEY = 'a80e1bd1ed504af1af77bd8adc304bb0'
 
-interface HourlyData {
-  fxTime: string
-  temp: string
-  text: string
-  humidity: string
-  pressure: string
-  windScale: string
+// 默认城市 (厦门)
+const DEFAULT_LOCATION = '101230201'
+
+/**
+ * 获取实时天气
+ * @param location 城市ID，默认厦门
+ */
+export async function getWeatherNow(location = DEFAULT_LOCATION) {
+  const url = `${QWEATHER_API}/weather/now?location=${location}&key=${QWEATHER_KEY}`
+  
+  const res = await fetch(url)
+  const data = await res.json()
+  
+  return data
 }
 
-// 获取实时天气
-export async function getWeatherNow(city: string = '101020100') {
-  // 模拟数据
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        code: 200,
-        now: {
-          temp: '26',
-          feelsLike: '28',
-          humidity: '65',
-          pressure: '1009',
-          windDir: '南风',
-          windScale: '2',
-          windSpeed: '12',
-          text: '多云',
-          icon: '101'
-        },
-        fxLink: 'https://www.qweather.com'
-      })
-    }, 300)
-  })
+/**
+ * 获取24小时逐时预报
+ * @param location 城市ID
+ */
+export async function getWeather24h(location = DEFAULT_LOCATION) {
+  const url = `${QWEATHER_API}/weather/24h?location=${location}&key=${QWEATHER_KEY}`
+  
+  const res = await fetch(url)
+  const data = await res.json()
+  
+  return data
 }
 
-// 获取未来 24 小时天气
-export async function getWeather24h(city: string = '101020100') {
-  return new Promise((resolve) => {
-    const hours: HourlyData[] = []
-    const now = new Date()
-    for (let i = 0; i < 24; i++) {
-      const h = new Date(now.getTime() + i * 3600000)
-      hours.push({
-        fxTime: h.toISOString(),
-        temp: String(Math.round(20 + Math.random() * 10)),
-        text: i % 3 === 0 ? '多云' : '晴',
-        humidity: String(Math.round(50 + Math.random() * 30)),
-        pressure: String(Math.round(1000 + Math.random() * 20)),
-        windScale: String(Math.round(1 + Math.random() * 3))
-      })
-    }
-    setTimeout(() => {
-      resolve({
-        code: 200,
-        hourly: hours
-      })
-    }, 300)
-  })
+/**
+ * 获取7天预报
+ * @param location 城市ID
+ */
+export async function getWeather7d(location = DEFAULT_LOCATION) {
+  const url = `${QWEATHER_API}/weather/7d?location=${location}&key=${QWEATHER_KEY}`
+  
+  const res = await fetch(url)
+  const data = await res.json()
+  
+  return data
 }
 
-// 获取未来 7 天天气
-export async function getWeather7d(city: string = '101020100') {
-  return new Promise((resolve) => {
-    const days = ['今天', '明天', '后天']
-    const daily = days.map((d, i) => ({
-      fxDate: new Date(Date.now() + i * 86400000).toISOString().split('T')[0],
-      tempMax: String(Math.round(25 + Math.random() * 8)),
-      tempMin: String(Math.round(15 + Math.random() * 5)),
-      textDay: '多云',
-      textNight: '晴',
-      humidity: String(Math.round(50 + Math.random() * 30)),
-      pressure: String(Math.round(1000 + Math.random() * 20))
-    }))
-    
-    setTimeout(() => {
-      resolve({
-        code: 200,
-        daily
-      })
-    }, 300)
-  })
+/**
+ * 获取生活指数
+ * @param location 城市ID
+ * @param type 指数类型: 1=运动 2=洗车 3=穿衣 4=钓鱼 5=紫外线 6=旅游 7=过敏 8=紫外线
+ */
+export async function getIndices(
+  location = DEFAULT_LOCATION,
+  type = '4' // 默认钓鱼指数
+) {
+  const url = `${QWEATHER_API}/indices/1d?type=${type}&location=${location}&key=${QWEATHER_KEY}`
+  
+  const res = await fetch(url)
+  const data = await res.json()
+  
+  return data
+}
+
+/**
+ * 获取和风天气城市ID
+ * @param city 城市名称
+ */
+export async function searchCity(city: string) {
+  const url = `https://geoapi.qweather.com/v2/city/lookup?location=${encodeURIComponent(city)}&key=${QWEATHER_KEY}`
+  
+  const res = await fetch(url)
+  const data = await res.json()
+  
+  return data
 }

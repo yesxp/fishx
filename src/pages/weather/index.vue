@@ -27,31 +27,31 @@
       <view class="hero">
         <view class="hero-top">
           <view>
-            <text class="hero-city">杭州 · 西湖区</text>
+            <text class="hero-city">厦门</text>
             <view class="hero-score-row">
-              <text class="hero-score">82</text>
+              <text class="hero-score">{{ weatherStore.indexResult.score }}</text>
               <text class="hero-score-unit">分</text>
             </view>
-            <text class="hero-label">适宜出钓</text>
+            <text class="hero-label">{{ weatherStore.indexResult.level }}</text>
           </view>
-          <text class="hero-icon">🌤️</text>
+          <text class="hero-icon">{{ getWeatherIcon(weatherStore.weatherNow?.icon || '100') }}</text>
         </view>
         <view class="hero-grid">
           <view class="hero-item">
             <text class="hero-item-label">温度</text>
-            <text class="hero-item-value">26°</text>
+            <text class="hero-item-value">{{ weatherStore.weatherNow?.temp || '--' }}°</text>
           </view>
           <view class="hero-item">
             <text class="hero-item-label">体感</text>
-            <text class="hero-item-value">24°</text>
+            <text class="hero-item-value">{{ weatherStore.weatherNow?.feelsLike || '--' }}°</text>
           </view>
           <view class="hero-item">
             <text class="hero-item-label">气压</text>
-            <text class="hero-item-value">1013</text>
+            <text class="hero-item-value">{{ weatherStore.weatherNow?.pressure || '--' }}</text>
           </view>
           <view class="hero-item">
             <text class="hero-item-label">风力</text>
-            <text class="hero-item-value">东风3</text>
+            <text class="hero-item-value">{{ weatherStore.weatherNow?.windDir || '' }}{{ weatherStore.weatherNow?.windScale || '' }}</text>
           </view>
         </view>
       </view>
@@ -60,59 +60,26 @@
       <view class="card">
         <view class="card-title-row">
           <text class="card-title">逐小时预报</text>
-          <view class="badge badge--ok"><text class="badge-text">鱼口活跃</text></view>
+          <view class="badge badge--ok" v-if="weatherStore.indexResult.score >= 70"><text class="badge-text">鱼口活跃</text></view>
+          <view class="badge badge--mid" v-else-if="weatherStore.indexResult.score >= 40"><text class="badge-text">一般</text></view>
+          <view class="badge badge--low" v-else><text class="badge-text">鱼口较慢</text></view>
         </view>
         <view class="hourly-header">
-          <text class="hourly-sub">气压变化</text>
-          <view class="hourly-header-right">
-            <text class="hourly-sun">☀️ 05:41</text>
-            <text class="hourly-moon">🌙 19:14</text>
-          </view>
+          <text class="hourly-sub">温度变化</text>
+          <text class="hourly-sub">{{ weatherStore.weatherNow?.text || '加载中...' }}</text>
         </view>
         <!-- Chart Placeholder (SVG) -->
         <view class="hourly-chart">
-          <view class="chart-placeholder">
-            <text class="chart-label">📈 24h 温度曲线</text>
-          </view>
-        </view>
-        <!-- Meta rows -->
-        <view class="hourly-meta">
-          <view class="hourly-meta-row">
-            <text class="hourly-meta-label">空气</text>
-            <view class="hourly-meta-blocks">
-              <view class="hourly-meta-block l1" />
-              <view class="hourly-meta-block l2" />
-              <view class="hourly-meta-block l3" />
-              <view class="hourly-meta-block l2" />
-              <view class="hourly-meta-block l1" />
-              <view class="hourly-meta-block l1" />
-              <view class="hourly-meta-block l2" />
-              <view class="hourly-meta-block l1" />
+          <scroll-view scroll-x class="hourly-scroll" :show-scrollbar="false">
+            <view class="hourly-list">
+              <view v-for="(h, i) in weatherStore.hourly.slice(0, 24)" :key="i" class="hourly-item">
+                <text class="hourly-time">{{ i === 0 ? '现在' : h.time }}</text>
+                <text class="hourly-icon">{{ getWeatherIcon(h.icon) }}</text>
+                <text class="hourly-temp">{{ h.temp }}°</text>
+                <view class="hourly-bar" :style="{ height: getBarHeight(h.temp) + 'px' }" />
+              </view>
             </view>
-            <text class="hourly-meta-val ok">24</text>
-          </view>
-          <view class="hourly-meta-row">
-            <text class="hourly-meta-label">风力</text>
-            <view class="hourly-meta-blocks">
-              <view class="hourly-meta-block w1" />
-              <view class="hourly-meta-block w2" />
-              <view class="hourly-meta-block w3" />
-              <view class="hourly-meta-block w2" />
-              <view class="hourly-meta-block w1" />
-              <view class="hourly-meta-block w1" />
-              <view class="hourly-meta-block w2" />
-              <view class="hourly-meta-block w1" />
-            </view>
-            <text class="hourly-meta-val brand">1-2级</text>
-          </view>
-        </view>
-        <view class="hourly-time-axis">
-          <text>今天</text>
-          <text>04:00</text>
-          <text>08:00</text>
-          <text>12:00</text>
-          <text>16:00</text>
-          <text>20:00</text>
+          </scroll-view>
         </view>
       </view>
 
@@ -155,19 +122,19 @@
         <!-- 15 day rows -->
         <view class="fifteen-rows">
           <view
-            v-for="day in fifteenDays"
-            :key="day.date"
+            v-for="(day, index) in weatherStore.daily.slice(0, 7)"
+            :key="day.date + index"
             class="fifteen-row"
-            :class="{ 'fifteen-row--past': day.past }"
+            :class="{ 'fifteen-row--past': index === 0 }"
           >
-            <text class="f-row-day">{{ day.label }}</text>
-            <text class="f-row-date">{{ day.date }}</text>
-            <text class="f-row-weather">{{ day.weather }}</text>
-            <text class="f-row-icon">{{ day.icon }}</text>
-            <text class="f-row-temp"><text class="f-row-temp-hi">{{ day.high }}°</text> / {{ day.low }}°</text>
-            <text class="f-row-wind">{{ day.wind }}</text>
-            <view class="f-row-badge" :class="day.badgeClass">
-              <text class="f-row-badge-text">{{ day.score }}</text>
+            <text class="f-row-day">{{ index === 0 ? '今天' : day.week }}</text>
+            <text class="f-row-date">{{ day.date.slice(5) }}</text>
+            <text class="f-row-weather">{{ day.textDay }}</text>
+            <text class="f-row-icon">{{ getWeatherIcon(day.iconDay) }}</text>
+            <text class="f-row-temp"><text class="f-row-temp-hi">{{ day.tempDay }}°</text> / {{ day.tempNight }}°</text>
+            <text class="f-row-wind">{{ day.windDirDay }}{{ day.windScaleDay }}级</text>
+            <view class="f-row-badge" :class="index === 0 ? 'b-mid' : 'b-ok'">
+              <text class="f-row-badge-text">--</text>
             </view>
           </view>
         </view>
@@ -258,36 +225,56 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import FishBadge from '@/components/FishBadge.vue'
+import { useWeatherStore } from '@/stores/weather'
 
-const pressureData = [
-  { val: '1010', time: '06', height: 60, color: '#5865F2' },
-  { val: '1011', time: '09', height: 68, color: '#5865F2' },
-  { val: '1013', time: '12', height: 78, color: '#23A559' },
-  { val: '1015', time: '15', height: 85, color: '#23A559' },
-  { val: '1014', time: '18', height: 82, color: '#23A559' },
-  { val: '1012', time: '21', height: 72, color: '#5865F2' },
-]
+const weatherStore = useWeatherStore()
 
-const fifteenDays = [
-  { label: '昨天', date: '6/12', weather: '多云', icon: '⛅', high: 27, low: 20, wind: '西南风2级', score: 72, badgeClass: 'b-mid', past: true },
-  { label: '今天', date: '6/13', weather: '晴', icon: '🌤️', high: 27, low: 20, wind: '东风3级', score: 82, badgeClass: 'b-ok', past: false },
-  { label: '周六', date: '6/14', weather: '晴', icon: '☀️', high: 29, low: 21, wind: '东南风2级', score: 85, badgeClass: 'b-ok', past: false },
-  { label: '周日', date: '6/15', weather: '多云', icon: '⛅', high: 28, low: 22, wind: '南风2级', score: 78, badgeClass: 'b-ok', past: false },
-  { label: '周一', date: '6/16', weather: '中雨', icon: '🌧️', high: 24, low: 19, wind: '南风2级', score: 45, badgeClass: 'b-low', past: false },
-  { label: '周二', date: '6/17', weather: '小雨', icon: '🌧️', high: 22, low: 18, wind: '东南风2级', score: 38, badgeClass: 'b-low', past: false },
-  { label: '周三', date: '6/18', weather: '小雨', icon: '🌧️', high: 25, low: 19, wind: '东南风3级', score: 68, badgeClass: 'b-mid', past: false },
-  { label: '周四', date: '6/19', weather: '晴', icon: '🌤️', high: 27, low: 20, wind: '东风3级', score: 80, badgeClass: 'b-ok', past: false },
-  { label: '周五', date: '6/20', weather: '晴', icon: '☀️', high: 30, low: 22, wind: '南风2级', score: 83, badgeClass: 'b-ok', past: false },
-  { label: '周六', date: '6/21', weather: '晴', icon: '🌤️', high: 31, low: 23, wind: '东南风3级', score: 86, badgeClass: 'b-ok', past: false },
-]
+// 和风天气图标映射
+const weatherIconMap: Record<string, string> = {
+  '100': '☀️', '101': '⛅', '102': '⛅', '103': '🌤️', '104': '☁️',
+  '150': '🌙', '151': '⛅', '152': '⛅', '153': '🌤️', '154': '☁️',
+  '300': '🌧️', '301': '🌧️', '302': '⛈️', '303': '⛈️', '304': '⛈️',
+  '305': '🌧️', '306': '🌧️', '307': '🌧️', '308': '🌧️', '309': '🌦️',
+  '310': '🌧️', '311': '🌧️', '312': '🌧️', '313': '🌧️',
+  '314': '🌧️', '315': '🌧️', '316': '🌧️', '317': '🌧️',
+  '318': '🌧️', '399': '🌧️',
+  '400': '❄️', '401': '❄️', '402': '❄️', '403': '❄️', '404': '❄️',
+  '405': '❄️', '406': '❄️', '407': '🌨️', '408': '❄️', '409': '❄️',
+  '410': '❄️', '499': '❄️',
+  '500': '🌫️', '501': '🌫️', '502': '🌫️', '503': '🌫️', '504': '🌫️',
+  '507': '🌫️', '508': '🌫️', '509': '🌫️', '510': '🌫️',
+  '511': '🌫️', '512': '🌫️', '513': '🌫️', '514': '🌫️', '515': '🌫️',
+  '900': '🌡️', '901': '❄️', '999': '🌪️'
+}
 
+function getWeatherIcon(iconCode: string) {
+  return weatherIconMap[iconCode] || '🌤️'
+}
+
+// 计算小时柱高度 (基于温度范围)
+function getBarHeight(temp: number) {
+  // 假设温度范围 15-35度，映射到 20-80px高度
+  const minTemp = 15
+  const maxTemp = 35
+  const minHeight = 20
+  const maxHeight = 80
+  const clamped = Math.max(minTemp, Math.min(maxTemp, temp))
+  return minHeight + ((clamped - minTemp) / (maxTemp - minTemp)) * (maxHeight - minHeight)
+}
+
+// 鱼口预测
 const fishPredictions = [
   { name: '鲫鱼', status: '开口积极', variant: 'open' as const, trend: '↑' },
   { name: '鲤鱼', status: '正常', variant: 'normal' as const, trend: '→' },
   { name: '草鱼', status: '鱼口较慢', variant: 'slow' as const, trend: '↓' },
   { name: '鲢鳙', status: '鱼口较慢', variant: 'slow' as const, trend: '↓' },
 ]
+
+onMounted(() => {
+  weatherStore.loadWeather()
+})
 </script>
 
 <style scoped lang="scss">
@@ -523,25 +510,47 @@ $danger: #F23F43;
 }
 
 .hourly-chart {
-  height: 200px;
-  background: linear-gradient(180deg, rgba(88,101,242,0.02) 0%, rgba(88,101,242,0.06) 100%);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin: 12px 0;
 }
 
-.chart-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.hourly-scroll {
+  white-space: nowrap;
 }
 
-.chart-label {
-  font-size: 14px;
+.hourly-list {
+  display: inline-flex;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+.hourly-item {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 48px;
+}
+
+.hourly-time {
+  font-size: 11px;
   color: $text-muted;
+}
+
+.hourly-icon {
+  font-size: 20px;
+}
+
+.hourly-temp {
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.hourly-bar {
+  width: 24px;
+  background: linear-gradient(180deg, $brand 0%, rgba($brand, 0.3) 100%);
+  border-radius: 4px 4px 0 0;
 }
 
 .hourly-meta {
