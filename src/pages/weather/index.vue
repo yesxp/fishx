@@ -327,11 +327,9 @@
               <circle cx="80" cy="65" r="2.5" fill="#80848E"/>
               <circle cx="140" cy="55" r="2.5" fill="#80848E"/>
               <!-- 当前位置（红色台风图标） -->
-              <circle cx="200" cy="50" r="12" fill="none" stroke="#F23F43" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
-              <circle cx="200" cy="50" r="8" fill="#F23F43"/>
-              <text x="200" y="54" text-anchor="middle" font-size="10" fill="white" font-weight="bold">{{ activeTyphoon.name }}</text>
-              <!-- 台风名称标注 -->
-              <text x="200" y="35" text-anchor="middle" font-size="10" fill="#F23F43" font-weight="600">{{ activeTyphoon.level }}</text>
+              <circle cx="200" cy="50" r="14" fill="none" stroke="#F23F43" stroke-width="1" stroke-dasharray="3,2" opacity="0.4"/>
+              <circle cx="200" cy="50" r="9" fill="#F23F43"/>
+              <text x="200" y="53" text-anchor="middle" font-size="7" fill="white" font-weight="bold">{{ activeTyphoon.name }}</text>
               <!-- 预测路径（橙色虚线） -->
               <polyline points="200,50 240,42 270,30 300,15" fill="none" stroke="#F0B232" stroke-width="1.5" stroke-dasharray="6,4"/>
               <!-- 预测点 -->
@@ -983,9 +981,7 @@ $danger: #F23F43;
 .tip-text { font-size: 12px; color: $text-secondary; line-height: 1.5; }
 
 /* Typhoon Card */
-.typhoon-card {
-  cursor: pointer;
-}
+.typhoon-card {}
 
 .typhoon-header {
   display: flex;
