@@ -34,7 +34,7 @@ export const useWeatherStore = defineStore('weather', () => {
         getWeatherNow(),
         getWeather24h(),
         getWeather7d(),
-        getIndices('101230201', '4') // 钓鱼指数
+        getIndices('101280101', '4') // 钓鱼指数，广州
       ])
       
       // 实时天气

@@ -9,7 +9,7 @@ const QWEATHER_GEO = 'https://pa3qqtg6ym.re.qweatherapi.com/geo/v2' // 地理位
 const QWEATHER_KEY = '26dffedc888848e0a69978a8d0fe04f2'
 
 // 默认城市 - 先用杭州测试
-const DEFAULT_LOCATION = '101210101' // 杭州
+const DEFAULT_LOCATION = '101280101'  // 广州
 
 /**
  * 获取实时天气
