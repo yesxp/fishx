@@ -299,37 +299,64 @@
             </view>
             <view class="typhoon-info-item">
               <text class="typhoon-info-label">移速</text>
-              <view class="card typhoon-card" v-else-if="!weatherStore.loading && activeTyphoon" @tap="goTyphoon">
-                <view class="card-title-row">
-                  <text class="card-title">🌀 台风「{{ activeTyphoon.name }}」</text>
-                  <view class="badge" :class="'badge--' + activeTyphoon.levelClass">
-                    <text class="badge-text" :class="'badge-text--' + activeTyphoon.levelClass">{{ activeTyphoon.level }}</text>
-                  </view>
-                  <text class="typhoon-link" style="margin-left:auto">详情 →</text>
-                </view>
-                <view class="typhoon-info-grid">
-                  <view class="typhoon-info-item">
-                    <text class="typhoon-info-label">中心风速</text>
-                    <text class="typhoon-info-value">{{ activeTyphoon.windSpeed }}</text>
-                  </view>
-                  <view class="typhoon-info-item">
-                    <text class="typhoon-info-label">移动方向</text>
-                    <text class="typhoon-info-value">{{ activeTyphoon.moveDir }}</text>
-                  </view>
-                  <view class="typhoon-info-item">
-                    <text class="typhoon-info-label">移动速度</text>
-                    <text class="typhoon-info-value">{{ activeTyphoon.moveSpeed }}</text>
-                  </view>
-                  <view class="typhoon-info-item">
-                    <text class="typhoon-info-label">距离</text>
-                    <text class="typhoon-info-value">{{ activeTyphoon.distance }}</text>
-                  </view>
-                </view>
-                <view class="typhoon-impact">
-                  <view class="typhoon-impact-icon">⚠️</view>
-                  <text class="typhoon-impact-text">{{ activeTyphoon.impact }}</text>
-                </view>
-              </view>
+              <text class="typhoon-info-val">{{ typhoonInfo.moveSpeed }}km/h</text>
+            </view>
+          </view>
+          <view class="typhoon-tip">
+            <text class="tide-tip-text">⚠️ 台风期间不建议出海作钓，注意安全</text>
+          </view>
+        </view>
+        <view class="card typhoon-card" v-else-if="!weatherStore.loading && activeTyphoon" @tap="goTyphoon">
+          <view class="card-title-row">
+            <text class="card-title">🌀 台风「{{ activeTyphoon.name }}」</text>
+            <view class="badge" :class="'badge--' + activeTyphoon.levelClass">
+              <text class="badge-text" :class="'badge-text--' + activeTyphoon.levelClass">{{ activeTyphoon.level }}</text>
+            </view>
+            <text class="typhoon-link" style="margin-left:auto">详情 →</text>
+          </view>
+          <view class="typhoon-mini-map">
+            <svg viewBox="0 0 340 140" width="100%" height="140">
+              <rect x="0" y="0" width="340" height="140" fill="#F2F3F5" rx="8"/>
+              <polyline points="20,80 60,75 100,68 140,60 170,55" fill="none" stroke="#80848E" stroke-width="1.5"/>
+              <circle cx="20" cy="80" r="2.5" fill="#80848E"/>
+              <circle cx="60" cy="75" r="2.5" fill="#80848E"/>
+              <circle cx="100" cy="68" r="2.5" fill="#80848E"/>
+              <circle cx="140" cy="60" r="2.5" fill="#80848E"/>
+              <circle cx="190" cy="52" r="20" fill="#F23F43" opacity="0.08"/>
+              <circle cx="190" cy="52" r="14" fill="#F23F43" opacity="0.15"/>
+              <circle cx="190" cy="52" r="9" fill="#F23F43"/>
+              <text x="190" y="22" text-anchor="middle" font-size="12" fill="#F23F43" font-weight="700">{{ activeTyphoon.name }}</text>
+              <polyline points="190,52 230,44 265,32 300,18" fill="none" stroke="#F0B232" stroke-width="1.5" stroke-dasharray="6,4"/>
+              <circle cx="230" cy="44" r="2.5" fill="#F0B232"/>
+              <circle cx="265" cy="32" r="2.5" fill="#F0B232"/>
+              <circle cx="300" cy="18" r="2.5" fill="#F0B232"/>
+              <circle cx="150" cy="50" r="3" fill="#5865F2"/>
+              <text x="150" y="42" text-anchor="middle" font-size="9" fill="#5865F2" font-weight="500">广州</text>
+            </svg>
+          </view>
+          <view class="typhoon-info-grid">
+            <view class="typhoon-info-item">
+              <text class="typhoon-info-label">风速</text>
+              <text class="typhoon-info-value">{{ activeTyphoon.windSpeed }}</text>
+            </view>
+            <view class="typhoon-info-item">
+              <text class="typhoon-info-label">移向</text>
+              <text class="typhoon-info-value">{{ activeTyphoon.moveDir }}</text>
+            </view>
+            <view class="typhoon-info-item">
+              <text class="typhoon-info-label">移速</text>
+              <text class="typhoon-info-value">{{ activeTyphoon.moveSpeed }}</text>
+            </view>
+            <view class="typhoon-info-item">
+              <text class="typhoon-info-label">距离</text>
+              <text class="typhoon-info-value">{{ activeTyphoon.distance }}</text>
+            </view>
+          </view>
+          <view class="typhoon-impact">
+            <view class="typhoon-impact-icon">⚠️</view>
+            <text class="typhoon-impact-text">{{ activeTyphoon.impact }}</text>
+          </view>
+        </view>
         <view class="card" v-else-if="!weatherStore.loading">
           <view class="card-title-row">
             <text class="card-title">🌀 台风路径</text>
