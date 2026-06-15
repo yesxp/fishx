@@ -1,16 +1,11 @@
 <template>
   <view class="echarts-wrap" :style="{ width: width, height: height }">
-    <!-- #ifdef H5 -->
-    <div ref="chartRef" :style="{ width: '100%', height: '100%' }"></div>
-    <!-- #endif -->
-    <!-- #ifndef H5 -->
-    <canvas :canvas-id="canvasId" :id="canvasId" :style="{ width: '100%', height: '100%' }"></canvas>
-    <!-- #endif -->
+    <l-echart ref="chartRef" @finished="onFinished" />
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+import { ref, watch, onBeforeUnmount } from 'vue'
 
 const props = defineProps<{
   option: any
@@ -18,24 +13,30 @@ const props = defineProps<{
   height?: string
 }>()
 
-const chartRef = ref<HTMLElement>()
-const canvasId = 'echarts_' + Math.random().toString(36).slice(2, 8)
+const chartRef = ref<any>(null)
 let chartInstance: any = null
+let echartsLib: any = null
 
-// #ifdef H5
-let echarts: any = null
+async function onFinished() {
+  if (!chartRef.value) return
+  // #ifdef H5
+  echartsLib = await import('echarts')
+  // #endif
+  // #ifdef MP-WEIXIN
+  echartsLib = require('../../uni_modules/lime-echart/static/echarts.min')
+  // #endif
+  // #ifndef H5 || MP-WEIXIN
+  echartsLib = await import('echarts')
+  // #endif
 
-onMounted(async () => {
-  echarts = await import('echarts')
-  await nextTick()
-  if (chartRef.value) {
-    chartInstance = echarts.init(chartRef.value)
+  chartInstance = await chartRef.value.init(echartsLib)
+  if (chartInstance && props.option) {
     chartInstance.setOption(props.option)
   }
-})
+}
 
 watch(() => props.option, (newOpt) => {
-  if (chartInstance) {
+  if (chartInstance && newOpt) {
     chartInstance.setOption(newOpt, true)
   }
 }, { deep: true })
@@ -46,7 +47,6 @@ onBeforeUnmount(() => {
     chartInstance = null
   }
 })
-// #endif
 </script>
 
 <style scoped>
