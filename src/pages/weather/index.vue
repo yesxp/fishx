@@ -888,11 +888,11 @@ const isRising = computed(() => tideStatus.value.text === '涨潮中')
 const hourlyChartRef = ref<HTMLElement>()
 let echartsInstance: any = null
 let echartsLib: any = null
+let chartInited = false
 
 async function initHourlyChart() {
-  await nextTick()
+  if (chartInited || !hourlyChartRef.value) return
   // #ifdef H5
-  if (!hourlyChartRef.value) return
   echartsLib = await import('echarts/core')
   const { LineChart } = await import('echarts/charts')
   const { GridComponent, TooltipComponent } = await import('echarts/components')
@@ -900,6 +900,7 @@ async function initHourlyChart() {
   echartsLib.use([LineChart, GridComponent, TooltipComponent, CanvasRenderer])
 
   echartsInstance = echartsLib.init(hourlyChartRef.value)
+  chartInited = true
   const opt = hourlyChartOption.value
   if (opt && Object.keys(opt).length > 0) {
     echartsInstance.setOption(opt)
@@ -907,11 +908,18 @@ async function initHourlyChart() {
   // #endif
 }
 
-watch(() => hourlyChartOption.value, (opt) => {
-  if (echartsInstance && opt && Object.keys(opt).length > 0) {
-    echartsInstance.setOption(opt, true)
+// 数据加载完后更新图表
+watch(() => weatherStore.hourly.length, async (len) => {
+  if (len > 0) {
+    await nextTick()
+    if (!echartsInstance) {
+      await initHourlyChart()
+    }
+    if (echartsInstance) {
+      echartsInstance.setOption(hourlyChartOption.value, true)
+    }
   }
-}, { deep: true })
+})
 
 onBeforeUnmount(() => {
   if (echartsInstance) {
@@ -924,7 +932,8 @@ onMounted(() => {
   weatherStore.loadWeather()
   weatherStore.loadTideCalendar()
   weatherStore.loadTyphoons()
-  initHourlyChart()
+  // 延迟初始化，等 DOM 渲染
+  setTimeout(() => initHourlyChart(), 500)
 })
 </script>
 
