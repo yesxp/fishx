@@ -34,15 +34,13 @@
       <!-- Tags -->
       <scroll-view scroll-x class="tags-scroll" :show-scrollbar="false">
         <view class="tags-inner">
-          <view
+          <wd-tag
             v-for="(tag, i) in tags"
             :key="i"
-            class="tag"
-            :class="{ 'tag--active': activeTag === i }"
-            @tap="activeTag = i"
-          >
-            <text class="tag-text">{{ tag }}</text>
-          </view>
+            :type="activeTag === i ? 'primary' : 'default'"
+            round
+            @click="activeTag = i"
+          >{{ tag }}</wd-tag>
         </view>
       </scroll-view>
 
@@ -242,30 +240,6 @@ $tag-bg: #F2F3F5;
 .tags-inner {
   display: flex;
   gap: 8px;
-}
-
-.tag {
-  flex-shrink: 0;
-  padding: 6px 14px;
-  border-radius: 100px;
-  background: $tag-bg;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.tag--active {
-  background: $bg-card;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-
-.tag-text {
-  font-size: 13px;
-  font-weight: 500;
-  color: $text-secondary;
-}
-
-.tag--active .tag-text {
-  color: $text-primary;
 }
 
 /* Spot List */

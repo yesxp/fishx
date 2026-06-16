@@ -7,9 +7,7 @@
           <text class="back-icon">←</text>
         </view>
         <text class="header-title">记录渔获</text>
-        <view class="header-submit" @tap="onSubmit">
-          <text class="submit-text">发布</text>
-        </view>
+        <wd-button type="primary" size="small" round @click="onSubmit">发布</wd-button>
       </view>
     </view>
 
@@ -54,12 +52,7 @@
         <view class="form-group">
           <text class="form-label">重量</text>
           <view class="input-row">
-            <input
-              v-model="weight"
-              type="digit"
-              class="form-input"
-              placeholder="输入重量（斤）"
-            />
+            <wd-input v-model="weight" type="digit" placeholder="输入重量（斤）" />
             <text class="input-unit">斤</text>
           </view>
         </view>
@@ -68,37 +61,21 @@
         <view class="form-group">
           <text class="form-label">钓点</text>
           <view class="input-row">
-            <input
-              v-model="location"
-              class="form-input"
-              placeholder="输入钓点名称"
-            />
+            <wd-input v-model="location" placeholder="输入钓点名称" />
           </view>
         </view>
 
         <!-- Description -->
         <view class="form-group">
           <text class="form-label">描述</text>
-          <textarea
-            v-model="description"
-            class="form-textarea"
-            placeholder="分享你的钓鱼心得..."
-            maxlength="500"
-          />
-          <text class="char-count">{{ description.length }}/500</text>
+          <wd-textarea v-model="description" placeholder="分享你的钓鱼心得..." maxlength="500" autosize />
         </view>
 
         <!-- Privacy -->
         <view class="form-group">
           <view class="toggle-row">
             <text class="form-label">仅自己可见</text>
-            <view
-              class="toggle"
-              :class="{ 'toggle--on': isPrivate }"
-              @tap="isPrivate = !isPrivate"
-            >
-              <view class="toggle-thumb" />
-            </view>
+            <wd-switch v-model="isPrivate" />
           </view>
         </view>
       </view>
@@ -230,18 +207,7 @@ $text-muted: #80848E;
   color: $text-primary;
 }
 
-.header-submit {
-  padding: 6px 16px;
-  background: $brand;
-  border-radius: 100px;
-  cursor: pointer;
-}
 
-.submit-text {
-  font-size: 14px;
-  font-weight: 500;
-  color: #fff;
-}
 
 /* Content */
 .content {
@@ -379,39 +345,16 @@ $text-muted: #80848E;
   gap: 8px;
 }
 
-.form-input {
-  flex: 1;
-  height: 40px;
-  padding: 0 12px;
-  background: #F2F3F5;
-  border-radius: 8px;
-  font-size: 14px;
-  color: $text-primary;
-}
+
 
 .input-unit {
   font-size: 14px;
   color: $text-muted;
 }
 
-.form-textarea {
-  width: 100%;
-  min-height: 100px;
-  padding: 12px;
-  background: #F2F3F5;
-  border-radius: 8px;
-  font-size: 14px;
-  color: $text-primary;
-  line-height: 1.5;
-}
 
-.char-count {
-  font-size: 11px;
-  color: $text-muted;
-  text-align: right;
-  display: block;
-  margin-top: 4px;
-}
+
+
 
 .toggle-row {
   display: flex;
@@ -419,33 +362,5 @@ $text-muted: #80848E;
   justify-content: space-between;
 }
 
-.toggle {
-  width: 44px;
-  height: 24px;
-  border-radius: 12px;
-  background: $divider;
-  position: relative;
-  cursor: pointer;
-  transition: background 0.2s;
-}
 
-.toggle--on {
-  background: $brand;
-}
-
-.toggle-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #fff;
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  transition: transform 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-}
-
-.toggle--on .toggle-thumb {
-  transform: translateX(20px);
-}
 </style>

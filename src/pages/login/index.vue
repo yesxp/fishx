@@ -13,56 +13,52 @@
     <view class="login-form">
       <!-- Phone Login -->
       <view class="login-section">
-        <view class="input-group">
-          <view class="phone-prefix">
-            <text class="prefix-text">+86</text>
-          </view>
-          <input
-            v-model="phone"
-            type="number"
-            class="phone-input"
-            placeholder="请输入手机号"
-            maxlength="11"
-          />
-        </view>
+        <wd-input
+          v-model="phone"
+          type="number"
+          placeholder="请输入手机号"
+          prefix-icon="phone"
+          maxlength="11"
+          class="phone-input"
+        />
         <view class="code-row">
-          <input
+          <wd-input
             v-model="smsCode"
             type="number"
-            class="code-input"
             placeholder="验证码"
             maxlength="6"
+            class="code-input"
           />
-          <view
+          <wd-button
+            size="small"
+            type="primary"
+            plain
+            :disabled="countdown > 0"
+            @click="onSendCode"
             class="code-btn"
-            :class="{ 'code-btn--disabled': countdown > 0 }"
-            @tap="onSendCode"
           >
-            <text class="code-btn-text">{{ countdown > 0 ? `${countdown}s` : '获取验证码' }}</text>
-          </view>
+            {{ countdown > 0 ? countdown + 's' : '获取验证码' }}
+          </wd-button>
         </view>
-        <view
+        <wd-button
+          type="primary"
+          block
+          :disabled="!canLogin"
+          @click="onPhoneLogin"
           class="login-btn"
-          :class="{ 'login-btn--disabled': !canLogin }"
-          @tap="onPhoneLogin"
         >
-          <text class="login-btn-text">登录</text>
-        </view>
+          登录
+        </wd-button>
       </view>
 
       <!-- Divider -->
-      <view class="divider">
-        <view class="divider-line" />
-        <text class="divider-text">其他方式</text>
-        <view class="divider-line" />
-      </view>
+      <wd-divider>其他方式</wd-divider>
 
       <!-- Third-party Login -->
       <view class="third-party">
-        <view class="tp-btn" @tap="onWechatLogin">
-          <text class="tp-icon">💚</text>
-          <text class="tp-text">微信登录</text>
-        </view>
+        <wd-button block plain @click="onWechatLogin" class="tp-btn">
+          💚 微信登录
+        </wd-button>
       </view>
     </view>
 
@@ -236,32 +232,8 @@ $tag-bg: #F2F3F5;
   margin-bottom: 20px;
 }
 
-.input-group {
-  display: flex;
-  align-items: center;
-  background: $tag-bg;
-  border-radius: 10px;
-  padding: 0 12px;
-  margin-bottom: 12px;
-}
-
-.phone-prefix {
-  padding-right: 10px;
-  border-right: 1px solid $divider;
-  margin-right: 10px;
-}
-
-.prefix-text {
-  font-size: 14px;
-  font-weight: 600;
-  color: $text-primary;
-}
-
 .phone-input {
-  flex: 1;
-  height: 44px;
-  font-size: 14px;
-  color: $text-primary;
+  margin-bottom: 12px;
 }
 
 .code-row {
@@ -272,101 +244,26 @@ $tag-bg: #F2F3F5;
 
 .code-input {
   flex: 1;
-  height: 44px;
-  background: $tag-bg;
-  border-radius: 10px;
-  padding: 0 12px;
-  font-size: 14px;
-  color: $text-primary;
 }
 
 .code-btn {
-  padding: 0 16px;
-  height: 44px;
-  border-radius: 10px;
-  background: rgba($brand, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.code-btn--disabled {
-  opacity: 0.5;
-}
-
-.code-btn-text {
-  font-size: 13px;
-  font-weight: 500;
-  color: $brand;
-  white-space: nowrap;
-}
-
-.login-btn {
-  width: 100%;
-  height: 48px;
-  border-radius: 12px;
-  background: $brand;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.login-btn--disabled {
-  opacity: 0.5;
-}
-
-.login-btn-text {
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-}
-
-/* Divider */
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.divider-line {
-  flex: 1;
-  height: 1px;
-  background: $divider;
-}
-
-.divider-text {
-  font-size: 12px;
-  color: $text-muted;
   flex-shrink: 0;
 }
 
+.login-btn {
+  margin-top: 8px;
+}
+
+/* Divider */
+
+
 /* Third-party */
 .third-party {
-  display: flex;
-  justify-content: center;
+  margin-top: 16px;
 }
 
 .tp-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 12px 24px;
-  border-radius: 12px;
-  background: $tag-bg;
-  cursor: pointer;
-}
-
-.tp-icon {
-  font-size: 28px;
-}
-
-.tp-text {
-  font-size: 12px;
-  color: $text-secondary;
+  font-size: 14px;
 }
 
 /* Agreement */

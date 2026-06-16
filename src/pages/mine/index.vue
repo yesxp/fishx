@@ -24,50 +24,45 @@
       <view class="profile-header">
         <view class="profile-banner" />
         <view class="profile-avatar-wrap">
-          <view class="profile-avatar">
-            <text class="profile-avatar-text">{{ userInitial }}</text>
-          </view>
-          <view class="profile-status" />
+            <wd-avatar size="80px">{{ userInitial }}</wd-avatar>
+            <view class="profile-status" />
         </view>
         <text class="profile-name">{{ nickname }}</text>
         <text class="profile-bio">热爱生活，热爱钓鱼</text>
-        <view class="profile-stats">
-          <view class="profile-stat">
-            <text class="profile-stat-value">128</text>
-            <text class="profile-stat-label">渔获</text>
-          </view>
-          <view class="profile-stat">
-            <text class="profile-stat-value">2.4k</text>
-            <text class="profile-stat-label">获赞</text>
-          </view>
-          <view class="profile-stat">
-            <text class="profile-stat-value">86</text>
-            <text class="profile-stat-label">关注</text>
-          </view>
-        </view>
+        <wd-grid :column="3" :border="false" style="margin-top: 16px;">
+          <wd-grid-item badge="" text="渔获">
+            <template #value>128</template>
+          </wd-grid-item>
+          <wd-grid-item badge="" text="获赞">
+            <template #value>2.4k</template>
+          </wd-grid-item>
+          <wd-grid-item badge="" text="关注">
+            <template #value>86</template>
+          </wd-grid-item>
+        </wd-grid>
       </view>
 
       <!-- Menu 1: Data -->
-      <view class="profile-menu">
-        <view class="profile-menu-item" v-for="item in menuItems1" :key="item.text" @tap="onMenuTap(item)">
-          <view class="profile-menu-icon" :class="'profile-menu-icon--' + item.color">
-            <view v-html="menuIcons[item.icon]" />
-          </view>
-          <text class="profile-menu-text">{{ item.text }}</text>
-          <text class="profile-menu-arrow">›</text>
-        </view>
-      </view>
+      <wd-cell-group style="margin: 0 12px 12px;">
+        <wd-cell v-for="item in menuItems1" :key="item.text" :title="item.text" is-link @click="onMenuTap(item)">
+          <template #icon>
+            <view class="profile-menu-icon" :class="'profile-menu-icon--' + item.color">
+              <view v-html="menuIcons[item.icon]" />
+            </view>
+          </template>
+        </wd-cell>
+      </wd-cell-group>
 
       <!-- Menu 2: System -->
-      <view class="profile-menu">
-        <view class="profile-menu-item" v-for="item in menuItems2" :key="item.text" @tap="onMenuTap(item)">
-          <view class="profile-menu-icon" :class="'profile-menu-icon--' + item.color">
-            <view v-html="menuIcons[item.icon]" />
-          </view>
-          <text class="profile-menu-text">{{ item.text }}</text>
-          <text class="profile-menu-arrow">›</text>
-        </view>
-      </view>
+      <wd-cell-group style="margin: 0 12px 12px;">
+        <wd-cell v-for="item in menuItems2" :key="item.text" :title="item.text" is-link @click="onMenuTap(item)">
+          <template #icon>
+            <view class="profile-menu-icon" :class="'profile-menu-icon--' + item.color">
+              <view v-html="menuIcons[item.icon]" />
+            </view>
+          </template>
+        </wd-cell>
+      </wd-cell-group>
 
       <view style="height: 120rpx;" />
     </scroll-view>
@@ -204,7 +199,7 @@ $text-muted: #80848E;
 /* Profile Header */
 .profile-header {
   text-align: center;
-  padding: 0 16px 24px;
+  padding: 0 16px 12px;
   background: $bg-card;
   border-bottom: 1px solid $divider;
   margin-bottom: 12px;
@@ -223,18 +218,8 @@ $text-muted: #80848E;
   width: 80px;
   height: 80px;
   margin: -40px auto 12px;
-}
-
-.profile-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: $divider;
   display: flex;
-  align-items: center;
   justify-content: center;
-  border: 4px solid $bg-card;
-  box-sizing: border-box;
 }
 
 .profile-status {
@@ -246,12 +231,6 @@ $text-muted: #80848E;
   border-radius: 50%;
   background: $status-green;
   border: 3px solid $bg-card;
-}
-
-.profile-avatar-text {
-  font-size: 28px;
-  font-weight: 600;
-  color: $text-muted;
 }
 
 .profile-name {
@@ -268,56 +247,7 @@ $text-muted: #80848E;
   display: block;
 }
 
-.profile-stats {
-  display: flex;
-  justify-content: center;
-  gap: 32px;
-  margin-top: 16px;
-}
-
-.profile-stat {
-  text-align: center;
-}
-
-.profile-stat-value {
-  font-size: 18px;
-  font-weight: 700;
-  color: $text-primary;
-  display: block;
-}
-
-.profile-stat-label {
-  font-size: 12px;
-  color: $text-muted;
-  display: block;
-}
-
 /* Profile Menu */
-.profile-menu {
-  background: $bg-card;
-  border-radius: 12px;
-  margin: 0 12px 12px;
-  border: 1px solid $divider;
-  overflow: hidden;
-}
-
-.profile-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-bottom: 1px solid $divider;
-  cursor: pointer;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:active {
-    background: #F2F3F5;
-  }
-}
-
 .profile-menu-icon {
   width: 32px;
   height: 32px;
@@ -327,6 +257,7 @@ $text-muted: #80848E;
   justify-content: center;
   font-size: 16px;
   flex-shrink: 0;
+  margin-right: 8px;
 }
 
 .profile-menu-icon--blue {
@@ -339,16 +270,5 @@ $text-muted: #80848E;
 
 .profile-menu-icon--orange {
   background: rgba(#F0B232, 0.1);
-}
-
-.profile-menu-text {
-  flex: 1;
-  font-size: 14px;
-  color: $text-primary;
-}
-
-.profile-menu-arrow {
-  font-size: 14px;
-  color: $text-muted;
 }
 </style>

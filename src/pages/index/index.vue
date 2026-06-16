@@ -24,15 +24,14 @@
       </view>
       <scroll-view scroll-x class="tags-scroll" :show-scrollbar="false">
         <view class="tags-inner">
-          <view
+          <wd-tag
             v-for="(tag, i) in tags"
             :key="i"
-            class="tag"
-            :class="{ 'tag--active': activeTag === i }"
-            @tap="activeTag = i"
-          >
-            <text class="tag-text">{{ tag }}</text>
-          </view>
+            :type="activeTag === i ? 'primary' : 'default'"
+            round
+            @click="activeTag = i"
+            custom-style="cursor: pointer;"
+          >{{ tag }}</wd-tag>
         </view>
       </scroll-view>
     </view>
@@ -68,23 +67,23 @@
       />
 
       <!-- Spot Grid -->
-      <view class="card-grid">
-        <view class="grid-item" v-for="spot in spotGrid1" :key="spot.name">
-          <view class="grid-item-image" :class="spot.bgClass">
+      <wd-grid :column="2" :gutter="12" :border="false">
+        <wd-grid-item v-for="spot in spotGrid1" :key="spot.name">
+          <view class="grid-item" :class="spot.bgClass">
             <view class="fish-placeholder-inner">
               <text class="placeholder-emoji">📍</text>
             </view>
-          </view>
-          <view class="grid-item-body">
-            <text class="grid-item-title">{{ spot.name }}</text>
-            <view class="grid-item-meta">
-              <text>{{ spot.dist }}</text>
-              <text class="dot">·</text>
-              <text class="grid-item-tag" :class="spot.tagClass">{{ spot.tag }}</text>
+            <view class="grid-item-body">
+              <text class="grid-item-title">{{ spot.name }}</text>
+              <view class="grid-item-meta">
+                <text>{{ spot.dist }}</text>
+                <text class="dot">·</text>
+                <text class="grid-item-tag" :class="spot.tagClass">{{ spot.tag }}</text>
+              </view>
             </view>
           </view>
-        </view>
-      </view>
+        </wd-grid-item>
+      </wd-grid>
 
       <!-- Catch Card 2 -->
       <CatchCard
@@ -103,32 +102,30 @@
       />
 
       <!-- Spot Grid 2 -->
-      <view class="card-grid">
-        <view class="grid-item" v-for="spot in spotGrid2" :key="spot.name">
-          <view class="grid-item-image" :class="spot.bgClass">
+      <wd-grid :column="2" :gutter="12" :border="false">
+        <wd-grid-item v-for="spot in spotGrid2" :key="spot.name">
+          <view class="grid-item" :class="spot.bgClass">
             <view class="fish-placeholder-inner">
               <text class="placeholder-emoji">📍</text>
             </view>
-          </view>
-          <view class="grid-item-body">
-            <text class="grid-item-title">{{ spot.name }}</text>
-            <view class="grid-item-meta">
-              <text>{{ spot.dist }}</text>
-              <text class="dot">·</text>
-              <text class="grid-item-tag" :class="spot.tagClass">{{ spot.tag }}</text>
+            <view class="grid-item-body">
+              <text class="grid-item-title">{{ spot.name }}</text>
+              <view class="grid-item-meta">
+                <text>{{ spot.dist }}</text>
+                <text class="dot">·</text>
+                <text class="grid-item-tag" :class="spot.tagClass">{{ spot.tag }}</text>
+              </view>
             </view>
           </view>
-        </view>
-      </view>
+        </wd-grid-item>
+      </wd-grid>
 
       <!-- Bottom Safe Area -->
       <view style="height: 120rpx;" />
     </scroll-view>
 
     <!-- FAB -->
-    <view class="fab" @tap="onCreate">
-      <text class="fab-icon">＋</text>
-    </view>
+    <wd-fab type="primary" icon="add" @click="onCreate" />
   </view>
 </template>
 
@@ -262,7 +259,6 @@ $warning: #F0B232;
   font-size: 16px;
 }
 
-/* Tags */
 .tags-scroll {
   white-space: nowrap;
 }
@@ -272,30 +268,6 @@ $warning: #F0B232;
   gap: 8px;
 }
 
-.tag {
-  flex-shrink: 0;
-  padding: 6px 14px;
-  border-radius: 100px;
-  background: $tag-bg;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.tag--active {
-  background: $bg-card;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-
-.tag-text {
-  font-size: 13px;
-  font-weight: 500;
-  color: $text-secondary;
-}
-
-.tag--active .tag-text {
-  color: $text-primary;
-}
-
 /* Content */
 .content { overflow-x: hidden;
   padding: 12px;
@@ -303,12 +275,6 @@ $warning: #F0B232;
 }
 
 /* Grid */
-.card-grid {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
 .grid-item {
   flex: 1;
   background: $bg-card;
@@ -409,29 +375,5 @@ $warning: #F0B232;
 
 .fish-img-6 {
   background: linear-gradient(135deg, #FBE9E7 0%, #FF8A65 100%);
-}
-
-/* FAB */
-.fab {
-  position: fixed;
-  bottom: 100px;
-  right: 20px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: $brand;
-  box-shadow: 0 4px 12px rgba(88, 101, 242, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99;
-  cursor: pointer;
-}
-
-.fab-icon {
-  font-size: 28px;
-  color: #fff;
-  font-weight: 300;
-  line-height: 1;
 }
 </style>

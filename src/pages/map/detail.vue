@@ -25,34 +25,36 @@
       <view class="info-card" v-if="spot">
         <text class="spot-name">{{ spot.name }}</text>
         <text class="spot-type">{{ spot.type }}</text>
-        <view class="spot-stats">
-          <view class="spot-stat">
+
+        <!-- Stats Grid -->
+        <wd-grid :column="2" :border="false" class="spot-stats">
+          <wd-grid-item>
             <text class="spot-stat-value">{{ spot.rating }}</text>
             <text class="spot-stat-label">评分</text>
-          </view>
-          <view class="spot-stat">
+          </wd-grid-item>
+          <wd-grid-item>
             <text class="spot-stat-value">{{ spot.catchCount }}</text>
             <text class="spot-stat-label">渔获数</text>
-          </view>
-        </view>
+          </wd-grid-item>
+        </wd-grid>
+
+        <!-- Fish Tags -->
         <view class="spot-fish">
           <text class="spot-fish-label">常见鱼种</text>
           <view class="fish-tags">
-            <view v-for="f in spot.fishTypes" :key="f" class="fish-tag">
-              <text class="fish-tag-text">{{ f }}</text>
-            </view>
+            <wd-tag v-for="f in spot.fishTypes" :key="f" round custom-style="background-color: #F2F3F5; color: #4E5058;">{{ f }}</wd-tag>
           </view>
         </view>
       </view>
 
       <!-- Action Buttons -->
       <view class="actions">
-        <view class="action-btn action-btn--primary" @tap="onCheckIn">
-          <text class="action-btn-text">打卡</text>
-        </view>
-        <view class="action-btn" @tap="onNavigate">
-          <text class="action-btn-text--outline">🧭 导航</text>
-        </view>
+        <wd-button type="primary" block @click="onCheckIn" custom-style="background-color: #5865F2; border-color: #5865F2; border-radius: 12px; height: 48px;">
+          打卡
+        </wd-button>
+        <wd-button block plain @click="onNavigate" custom-style="border-radius: 12px; height: 48px;">
+          🧭 导航
+        </wd-button>
       </view>
 
       <view style="height: 120rpx;" />
@@ -165,10 +167,6 @@ $success: #23A559;
   gap: 8px;
 }
 
-.map-pin {
-  font-size: 40px;
-}
-
 .map-name {
   font-size: 14px;
   font-weight: 600;
@@ -199,13 +197,7 @@ $success: #23A559;
 }
 
 .spot-stats {
-  display: flex;
-  gap: 32px;
   margin-bottom: 16px;
-}
-
-.spot-stat {
-  text-align: center;
 }
 
 .spot-stat-value {
@@ -235,46 +227,9 @@ $success: #23A559;
   flex-wrap: wrap;
 }
 
-.fish-tag {
-  padding: 4px 12px;
-  border-radius: 100px;
-  background: #F2F3F5;
-}
-
-.fish-tag-text {
-  font-size: 13px;
-  color: $text-secondary;
-}
-
 .actions {
   display: flex;
+  flex-direction: column;
   gap: 12px;
-}
-
-.action-btn {
-  flex: 1;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: #F2F3F5;
-}
-
-.action-btn--primary {
-  background: $brand;
-}
-
-.action-btn-text {
-  font-size: 15px;
-  font-weight: 600;
-  color: #fff;
-}
-
-.action-btn-text--outline {
-  font-size: 15px;
-  font-weight: 600;
-  color: $text-primary;
 }
 </style>

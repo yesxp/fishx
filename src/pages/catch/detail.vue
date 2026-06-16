@@ -32,24 +32,16 @@
           <text class="comments-title">评论 ({{ comments.length }})</text>
         </view>
 
-        <view v-if="comments.length === 0" class="empty-comments">
-          <text class="empty-icon">💬</text>
-          <text class="empty-text">暂无评论，快来抢沙发！</text>
-        </view>
+        <wd-empty v-if="comments.length === 0" description="暂无评论，快来抢沙发！" />
 
         <view v-else class="comment-list">
-          <view v-for="comment in comments" :key="comment.id" class="comment-item">
-            <view class="comment-avatar">
-              <text class="comment-avatar-text">{{ comment.nickname.charAt(0) }}</text>
-            </view>
-            <view class="comment-body">
-              <view class="comment-header">
-                <text class="comment-nick">{{ comment.nickname }}</text>
-                <text class="comment-time">{{ comment.time }}</text>
+          <wd-cell v-for="comment in comments" :key="comment.id" :title="comment.nickname" :label="comment.content" :value="comment.time" clickable>
+            <template #icon>
+              <view class="comment-avatar">
+                <text class="comment-avatar-text">{{ comment.nickname.charAt(0) }}</text>
               </view>
-              <text class="comment-content">{{ comment.content }}</text>
-            </view>
-          </view>
+            </template>
+          </wd-cell>
         </view>
       </view>
 
@@ -58,20 +50,8 @@
 
     <!-- Comment Input -->
     <view class="comment-bar">
-      <input
-        v-model="commentText"
-        class="comment-input"
-        placeholder="写评论..."
-        confirm-type="send"
-        @confirm="onSendComment"
-      />
-      <view
-        class="comment-send"
-        :class="{ 'comment-send--active': commentText.trim() }"
-        @tap="onSendComment"
-      >
-        <text class="send-text">发送</text>
-      </view>
+      <wd-input v-model="commentText" placeholder="写评论..." @confirm="onSendComment" />
+      <wd-button type="primary" size="small" round :disabled="!commentText.trim()" @click="onSendComment">发送</wd-button>
     </view>
   </view>
 </template>
@@ -232,36 +212,9 @@ $text-muted: #80848E;
   color: $text-primary;
 }
 
-.empty-comments {
-  padding: 32px 16px;
-  text-align: center;
-}
-
-.empty-icon {
-  font-size: 32px;
-  display: block;
-  margin-bottom: 8px;
-}
-
-.empty-text {
-  font-size: 13px;
-  color: $text-muted;
-}
-
 .comment-list {
   display: flex;
   flex-direction: column;
-}
-
-.comment-item {
-  display: flex;
-  gap: 10px;
-  padding: 12px 14px;
-  border-bottom: 1px solid $divider;
-
-  &:last-child {
-    border-bottom: none;
-  }
 }
 
 .comment-avatar {
@@ -281,35 +234,6 @@ $text-muted: #80848E;
   color: $text-muted;
 }
 
-.comment-body {
-  flex: 1;
-  min-width: 0;
-}
-
-.comment-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.comment-nick {
-  font-size: 13px;
-  font-weight: 600;
-  color: $text-primary;
-}
-
-.comment-time {
-  font-size: 11px;
-  color: $text-muted;
-}
-
-.comment-content {
-  font-size: 13px;
-  color: $text-secondary;
-  line-height: 1.5;
-}
-
 /* Comment Bar */
 .comment-bar {
   position: sticky;
@@ -320,37 +244,5 @@ $text-muted: #80848E;
   display: flex;
   gap: 8px;
   align-items: center;
-}
-
-.comment-input {
-  flex: 1;
-  height: 36px;
-  padding: 0 12px;
-  background: #F2F3F5;
-  border-radius: 100px;
-  font-size: 14px;
-  color: $text-primary;
-}
-
-.comment-send {
-  padding: 8px 16px;
-  background: $divider;
-  border-radius: 100px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.comment-send--active {
-  background: $brand;
-}
-
-.send-text {
-  font-size: 14px;
-  font-weight: 500;
-  color: $text-muted;
-}
-
-.comment-send--active .send-text {
-  color: #fff;
 }
 </style>
