@@ -11,7 +11,7 @@
           </view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 22:35</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 22:40</text>
           </view>
         </view>
         <view class="header-actions">
@@ -554,17 +554,20 @@ const hourlyChartOption = computed(() => {
         margin: 8,
         formatter: (value, index) => {
           const icon = getWeatherIcon(display[index].icon)
-          return `{icon${index}}\n${value}`
+          return `{icon|${icon}}\n${value}`
         },
-        rich: Object.fromEntries(
-          display.map((h, i) => [`icon${i}`, {
+        rich: {
+          icon: {
             fontSize: 16,
             lineHeight: 22,
             align: 'center',
-          }])
-        ),
+          },
+        },
       },
-      splitLine: { show: false },
+      splitLine: {
+        show: true,
+        lineStyle: { color: '#ECEEF1', type: 'dashed', width: 1 },
+      },
     },
     yAxis: {
       type: 'value',
