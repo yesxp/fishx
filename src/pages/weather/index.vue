@@ -24,116 +24,128 @@
       </view>
 
       <template v-else>
-        <!-- ===== Hero ===== -->
+        <!-- ===== Hero Card (Redesigned) ===== -->
         <view class="hero">
-          <view class="hero-top">
-            <view>
-              <text class="hero-city">📍 广州</text>
-              <view class="hero-score-row">
-                <text class="hero-score">{{ weatherStore.indexResult.score }}</text>
-                <text class="hero-score-unit">分</text>
+          <!-- Top Row: Date + Score Ring -->
+          <view class="hero-top-row">
+            <view class="hero-date-col">
+              <text class="hero-date">📍 广州</text>
+              <text class="hero-date-full">6月16日 周二</text>
+            </view>
+            <view class="hero-score-ring">
+              <view class="score-ring-outer">
+                <view class="score-ring-inner">
+                  <text class="hero-score">{{ weatherStore.indexResult.score }}</text>
+                  <text class="hero-score-unit">分</text>
+                </view>
               </view>
-              <text class="hero-label">{{ weatherStore.indexResult.level }}</text>
-            </view>
-            <view class="hero-weather-main">
-              <text class="hero-icon">{{ getWeatherIcon(weatherStore.weatherNow?.icon || '100') }}</text>
-              <text class="hero-temp-now">{{ weatherStore.weatherNow?.temp || '--' }}°</text>
+              <text class="hero-score-label">实况</text>
+              <text class="hero-score-level">{{ weatherStore.indexResult.level }}</text>
             </view>
           </view>
-          <view class="hero-desc">
-            <text class="hero-desc-text">{{ weatherStore.weatherNow?.text || '' }}，体感 {{ weatherStore.weatherNow?.feelsLike || '--' }}°</text>
+
+          <!-- Middle: Temp + Weather -->
+          <view class="hero-mid-row">
+            <text class="hero-icon">{{ getWeatherIcon(weatherStore.weatherNow?.icon || '100') }}</text>
+            <view class="hero-temp-info">
+              <text class="hero-temp-big">{{ weatherStore.weatherNow?.temp || '--' }}°</text>
+              <text class="hero-weather-text">{{ weatherStore.weatherNow?.text || '' }}</text>
+              <text class="hero-feels-like">体感 {{ weatherStore.weatherNow?.feelsLike || '--' }}°</text>
+            </view>
           </view>
-          <wd-grid :column="4" :border="false" custom-class="hero-grid" :gutter="8">
-            <wd-grid-item custom-class="hero-item">
-              <text class="hero-item-label">气压</text>
-              <text class="hero-item-value">{{ weatherStore.weatherNow?.pressure || '--' }}</text>
-              <text class="hero-item-unit">hPa</text>
-            </wd-grid-item>
-            <wd-grid-item custom-class="hero-item">
-              <text class="hero-item-label">湿度</text>
-              <text class="hero-item-value">{{ weatherStore.weatherNow?.humidity || '--' }}%</text>
-              <text class="hero-item-unit">RH</text>
-            </wd-grid-item>
-            <wd-grid-item custom-class="hero-item">
-              <text class="hero-item-label">风力</text>
-              <text class="hero-item-value">{{ weatherStore.weatherNow?.windScale || '--' }}</text>
-              <text class="hero-item-unit">{{ weatherStore.weatherNow?.windDir || '' }}</text>
-            </wd-grid-item>
-            <wd-grid-item custom-class="hero-item">
-              <text class="hero-item-label">能见度</text>
-              <text class="hero-item-value">{{ weatherStore.weatherNow?.vis || '--' }}</text>
-              <text class="hero-item-unit">km</text>
-            </wd-grid-item>
-          </wd-grid>
+
+          <!-- Bottom: 2x2 Grid -->
+          <view class="hero-detail-grid">
+            <view class="hero-detail-item">
+              <view class="hero-detail-icon hero-detail-icon--purple"></view>
+              <view class="hero-detail-info">
+                <text class="hero-detail-label">气压</text>
+                <text class="hero-detail-value">{{ weatherStore.weatherNow?.pressure || '--' }} <text class="hero-detail-unit">hPa</text></text>
+              </view>
+              <wd-tag type="primary" size="small" round custom-class="hero-trend-tag">平稳</wd-tag>
+            </view>
+            <view class="hero-detail-item">
+              <view class="hero-detail-icon hero-detail-icon--cyan"></view>
+              <view class="hero-detail-info">
+                <text class="hero-detail-label">风力</text>
+                <text class="hero-detail-value">{{ weatherStore.weatherNow?.windScale || '--' }} <text class="hero-detail-unit">{{ weatherStore.weatherNow?.windDir || '' }}</text></text>
+              </view>
+              <wd-tag type="success" size="small" round custom-class="hero-trend-tag">适宜</wd-tag>
+            </view>
+            <view class="hero-detail-item">
+              <view class="hero-detail-icon hero-detail-icon--green"></view>
+              <view class="hero-detail-info">
+                <text class="hero-detail-label">湿度</text>
+                <text class="hero-detail-value">{{ weatherStore.weatherNow?.humidity || '--' }}<text class="hero-detail-unit">%</text></text>
+              </view>
+              <wd-tag type="default" size="small" round custom-class="hero-trend-tag"></wd-tag>
+            </view>
+            <view class="hero-detail-item">
+              <view class="hero-detail-icon hero-detail-icon--orange"></view>
+              <view class="hero-detail-info">
+                <text class="hero-detail-label">能见度</text>
+                <text class="hero-detail-value">{{ weatherStore.weatherNow?.vis || '--' }} <text class="hero-detail-unit">km</text></text>
+              </view>
+              <wd-tag type="default" size="small" round custom-class="hero-trend-tag"></wd-tag>
+            </view>
+          </view>
         </view>
 
-        <!-- ===== 今日垂钓建议（鱼口预测 + 钓法建议） ===== -->
+        <!-- ===== 今日垂钓建议（Redesigned） ===== -->
         <view class="card">
           <view class="card-title-row">
             <text class="card-title">🎯 今日垂钓建议</text>
             <text class="card-subtitle">基于天气 + 潮汐</text>
           </view>
-          <view class="fish-list">
+
+          <!-- Time Window Blocks -->
+          <view class="fishing-windows">
+            <view class="fishing-window fishing-window--best">
+              <text class="fishing-window-dot">🟢</text>
+              <view class="fishing-window-info">
+                <text class="fishing-window-label">最佳窗口</text>
+                <text class="fishing-window-time">{{ fishingTips.timing }}</text>
+              </view>
+            </view>
+            <view class="fishing-window fishing-window--secondary">
+              <text class="fishing-window-dot">🟠</text>
+              <view class="fishing-window-info">
+                <text class="fishing-window-label">傍晚次佳</text>
+                <text class="fishing-window-time">16:00-17:30</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- Condition Tags -->
+          <view class="fishing-tags">
+            <wd-tag type="success" size="small" round custom-style="margin-right: 6px; margin-bottom: 6px;">溶氧充足</wd-tag>
+            <wd-tag v-if="weatherStore.weatherNow?.text?.includes('雨')" type="danger" size="small" round custom-style="margin-right: 6px; margin-bottom: 6px;">雷暴风险</wd-tag>
+            <wd-tag type="primary" size="small" round custom-style="margin-right: 6px; margin-bottom: 6px;">晨口窗口</wd-tag>
+            <wd-tag type="warning" size="small" round custom-style="margin-right: 6px; margin-bottom: 6px;">{{ tideStatus.text === '涨潮中' ? '涨潮助力' : tideStatus.text === '退潮中' ? '退潮待机' : '平潮观望' }}</wd-tag>
+            <wd-tag type="default" size="small" round custom-style="margin-right: 6px; margin-bottom: 6px;">{{ fishPredictions[0]?.variant === 'open' ? '鱼口活跃' : fishPredictions[0]?.variant === 'slow' ? '鱼口较慢' : '一般' }}</wd-tag>
+          </view>
+
+          <!-- Advice Paragraph -->
+          <view class="fishing-advice">
+            <text class="fishing-advice-text">饵料：{{ fishingTips.bait }}。目标鱼种：{{ fishingTips.target }}。{{ fishingTips.note }}。建议选早晚凉爽时段作钓，使用活饵优先，味型偏腥，耐心等口不要频繁提竿。</text>
+          </view>
+
+          <!-- Fish Predictions (compact) -->
+          <view class="fish-compact-list">
             <template v-for="(fish, index) in fishPredictions" :key="fish.name">
-              <wd-cell :border="false" custom-class="fish-row" center>
-                <template #prefix>
-                  <text class="fish-emoji">{{ fish.emoji }}</text>
-                </template>
-                <template #title>
-                  <text class="fish-name">{{ fish.name }}</text>
-                  <text class="fish-desc">{{ fish.desc }}</text>
-                </template>
-                <view class="fish-right">
-                  <view class="fish-badge" :class="'fish-badge--' + fish.variant">
-                    <text class="fish-badge-text">{{ fish.status }}</text>
-                  </view>
-                  <text class="fish-trend">{{ fish.trend }}</text>
+              <view class="fish-compact-row">
+                <text class="fish-compact-emoji">{{ fish.emoji }}</text>
+                <view class="fish-compact-info">
+                  <text class="fish-compact-name">{{ fish.name }}</text>
+                  <text class="fish-compact-desc">{{ fish.desc }}</text>
                 </view>
-              </wd-cell>
+                <view class="fish-badge" :class="'fish-badge--' + fish.variant">
+                  <text class="fish-badge-text">{{ fish.status }}</text>
+                </view>
+                <text class="fish-trend">{{ fish.trend }}</text>
+              </view>
               <wd-divider v-if="index < fishPredictions.length - 1" hairline custom-style="margin: 0; padding: 0;" />
             </template>
-          </view>
-          <wd-divider hairline custom-style="margin: 0; padding: 0;" />
-          <view class="tips">
-            <wd-cell :border="false" custom-class="tip" center>
-              <template #prefix>
-                <view class="tip-icon tip-icon--b">🎣</view>
-              </template>
-              <template #title>
-                <text class="tip-title">饵料选择</text>
-                <text class="tip-text">{{ fishingTips.bait }}</text>
-              </template>
-            </wd-cell>
-            <wd-divider hairline custom-style="margin: 0; padding: 0;" />
-            <wd-cell :border="false" custom-class="tip" center>
-              <template #prefix>
-                <view class="tip-icon tip-icon--g">🐟</view>
-              </template>
-              <template #title>
-                <text class="tip-title">目标鱼种</text>
-                <text class="tip-text">{{ fishingTips.target }}</text>
-              </template>
-            </wd-cell>
-            <wd-divider hairline custom-style="margin: 0; padding: 0;" />
-            <wd-cell :border="false" custom-class="tip" center>
-              <template #prefix>
-                <view class="tip-icon tip-icon--o">⏰</view>
-              </template>
-              <template #title>
-                <text class="tip-title">最佳时段</text>
-                <text class="tip-text">{{ fishingTips.timing }}</text>
-              </template>
-            </wd-cell>
-            <wd-divider hairline custom-style="margin: 0; padding: 0;" />
-            <wd-cell :border="false" custom-class="tip" center>
-              <template #prefix>
-                <view class="tip-icon tip-icon--p">💡</view>
-              </template>
-              <template #title>
-                <text class="tip-title">注意事项</text>
-                <text class="tip-text">{{ fishingTips.note }}</text>
-              </template>
-            </wd-cell>
           </view>
         </view>
 
@@ -149,6 +161,29 @@
               {{ weatherStore.indexResult.score >= 70 ? '鱼口活跃' : weatherStore.indexResult.score >= 40 ? '一般' : '鱼口较慢' }}
             </wd-tag>
           </view>
+          <!-- Day Selector Tabs -->
+          <view class="hourly-day-tabs">
+            <view class="hourly-day-tab">
+              <text class="hourly-day-tab-name">昨天</text>
+              <text class="hourly-day-tab-date">6/15</text>
+            </view>
+            <view class="hourly-day-tab hourly-day-tab--active">
+              <text class="hourly-day-tab-name">今天</text>
+              <text class="hourly-day-tab-date">6/16</text>
+            </view>
+            <view class="hourly-day-tab">
+              <text class="hourly-day-tab-name">明天</text>
+              <text class="hourly-day-tab-date">6/17</text>
+            </view>
+            <view class="hourly-day-tab">
+              <text class="hourly-day-tab-name">周四</text>
+              <text class="hourly-day-tab-date">6/18</text>
+            </view>
+            <view class="hourly-day-tab">
+              <text class="hourly-day-tab-name">周五</text>
+              <text class="hourly-day-tab-date">6/19</text>
+            </view>
+          </view>
           <view class="hourly-chart-wrap" v-if="weatherStore.hourly.length > 0">
             <uni-echarts custom-style="width:100%;height:240px" :option="hourlyChartOption" />
           </view>
@@ -156,7 +191,7 @@
 
 
 
-        <!-- ===== 天气日历（未来7天） ===== -->
+        <!-- ===== 天气日历（未来7天）Redesigned ===== -->
         <view class="card">
           <view class="card-title-row">
             <text class="card-title">天气日历</text>
@@ -179,11 +214,20 @@
                 </view>
                 <text class="day-temp-hi">{{ day.tempDay }}°</text>
               </view>
+              <view class="day-comfort">
+                <wd-tag
+                  :type="Number(day.tempDay) >= 35 ? 'danger' : Number(day.tempDay) >= 30 ? 'warning' : Number(day.tempDay) >= 20 ? 'success' : 'primary'"
+                  size="small"
+                  round
+                >
+                  {{ Number(day.tempDay) >= 35 ? '闷热' : Number(day.tempDay) >= 30 ? '热' : Number(day.tempDay) >= 20 ? '温暖' : '凉爽' }}
+                </wd-tag>
+              </view>
             </view>
           </view>
         </view>
 
-        <!-- ===== 天文潮汐 ===== -->
+        <!-- ===== 天文潮汐 Redesigned ===== -->
         <view class="card" v-if="tideData">
           <view class="card-title-row">
             <text class="card-title">🌊 天文潮汐</text>
@@ -191,6 +235,8 @@
           </view>
           <view class="tide-chart-wrap">
             <svg viewBox="0 0 340 100" width="100%" height="100" class="tide-svg">
+              <!-- Fishing-friendly zone overlays -->
+              <rect v-for="i in 4" :key="'tz'+i" :x="(i*70) - 15" y="0" width="30" height="100" fill="#23A559" opacity="0.06" rx="4"/>
               <line v-for="i in 4" :key="'gl'+i" :x1="0" :y1="i*25" :x2="340" :y2="i*25" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4,4"/>
               <path :d="tidePath" fill="none" stroke="#5865F2" stroke-width="2"/>
               <path :d="tideAreaPath" fill="url(#tideFillGrad)" opacity="0.15"/>
@@ -214,12 +260,18 @@
               <text class="tide-time-label">24:00</text>
             </view>
           </view>
-          <view class="tide-info">
-            <view v-for="(entry, i) in tideTable" :key="i" class="tide-info-item">
-              <text class="tide-info-label">{{ entry.type === 'H' ? '🌊 满潮' : '🌊 干潮' }}</text>
-              <text class="tide-info-time">{{ entry.time }}</text>
-              <text class="tide-info-val">{{ entry.height }}m</text>
-            </view>
+          <!-- Compact Tide Info Badges -->
+          <view class="tide-info-compact">
+            <template v-for="(entry, i) in tideTable" :key="i">
+              <view class="tide-badge" :class="entry.type === 'H' ? 'tide-badge--high' : 'tide-badge--low'">
+                <text class="tide-badge-icon">{{ entry.type === 'H' ? '🌊' : '🌊' }}</text>
+                <view class="tide-badge-info">
+                  <text class="tide-badge-label">{{ entry.type === 'H' ? '满潮' : '干潮' }}</text>
+                  <text class="tide-badge-time">{{ entry.time }}</text>
+                </view>
+                <text class="tide-badge-val">{{ entry.height }}m</text>
+              </view>
+            </template>
           </view>
         </view>
 
@@ -236,7 +288,7 @@
             <text class="tide-cal-col tide-cal-col--hl">满潮</text>
             <text class="tide-cal-col tide-cal-col--hl">干潮</text>
           </view>
-          <view v-for="(day, i) in tideCalendar" :key="i" class="tide-cal-row" :class="{ 'tide-cal-row--today': i === 0 }">
+          <view v-for="(day, i) in tideCalendar" :key="i" class="tide-cal-row" :class="{ 'tide-cal-row--today': i === 0, 'tide-cal-row--alt': i % 2 === 1 }">
             <view class="tide-cal-col tide-cal-col--day">
               <text class="tide-cal-date">{{ i === 0 ? '今天' : getWeekDayShort(day.date) }}</text>
             </view>
@@ -928,31 +980,50 @@ $danger: #F23F43;
 .loading-state { display: flex; align-items: center; justify-content: center; height: 300px; }
 .loading-text { font-size: 14px; color: $text-muted; }
 
-/* Hero */
+/* Hero Card (Redesigned) */
 .hero { background: linear-gradient(135deg, #5865F2, #7B68EE); border-radius: 16px; padding: 20px; margin-bottom: 12px; color: #fff; }
-.hero-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-.hero-city { font-size: 13px; opacity: 0.8; display: block; margin-bottom: 4px; }
-.hero-score-row { display: flex; align-items: baseline; gap: 4px; }
-.hero-score { font-size: 52px; font-weight: 700; line-height: 1; }
-.hero-score-unit { font-size: 18px; font-weight: 400; opacity: 0.7; }
-.hero-label { font-size: 14px; opacity: 0.9; margin-top: 4px; display: block; }
-.hero-weather-main { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.hero-icon { font-size: 40px; }
-.hero-temp-now { font-size: 16px; font-weight: 600; opacity: 0.9; }
-.hero-desc { margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.15); }
-.hero-desc-text { font-size: 13px; opacity: 0.8; }
-.hero-grid { display: flex !important; flex-wrap: wrap; background: transparent !important; overflow: visible !important; }
-.hero-grid :deep(.wd-grid-item__content) {
-  background: rgba(255,255,255,0.15) !important;
-  padding: 8px 4px !important;
-  text-align: center;
-  border-radius: 10px;
+
+.hero-top-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.hero-date-col { display: flex; flex-direction: column; gap: 4px; }
+.hero-date { font-size: 14px; font-weight: 600; opacity: 0.9; display: block; }
+.hero-date-full { font-size: 12px; opacity: 0.6; display: block; }
+
+.hero-score-ring { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.score-ring-outer {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: conic-gradient(#fff 0%, #fff calc(var(--score-pct, 80) * 1%), rgba(255,255,255,0.2) calc(var(--score-pct, 80) * 1%));
+  display: flex; align-items: center; justify-content: center;
 }
-.hero-grid :deep(.wd-grid-item) { background: transparent !important; }
-.hero-item { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 8px 4px; text-align: center; }
-.hero-item-label { font-size: 10px; opacity: 0.7; display: block; }
-.hero-item-value { font-size: 16px; font-weight: 600; margin-top: 2px; display: block; }
-.hero-item-unit { font-size: 9px; opacity: 0.6; display: block; margin-top: 1px; }
+.score-ring-inner {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: rgba(88,101,242,0.85);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.hero-score { font-size: 26px; font-weight: 700; line-height: 1; }
+.hero-score-unit { font-size: 10px; opacity: 0.7; }
+.hero-score-label { font-size: 10px; opacity: 0.6; }
+.hero-score-level { font-size: 12px; font-weight: 600; opacity: 0.9; }
+
+.hero-mid-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.15); }
+.hero-icon { font-size: 48px; }
+.hero-temp-info { display: flex; flex-direction: column; gap: 2px; }
+.hero-temp-big { font-size: 40px; font-weight: 700; line-height: 1; }
+.hero-weather-text { font-size: 14px; opacity: 0.85; }
+.hero-feels-like { font-size: 12px; opacity: 0.6; }
+
+.hero-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.hero-detail-item { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.12); border-radius: 10px; padding: 10px 10px; }
+.hero-detail-icon { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; }
+.hero-detail-icon--purple { background: rgba(255,255,255,0.3); }
+.hero-detail-icon--cyan { background: rgba(86,204,222,0.4); }
+.hero-detail-icon--green { background: rgba(35,165,89,0.4); }
+.hero-detail-icon--orange { background: rgba(240,178,50,0.4); }
+.hero-detail-info { flex: 1; min-width: 0; }
+.hero-detail-label { font-size: 10px; opacity: 0.6; display: block; }
+.hero-detail-value { font-size: 14px; font-weight: 600; display: block; line-height: 1.2; }
+.hero-detail-unit { font-size: 10px; opacity: 0.6; font-weight: 400; }
+.hero-trend-tag { flex-shrink: 0; }
 
 /* Card */
 .card { background: $bg-card; border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid $divider; }
@@ -986,6 +1057,18 @@ $danger: #F23F43;
 .hourly-chart-wrap { margin-top: 8px; }
 .hourly-chart-inner { min-height: 200px; }
 .hourly-svg { display: block; }
+
+/* Hourly Day Tabs */
+.hourly-day-tabs { display: flex; gap: 0; margin-bottom: 12px; background: $tag-bg; border-radius: 10px; padding: 3px; }
+.hourly-day-tab { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 6px 4px; border-radius: 8px; cursor: pointer; }
+.hourly-day-tab--active { background: $bg-card; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.hourly-day-tab-name { font-size: 12px; font-weight: 500; color: $text-primary; }
+.hourly-day-tab--active .hourly-day-tab-name { color: $brand; font-weight: 700; }
+.hourly-day-tab-date { font-size: 10px; color: $text-muted; margin-top: 2px; }
+.hourly-day-tab--active .hourly-day-tab-date { color: $brand; opacity: 0.7; }
+
+/* 7-day comfort tag */
+.day-comfort { margin-left: auto; flex-shrink: 0; }
 
 /* 图例 */
 .chart-legend {
@@ -1049,9 +1132,23 @@ $danger: #F23F43;
 .tide-info-time { font-size: 16px; font-weight: 700; color: $text-primary; display: block; margin-top: 2px; }
 .tide-info-val { font-size: 11px; color: $text-muted; display: block; }
 
+/* Tide Compact Badges (Redesigned) */
+.tide-info-compact { display: flex; flex-wrap: wrap; gap: 6px; }
+.tide-badge { display: flex; align-items: center; gap: 6px; border-radius: 8px; padding: 6px 10px; flex: 1; min-width: 120px; }
+.tide-badge--high { background: rgba($warning, 0.08); }
+.tide-badge--low { background: rgba($brand, 0.08); }
+.tide-badge-icon { font-size: 16px; }
+.tide-badge-info { flex: 1; }
+.tide-badge-label { font-size: 10px; color: $text-muted; display: block; }
+.tide-badge-time { font-size: 13px; font-weight: 600; color: $text-primary; display: block; }
+.tide-badge-val { font-size: 12px; font-weight: 600; }
+.tide-badge--high .tide-badge-val { color: $warning; }
+.tide-badge--low .tide-badge-val { color: $brand; }
+
 /* Tide Calendar */
 .tide-cal-header { display: flex; padding: 6px 0; border-bottom: 1px solid $divider; }
 .tide-cal-row { display: flex; padding: 8px 0; border-bottom: 1px solid rgba($divider, 0.5); &:last-child { border-bottom: none; } }
+.tide-cal-row--alt { background: rgba($bg-page, 0.5); margin: 0 -8px; padding: 8px; border-radius: 6px; }
 .tide-cal-row--today { background: rgba($brand, 0.04); margin: 0 -8px; padding: 8px; border-radius: 6px; }
 .tide-cal-col { text-align: center; }
 .tide-cal-col--day { width: 48px; flex-shrink: 0; }
@@ -1100,6 +1197,31 @@ $danger: #F23F43;
 .fish-badge { padding: 3px 10px; border-radius: 100px; &--open { background: rgba($success, 0.1); } &--normal { background: rgba($brand, 0.1); } &--slow { background: rgba(128, 132, 142, 0.1); } }
 .fish-badge-text { font-size: 12px; font-weight: 500; color: $success; .fish-badge--normal & { color: $brand; } .fish-badge--slow & { color: $text-muted; } }
 .fish-trend { font-size: 16px; color: $text-muted; width: 20px; text-align: center; }
+
+/* Fishing Windows (Redesigned) */
+.fishing-windows { display: flex; gap: 8px; margin-bottom: 12px; }
+.fishing-window { flex: 1; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 8px; }
+.fishing-window--best { background: rgba($success, 0.08); border: 1px solid rgba($success, 0.2); }
+.fishing-window--secondary { background: rgba($warning, 0.08); border: 1px solid rgba($warning, 0.2); }
+.fishing-window-dot { font-size: 12px; }
+.fishing-window-info { flex: 1; }
+.fishing-window-label { font-size: 11px; font-weight: 500; color: $text-secondary; display: block; }
+.fishing-window-time { font-size: 15px; font-weight: 700; color: $text-primary; display: block; margin-top: 2px; }
+
+/* Fishing Tags */
+.fishing-tags { display: flex; flex-wrap: wrap; margin-bottom: 10px; }
+
+/* Fishing Advice Paragraph */
+.fishing-advice { background: rgba($brand, 0.03); border-radius: 8px; padding: 10px; margin-bottom: 12px; }
+.fishing-advice-text { font-size: 12px; color: $text-secondary; line-height: 1.6; }
+
+/* Fish Compact List (Redesigned) */
+.fish-compact-list { display: flex; flex-direction: column; }
+.fish-compact-row { display: flex; align-items: center; padding: 8px 0; gap: 10px; }
+.fish-compact-emoji { font-size: 20px; flex-shrink: 0; }
+.fish-compact-info { flex: 1; min-width: 0; }
+.fish-compact-name { font-size: 13px; font-weight: 600; color: $text-primary; display: block; }
+.fish-compact-desc { font-size: 11px; color: $text-muted; display: block; }
 
 /* Tips */
 .tips { display: flex; flex-direction: column; }
