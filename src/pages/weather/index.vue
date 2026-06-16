@@ -11,7 +11,7 @@
           </view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 00:20</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 21:50</text>
           </view>
         </view>
         <view class="header-actions">
@@ -77,17 +77,6 @@
             <text class="card-title">逐小时预报</text>
             <view class="badge" :class="badgeClass">
               <text class="badge-text">{{ weatherStore.indexResult.score >= 70 ? '鱼口活跃' : weatherStore.indexResult.score >= 40 ? '一般' : '鱼口较慢' }}</text>
-            </view>
-          </view>
-          <!-- 图例 -->
-          <view class="chart-legend">
-            <view class="chart-legend-item">
-              <view class="chart-legend-dot" style="background:#F23F43"/>
-              <text class="chart-legend-text">高温</text>
-            </view>
-            <view class="chart-legend-item">
-              <view class="chart-legend-dot" style="background:#5865F2"/>
-              <text class="chart-legend-text">低温</text>
             </view>
           </view>
           <view class="hourly-chart-wrap" v-if="weatherStore.hourly.length > 0">
@@ -520,77 +509,86 @@ const hourlyChartOption = computed(() => {
     const feelsOffset = (hum > 80 ? -1 : 0) + (wind >= 4 ? -2 : wind >= 3 ? -1 : 0)
     return temp + feelsOffset
   })
-  const icons = hourly.map(h => getWeatherIcon(h.icon))
 
   const allTemps = [...highTemps, ...lowTemps]
-  const minT = Math.min(...allTemps) - 2
-  const maxT = Math.max(...allTemps) + 2
+  const minT = Math.floor(Math.min(...allTemps) - 1)
+  const maxT = Math.ceil(Math.max(...allTemps) + 1)
 
   return {
-    grid: { left: 40, right: 15, top: 25, bottom: 50 },
+    grid: { left: 8, right: 35, top: 30, bottom: 30 },
+    legend: {
+      show: true,
+      top: 0,
+      right: 0,
+      itemWidth: 12,
+      itemHeight: 3,
+      textStyle: { color: '#80848E', fontSize: 10 },
+      data: ['高温', '低温'],
+    },
     xAxis: {
       type: 'category',
       data: times,
+      boundaryGap: false,
       axisLine: { lineStyle: { color: '#E3E5E8' } },
       axisTick: { show: false },
-      axisLabel: {
-        color: '#80848E',
-        fontSize: 10,
-        interval: 2,
-      },
+      axisLabel: { color: '#80848E', fontSize: 10, interval: 3 },
     },
     yAxis: {
       type: 'value',
-      min: Math.floor(minT),
-      max: Math.ceil(maxT),
+      position: 'right',
+      min: minT,
+      max: maxT,
       splitNumber: 4,
       axisLine: { show: false },
       axisTick: { show: false },
-      splitLine: { lineStyle: { color: '#E3E5E8', type: 'dashed' } },
+      splitLine: { lineStyle: { color: '#F0F1F3', type: 'solid', width: 0.5 } },
       axisLabel: { color: '#80848E', fontSize: 10, formatter: '{value}°' },
     },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: '#fff',
+      backgroundColor: 'rgba(255,255,255,0.95)',
       borderColor: '#E3E5E8',
+      borderWidth: 1,
       textStyle: { color: '#1E2028', fontSize: 12 },
-      formatter: (params: any) => {
-        const idx = params[0]?.dataIndex ?? 0
-        const icon = icons[idx] || ''
-        return `${icon} ${times[idx]}<br/>`
-          + `<span style="color:#F23F43">●</span> 高温 ${highTemps[idx]}°<br/>`
-          + `<span style="color:#5865F2">●</span> 低温 ${lowTemps[idx]}°`
-      },
+      axisPointer: { type: 'line', lineStyle: { color: '#D0D0D0', type: 'dashed' } },
     },
     series: [
       {
         name: '高温',
         type: 'line',
         data: highTemps,
-        smooth: true,
+        smooth: 0.4,
         symbol: 'circle',
-        symbolSize: 5,
-        lineStyle: { color: '#F23F43', width: 2 },
-        itemStyle: { color: '#F23F43' },
+        symbolSize: 6,
+        lineStyle: { color: '#FF8C42', width: 2 },
+        itemStyle: { color: '#FF8C42', borderColor: '#fff', borderWidth: 1.5 },
         label: {
           show: true,
           position: 'top',
-          color: '#F23F43',
+          color: '#FF8C42',
           fontSize: 10,
           fontWeight: 600,
           formatter: '{c}°',
-          interval: 2,
+          interval: 3,
+        },
+        areaStyle: {
+          color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(255,140,66,0.25)' },
+              { offset: 1, color: 'rgba(255,140,66,0.02)' },
+            ],
+          },
         },
       },
       {
         name: '低温',
         type: 'line',
         data: lowTemps,
-        smooth: true,
+        smooth: 0.4,
         symbol: 'circle',
-        symbolSize: 5,
+        symbolSize: 6,
         lineStyle: { color: '#5865F2', width: 2 },
-        itemStyle: { color: '#5865F2' },
+        itemStyle: { color: '#5865F2', borderColor: '#fff', borderWidth: 1.5 },
         label: {
           show: true,
           position: 'bottom',
@@ -598,12 +596,18 @@ const hourlyChartOption = computed(() => {
           fontSize: 10,
           fontWeight: 600,
           formatter: '{c}°',
-          interval: 2,
+          interval: 3,
+        },
+        areaStyle: {
+          color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(88,101,242,0.15)' },
+              { offset: 1, color: 'rgba(88,101,242,0.02)' },
+            ],
+          },
         },
       },
     ],
-    // 当前时间标记线
-    markLine: undefined,
   }
 })
 
