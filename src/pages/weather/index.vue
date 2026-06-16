@@ -525,7 +525,7 @@ const hourlyChartOption = computed(() => {
 
   // 虚线分隔：在每两个点中间画竖线
   const separatorLines = []
-  for (let i = 0; i < displayCount - 1; i++) {
+  for (let i = 0; i < hourly.length - 1; i++) {
     separatorLines.push({
       xAxis: i + 0.5,
       lineStyle: { color: '#ECEEF1', type: [4, 4], width: 1 },
