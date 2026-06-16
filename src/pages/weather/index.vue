@@ -11,7 +11,7 @@
           </view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 20:32</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 20:37</text>
           </view>
         </view>
       </template>
@@ -443,6 +443,9 @@
       </template>
     </scroll-view>
   </view>
+
+    <!-- Wot UI TabBar -->
+    <WotTabBar current="weather" />
 </template>
 
 <script setup lang="ts">
@@ -454,6 +457,8 @@ import { GridComponent, TooltipComponent } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 import { provideEcharts } from 'uni-echarts/shared'
 import UniEcharts from 'uni-echarts'
+import WotTabBar from '@/components/WotTabBar.vue'
+
 
 const weatherStore = useWeatherStore()
 provideEcharts(echarts)

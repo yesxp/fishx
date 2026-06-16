@@ -69,11 +69,16 @@
       <view style="height: 120rpx;" />
     </scroll-view>
   </view>
+
+    <!-- Wot UI TabBar -->
+    <WotTabBar current="mine" />
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useUserStore } from '@/stores/user'
+import WotTabBar from '@/components/WotTabBar.vue'
+
 
 const userStore = useUserStore()
 

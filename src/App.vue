@@ -82,4 +82,10 @@ uni-page-body {
 button::after {
   border: none;
 }
+
+/* 隐藏原生 tabbar，用 Wot UI wd-tabbar 替代 */
+uni-tabbar,
+uni-tabbar-bottom {
+  display: none !important;
+}
 </style>

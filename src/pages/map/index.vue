@@ -65,11 +65,16 @@
       <view style="height: 120rpx;" />
     </scroll-view>
   </view>
+
+    <!-- Wot UI TabBar -->
+    <WotTabBar current="map" />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import SpotCard from '@/components/SpotCard.vue'
+import WotTabBar from '@/components/WotTabBar.vue'
+
 
 const tags = ['全部', '路亚', '台钓', '海钓']
 const activeTag = ref(0)

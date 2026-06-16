@@ -130,12 +130,17 @@
     <!-- FAB -->
     <wd-fab type="primary" icon="add" @click="onCreate" />
   </view>
+
+    <!-- Wot UI TabBar -->
+    <WotTabBar current="home" />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import WeatherMini from '@/components/WeatherMini.vue'
 import CatchCard from '@/components/CatchCard.vue'
+import WotTabBar from '@/components/WotTabBar.vue'
+
 
 const tags = ['全部', '鲫鱼', '鲤鱼', '草鱼', '黑坑', '野钓', '路亚']
 const activeTag = ref(0)
