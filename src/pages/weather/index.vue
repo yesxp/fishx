@@ -11,7 +11,7 @@
           </view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 21:50</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 21:55</text>
           </view>
         </view>
         <view class="header-actions">
@@ -515,7 +515,7 @@ const hourlyChartOption = computed(() => {
   const maxT = Math.ceil(Math.max(...allTemps) + 1)
 
   return {
-    grid: { left: 8, right: 35, top: 30, bottom: 30 },
+    grid: { left: 8, right: 35, top: 30, bottom: 40 },
     legend: {
       show: true,
       top: 0,
@@ -525,13 +525,20 @@ const hourlyChartOption = computed(() => {
       textStyle: { color: '#80848E', fontSize: 10 },
       data: ['高温', '低温'],
     },
+    dataZoom: [{
+      type: 'inside',
+      start: 0,
+      end: 25,
+      zoomLock: false,
+      preventDefaultMouseMove: false,
+    }],
     xAxis: {
       type: 'category',
       data: times,
       boundaryGap: false,
       axisLine: { lineStyle: { color: '#E3E5E8' } },
       axisTick: { show: false },
-      axisLabel: { color: '#80848E', fontSize: 10, interval: 3 },
+      axisLabel: { color: '#80848E', fontSize: 10, interval: 0 },
     },
     yAxis: {
       type: 'value',
