@@ -16,6 +16,7 @@ declare module 'vue' {
     FishBadge: typeof import('./src/components/FishBadge.vue')['default']
     LEchart: typeof import('./src/components/LEchart.vue')['default']
     SpotCard: typeof import('./src/components/SpotCard.vue')['default']
+    TabBar: typeof import('./src/components/TabBar.vue')['default']
     WeatherMini: typeof import('./src/components/WeatherMini.vue')['default']
   }
 }
@@ -26,5 +27,6 @@ declare global {
   const FishBadge: typeof import('./src/components/FishBadge.vue')['default']
   const LEchart: typeof import('./src/components/LEchart.vue')['default']
   const SpotCard: typeof import('./src/components/SpotCard.vue')['default']
+  const TabBar: typeof import('./src/components/TabBar.vue')['default']
   const WeatherMini: typeof import('./src/components/WeatherMini.vue')['default']
 }

@@ -1,8 +1,8 @@
 <template>
   <view class="page-home">
     <!-- Header -->
-    <view class="header">
-      <view class="header-top">
+    <wd-navbar fixed placeholder bordered custom-class="custom-navbar">
+      <template #left>
         <view class="header-logo">
           <view class="logo-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12C2 12 5 8 12 8C19 8 22 12 22 12C22 12 19 16 12 16C5 16 2 12 2 12Z"/><circle cx="16" cy="12" r="1.5" fill="white"/></svg></view>
           <view>
@@ -10,6 +10,8 @@
             <text class="header-subtitle">渔获·发现</text>
           </view>
         </view>
+      </template>
+      <template #right>
         <view class="header-actions">
           <view class="header-btn" @tap="onSearch">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -21,20 +23,21 @@
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           </view>
         </view>
+      </template>
+    </wd-navbar>
+
+    <scroll-view scroll-x class="tags-scroll" :show-scrollbar="false">
+      <view class="tags-inner">
+        <wd-tag
+          v-for="(tag, i) in tags"
+          :key="i"
+          :type="activeTag === i ? 'primary' : 'default'"
+          round
+          @click="activeTag = i"
+          custom-style="cursor: pointer;"
+        >{{ tag }}</wd-tag>
       </view>
-      <scroll-view scroll-x class="tags-scroll" :show-scrollbar="false">
-        <view class="tags-inner">
-          <wd-tag
-            v-for="(tag, i) in tags"
-            :key="i"
-            :type="activeTag === i ? 'primary' : 'default'"
-            round
-            @click="activeTag = i"
-            custom-style="cursor: pointer;"
-          >{{ tag }}</wd-tag>
-        </view>
-      </scroll-view>
-    </view>
+    </scroll-view>
 
     <!-- Content -->
     <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false" :style="{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }">
@@ -183,22 +186,7 @@ $warning: #F0B232;
   position: relative;
 }
 
-/* Header */
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: $bg-card;
-  border-bottom: 1px solid $divider;
-  padding: 12px 16px;
-}
 
-.header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
 
 .header-logo {
   display: flex;

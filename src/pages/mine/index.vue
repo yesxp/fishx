@@ -1,8 +1,8 @@
 <template>
   <view class="page-mine">
     <!-- Header -->
-    <view class="header">
-      <view class="header-top">
+    <wd-navbar fixed placeholder bordered custom-class="custom-navbar">
+      <template #left>
         <view class="header-logo">
           <view class="logo-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></view>
           <view>
@@ -10,13 +10,15 @@
             <text class="header-subtitle">个人中心</text>
           </view>
         </view>
+      </template>
+      <template #right>
         <view class="header-actions">
           <view class="header-btn" @tap="goSettings">
             <text class="icon-text">⚙️</text>
           </view>
         </view>
-      </view>
-    </view>
+      </template>
+    </wd-navbar>
 
     <!-- Content -->
     <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
@@ -124,21 +126,7 @@ $text-muted: #80848E;
   background: $bg-page;
 }
 
-/* Header */
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: $bg-card;
-  border-bottom: 1px solid $divider;
-  padding: 12px 16px;
-}
 
-.header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
 
 .header-logo {
   display: flex;

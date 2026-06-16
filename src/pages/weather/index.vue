@@ -1,8 +1,8 @@
 <template>
   <view class="page-weather">
     <!-- Header -->
-    <view class="header">
-      <view class="header-top">
+    <wd-navbar fixed placeholder bordered custom-class="custom-navbar">
+      <template #left>
         <view class="header-logo">
           <view class="logo-icon">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -11,16 +11,18 @@
           </view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 18:44</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 20:32</text>
           </view>
         </view>
+      </template>
+      <template #right>
         <view class="header-actions">
           <view class="header-btn">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           </view>
         </view>
-      </view>
-    </view>
+      </template>
+    </wd-navbar>
 
     <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false" :style="{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }">
       <view v-if="weatherStore.loading && !weatherStore.weatherNow" class="loading-state">
@@ -964,9 +966,7 @@ $danger: #F23F43;
 
 .page-weather { overflow-x: hidden; min-height: 100vh; background: $bg-page; }
 
-/* Header */
-.header { position: sticky; top: 0; z-index: 100; background: $bg-card; border-bottom: 1px solid $divider; padding: 12px 16px; }
-.header-top { display: flex; align-items: center; justify-content: space-between; }
+
 .header-logo { display: flex; align-items: center; gap: 10px; }
 .logo-icon { width: 36px; height: 36px; background: $brand; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
 .header-title { font-size: 18px; font-weight: 700; color: $text-primary; display: block; line-height: 1.2; }

@@ -1,15 +1,11 @@
 <template>
   <view class="page-create">
     <!-- Header -->
-    <view class="header">
-      <view class="header-top">
-        <view class="header-back" @tap="goBack">
-          <text class="back-icon">←</text>
-        </view>
-        <text class="header-title">记录渔获</text>
+    <wd-navbar title="记录渔获" left-arrow fixed placeholder bordered @click-left="goBack">
+      <template #right>
         <wd-button type="primary" size="small" round @click="onSubmit">发布</wd-button>
-      </view>
-    </view>
+      </template>
+    </wd-navbar>
 
     <!-- Content -->
     <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
@@ -167,44 +163,6 @@ $text-muted: #80848E;
 .page-create {
   min-height: 100vh;
   background: $bg-page;
-}
-
-/* Header */
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: $bg-card;
-  border-bottom: 1px solid $divider;
-  padding: 12px 16px;
-}
-
-.header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.header-back {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #F2F3F5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.back-icon {
-  font-size: 20px;
-  color: $text-secondary;
-}
-
-.header-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: $text-primary;
 }
 
 
