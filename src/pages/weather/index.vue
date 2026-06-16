@@ -11,7 +11,7 @@
           </view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 22:05</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 22:15</text>
           </view>
         </view>
         <view class="header-actions">
@@ -482,6 +482,11 @@ function getWeatherIcon(iconCode: string) {
   return weatherIconMap[iconCode] || '🌤️'
 }
 
+// 和风天气图标 URL（SVG）
+function getWeatherIconUrl(iconCode: string): string {
+  return `https://icons.qweather.com/assets/icons/${iconCode}-fill.svg?ik=4JDXGV6WMN`
+}
+
 function getBarHeight(temp: number) {
   const clamped = Math.max(15, Math.min(35, temp))
   return 20 + ((clamped - 15) / 20) * 60
@@ -500,7 +505,7 @@ const hourlyChartOption = computed(() => {
   const hourly = weatherStore.hourly.slice(0, 24)
   if (hourly.length === 0) return {}
 
-  // 截取前7个点显示（卡片内足够）
+  // 截取前7个点显示
   const displayCount = Math.min(hourly.length, 7)
   const display = hourly.slice(0, displayCount)
   const times = display.map((h, i) => i === 0 ? '现在' : h.time.slice(-5))
@@ -512,13 +517,14 @@ const hourlyChartOption = computed(() => {
     const feelsOffset = (hum > 80 ? -1 : 0) + (wind >= 4 ? -2 : wind >= 3 ? -1 : 0)
     return temp + feelsOffset
   })
+  const icons = display.map(h => getWeatherIcon(h.icon))
 
   const allTemps = [...highTemps, ...lowTemps]
   const minT = Math.floor(Math.min(...allTemps) - 1)
   const maxT = Math.ceil(Math.max(...allTemps) + 1)
 
   return {
-    grid: { left: 8, right: 8, top: 30, bottom: 35 },
+    grid: { left: 8, right: 8, top: 50, bottom: 35 },
     legend: {
       show: true,
       top: 0,
@@ -535,6 +541,7 @@ const hourlyChartOption = computed(() => {
       axisLine: { lineStyle: { color: '#E3E5E8' } },
       axisTick: { show: false },
       axisLabel: { color: '#80848E', fontSize: 10 },
+      splitLine: { show: true, lineStyle: { color: '#ECEEF1', type: 'dashed', width: 1 } },
     },
     yAxis: {
       type: 'value',
@@ -543,7 +550,7 @@ const hourlyChartOption = computed(() => {
       splitNumber: 4,
       axisLine: { show: false },
       axisTick: { show: false },
-      splitLine: { lineStyle: { color: '#F0F1F3', type: 'solid', width: 0.5 } },
+      splitLine: { show: false },
       axisLabel: { show: false },
     },
     tooltip: {
@@ -564,11 +571,23 @@ const hourlyChartOption = computed(() => {
         symbolSize: 5,
         lineStyle: { color: '#FF8C42', width: 2 },
         itemStyle: { color: '#FF8C42', borderColor: '#fff', borderWidth: 1.5 },
-        label: { show: false },
+        label: {
+          show: true,
+          position: 'top',
+          color: '#FF8C42',
+          fontSize: 10,
+          fontWeight: 600,
+          formatter: (params) => `{icon${params.dataIndex}}|{temp${params.dataIndex}}`,
+          rich: Object.fromEntries(display.map((h, i) => [
+            `icon${i}`, { height: 16, align: 'center', backgroundColor: { image: getWeatherIconUrl(h.icon) }, width: 16 }
+          ]).concat(display.map((_, i) => [
+            `temp${i}`, { color: '#FF8C42', fontSize: 10, fontWeight: 600, align: 'center', padding: [2, 0, 0, 0] }
+          ]))),
+        },
         areaStyle: {
           color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(255,140,66,0.2)' },
+              { offset: 0, color: 'rgba(255,140,66,0.18)' },
               { offset: 1, color: 'rgba(255,140,66,0.02)' },
             ],
           },
@@ -583,11 +602,18 @@ const hourlyChartOption = computed(() => {
         symbolSize: 5,
         lineStyle: { color: '#5865F2', width: 2 },
         itemStyle: { color: '#5865F2', borderColor: '#fff', borderWidth: 1.5 },
-        label: { show: false },
+        label: {
+          show: true,
+          position: 'bottom',
+          color: '#5865F2',
+          fontSize: 10,
+          fontWeight: 600,
+          formatter: '{c}°',
+        },
         areaStyle: {
           color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(88,101,242,0.12)' },
+              { offset: 0, color: 'rgba(88,101,242,0.10)' },
               { offset: 1, color: 'rgba(88,101,242,0.01)' },
             ],
           },
