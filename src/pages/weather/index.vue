@@ -1,7 +1,7 @@
 <template>
   <view class="page-weather">
     <!-- Header -->
-    <wd-navbar fixed placeholder bordered custom-class="custom-navbar">
+    <wd-navbar fixed placeholder bordered custom-class="custom-navbar" safe-area-inset-top>
       <template #left>
         <view class="header-logo">
           <view class="logo-icon">
@@ -11,7 +11,7 @@
           </view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 20:49</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 21:04</text>
           </view>
         </view>
       </template>

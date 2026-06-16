@@ -1,7 +1,7 @@
 <template>
   <view class="page-create">
     <!-- Header -->
-    <wd-navbar title="记录渔获" left-arrow fixed placeholder bordered @click-left="goBack">
+    <wd-navbar title="记录渔获" left-arrow fixed placeholder bordered @click-left="goBack" safe-area-inset-top>
       <template #right>
         <wd-button type="primary" size="small" round @click="onSubmit">发布</wd-button>
       </template>

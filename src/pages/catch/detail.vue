@@ -1,7 +1,7 @@
 <template>
   <view class="page-detail">
     <!-- Header -->
-    <wd-navbar title="渔获详情" left-arrow fixed placeholder bordered @click-left="goBack" />
+    <wd-navbar title="渔获详情" left-arrow fixed placeholder bordered @click-left="goBack" safe-area-inset-top />
 
     <!-- Content -->
     <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
