@@ -11,7 +11,7 @@
           </view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 00:20</text>
           </view>
         </view>
         <view class="header-actions">
@@ -444,6 +444,7 @@ import { LineChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 import { provideEcharts } from 'uni-echarts/shared'
+import UniEcharts from 'uni-echarts'
 
 const weatherStore = useWeatherStore()
 provideEcharts(echarts)
