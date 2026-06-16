@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>鱼渔娱 - Discord Style Prototype</title>
+<style>
+:root {
+  --bg-primary: #F2F3F5;
+  --bg-card: #FFFFFF;
+  --text-primary: #060607;
+  --text-secondary: #4E5058;
+  --text-muted: #80848E;
+  --brand: #5865F2;
+  --brand-hover: #4752C4;
+  --divider: #E3E5E8;
+  --input-bg: #E3E5E8;
+  --tag-bg: #F2F3F5;
+  --tag-active-bg: #FFFFFF;
+  --success: #23A559;
+  --warning: #F0B232;
+  --danger: #F23F43;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg-primary); color: var(--text-primary); max-width: 430px; margin: 0 auto; min-height: 100vh; }
+
+/* Header */
+.header { position: sticky; top: 0; z-index: 100; background: var(--bg-card); border-bottom: 1px solid var(--divider); padding: 12px 16px; }
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.header-logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 36px; height: 36px; background: var(--brand); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 700; }
+.header-title { font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+.header-subtitle { font-size: 12px; color: var(--text-muted); }
+.header-actions { display: flex; gap: 8px; }
+.header-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--tag-bg); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s; }
+.header-btn:hover { background: var(--divider); }
+.header-btn svg { width: 18px; height: 18px; stroke: var(--text-secondary); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-primary { background: var(--brand) !important; }
+.btn-primary svg { stroke: white !important; }
+
+/* Tags */
+.tags-scroll { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.tags-scroll::-webkit-scrollbar { display: none; }
+.tag { flex-shrink: 0; padding: 6px 14px; border-radius: 100px; background: var(--tag-bg); border: none; font-size: 13px; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+.tag.active { background: var(--tag-active-bg); color: var(--text-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+/* Content */
+.content { padding: 12px 12px 80px; }
+
+/* Cards */
+.card-full { background: var(--bg-card); border-radius: 12px; margin-bottom: 12px; overflow: hidden; border: 1px solid var(--divider); }
+.card-full-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--divider); overflow: hidden; flex-shrink: 0; }
+.avatar-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text-muted); font-size: 14px; }
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+.user-time { font-size: 12px; color: var(--text-muted); }
+.card-full-image { width: 100%; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; }
+.fish-placeholder { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text-muted); }
+.fish-placeholder svg { width: 48px; height: 48px; opacity: 0.4; }
+.card-full-body { padding: 12px 14px; }
+.card-full-text { font-size: 14px; color: var(--text-primary); line-height: 1.6; margin-bottom: 10px; }
+.card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.card-tag { padding: 4px 10px; border-radius: 100px; background: var(--tag-bg); font-size: 12px; color: var(--brand); font-weight: 500; }
+.card-tag.green { color: var(--success); background: rgba(35, 165, 89, 0.1); }
+.card-tag.orange { color: #E67E22; background: rgba(230, 126, 34, 0.1); }
+.card-actions { display: flex; gap: 20px; padding: 10px 14px; border-top: 1px solid var(--divider); }
+.card-action { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); cursor: pointer; transition: color 0.15s; }
+.card-action:hover { color: var(--brand); }
+.card-action.liked { color: var(--danger); }
+.card-action svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.card-action.liked svg { fill: var(--danger); }
+
+/* Grid */
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.grid-item { background: var(--bg-card); border-radius: 12px; overflow: hidden; border: 1px solid var(--divider); }
+.grid-item-image { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+.grid-item-body { padding: 10px 12px; }
+.grid-item-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+.grid-item-meta { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+.grid-item-meta .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--divider); }
+.grid-item-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; background: rgba(35, 165, 89, 0.1); color: var(--success); font-size: 11px; font-weight: 500; }
+
+/* Weather Mini */
+.weather-mini { background: var(--bg-card); border-radius: 12px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--divider); display: flex; align-items: center; gap: 14px; }
+.weather-score { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), #9B59B6); display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+.weather-score-num { font-size: 20px; font-weight: 700; color: white; line-height: 1; }
+.weather-score-label { font-size: 10px; color: rgba(255,255,255,0.8); }
+.weather-info { flex: 1; min-width: 0; }
+.weather-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+.weather-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+.weather-detail { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+/* Weather Page */
+.weather-hero { background: linear-gradient(135deg, #5865F2, #9B59B6); border-radius: 16px; padding: 24px; margin-bottom: 16px; color: white; }
+.weather-hero-title { font-size: 14px; opacity: 0.8; margin-bottom: 4px; }
+.weather-hero-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.weather-hero-icon { font-size: 48px; line-height: 1; }
+.weather-hero-score { font-size: 64px; font-weight: 700; line-height: 1; }
+.weather-hero-label { font-size: 16px; margin-top: 4px; opacity: 0.9; }
+.weather-hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.weather-hero-item { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 10px; text-align: center; }
+.weather-hero-item-label { font-size: 11px; opacity: 0.7; }
+.weather-hero-item-value { font-size: 18px; font-weight: 600; margin-top: 2px; }
+
+.weather-factors { background: var(--bg-card); border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--divider); }
+.weather-factors-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 14px; }
+.weather-factor { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.weather-factor:last-child { margin-bottom: 0; }
+.weather-factor-label { font-size: 13px; color: var(--text-secondary); width: 48px; flex-shrink: 0; }
+.weather-factor-bar { flex: 1; height: 8px; background: var(--divider); border-radius: 4px; overflow: hidden; }
+.weather-factor-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+.weather-factor-value { font-size: 13px; font-weight: 600; color: var(--text-primary); width: 32px; text-align: right; }
+
+.weather-tips { background: var(--bg-card); border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--divider); }
+.weather-tips-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; }
+.weather-tip { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--divider); }
+.weather-tip:last-child { border-bottom: none; }
+.weather-tip-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.weather-tip-icon.blue { background: rgba(88, 101, 242, 0.1); }
+.weather-tip-icon.green { background: rgba(35, 165, 89, 0.1); }
+.weather-tip-icon.orange { background: rgba(240, 178, 50, 0.1); }
+.weather-tip-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+/* Fish Predict */
+.fish-predict-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--divider); }
+.fish-predict-row:last-child { border-bottom: none; }
+.fish-predict-name { font-size: 14px; font-weight: 500; color: var(--text-primary); width: 48px; }
+.fish-predict-status { padding: 3px 10px; border-radius: 100px; font-size: 12px; font-weight: 500; }
+.fish-predict-status.open { background: rgba(35, 165, 89, 0.1); color: var(--success); }
+.fish-predict-status.normal { background: rgba(88, 101, 242, 0.1); color: var(--brand); }
+.fish-predict-status.slow { background: rgba(128, 132, 142, 0.1); color: var(--text-muted); }
+.fish-predict-trend { font-size: 16px; color: var(--text-muted); margin-left: auto; }
+
+/* Map Page */
+.map-placeholder { height: 180px; background: linear-gradient(135deg, #E3F2FD 0%, #B3E5FC 50%, #E8F5E9 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; border-radius: 12px; border: 1px solid var(--divider); }
+.map-search { display: flex; gap: 8px; margin-bottom: 12px; }
+.map-search-input { flex: 1; padding: 10px 14px; border-radius: 100px; border: 1px solid var(--divider); background: var(--bg-card); font-size: 14px; color: var(--text-primary); outline: none; }
+.map-search-btn { width: 40px; height: 40px; border-radius: 100px; background: var(--brand); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.map-search-btn svg { width: 18px; height: 18px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.spot-card { background: var(--bg-card); border-radius: 12px; overflow: hidden; margin-bottom: 12px; border: 1px solid var(--divider); }
+.spot-card-top { display: flex; gap: 12px; padding: 12px; }
+.spot-card-image { width: 80px; height: 80px; border-radius: 10px; background: linear-gradient(135deg, #E3F2FD, #B3E5FC); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.spot-card-body { flex: 1; min-width: 0; }
+.spot-card-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+.spot-card-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.spot-card-meta { font-size: 11px; color: var(--text-muted); }
+.spot-card-bottom { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-top: 1px solid var(--divider); }
+.spot-card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.spot-card-tag { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+.spot-card-tag.free { background: rgba(35, 165, 89, 0.1); color: var(--success); }
+.spot-card-tag.paid { background: rgba(240, 178, 50, 0.1); color: var(--warning); }
+.spot-card-tag.wild { background: rgba(35, 165, 89, 0.1); color: var(--success); }
+.spot-card-tag.pit { background: rgba(242, 63, 67, 0.1); color: var(--danger); }
+.spot-card-tag.rating { background: rgba(88, 101, 242, 0.1); color: var(--brand); }
+.spot-card-arrow { font-size: 16px; color: var(--text-muted); }
+
+/* Profile Page */
+.profile-header { text-align: center; padding: 32px 16px 24px; background: var(--bg-card); border-bottom: 1px solid var(--divider); margin-bottom: 12px; }
+.profile-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--divider); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 600; color: var(--text-muted); }
+.profile-name { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.profile-bio { font-size: 13px; color: var(--text-muted); }
+.profile-stats { display: flex; justify-content: center; gap: 32px; margin-top: 16px; }
+.profile-stat { text-align: center; }
+.profile-stat-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.profile-stat-label { font-size: 12px; color: var(--text-muted); }
+
+.profile-menu { background: var(--bg-card); border-radius: 12px; margin: 0 12px 12px; border: 1px solid var(--divider); overflow: hidden; }
+.profile-menu-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--divider); cursor: pointer; transition: background 0.15s; }
+.profile-menu-item:last-child { border-bottom: none; }
+.profile-menu-item:hover { background: var(--tag-bg); }
+.profile-menu-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.profile-menu-icon.blue { background: rgba(88, 101, 242, 0.1); }
+.profile-menu-icon.green { background: rgba(35, 165, 89, 0.1); }
+.profile-menu-icon.orange { background: rgba(240, 178, 50, 0.1); }
+.profile-menu-icon.red { background: rgba(242, 63, 67, 0.1); }
+.profile-menu-text { flex: 1; font-size: 14px; color: var(--text-primary); }
+.profile-menu-arrow { font-size: 14px; color: var(--text-muted); }
+
+/* Tab Bar */
+.tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--bg-card); border-top: 1px solid var(--divider); display: flex; padding: 8px 0; padding-bottom: max(8px, env(safe-area-inset-bottom)); z-index: 100; }
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0; cursor: pointer; transition: color 0.15s; }
+.tab svg { width: 24px; height: 24px; stroke: var(--text-muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.15s; }
+.tab span { font-size: 11px; font-weight: 500; color: var(--text-muted); transition: color 0.15s; }
+.tab.active svg { stroke: var(--brand); }
+.tab.active span { color: var(--brand); }
+
+/* FAB */
+.fab { position: fixed; bottom: 80px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--brand); border: none; box-shadow: 0 4px 12px rgba(88, 101, 242, 0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 99; transition: transform 0.2s, box-shadow 0.2s; }
+.fab:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(88, 101, 242, 0.5); }
+.fab svg { width: 24px; height: 24px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Placeholder images */
+.fish-img-1 { background: linear-gradient(135deg, #E3F2FD 0%, #90CAF9 100%); }
+.fish-img-2 { background: linear-gradient(135deg, #E8F5E9 0%, #81C784 100%); }
+.fish-img-3 { background: linear-gradient(135deg, #FFF3E0 0%, #FFB74D 100%); }
+.fish-img-4 { background: linear-gradient(135deg, #F3E5F5 0%, #CE93D8 100%); }
+.fish-img-5 { background: linear-gradient(135deg, #E0F7FA 0%, #4DD0E1 100%); }
+.fish-img-6 { background: linear-gradient(135deg, #FBE9E7 0%, #FF8A65 100%); }
+
+/* Page switching */
+.page { display: none; }
+.page.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Page 1: 首页/渔获 -->
+<div id="page-home" class="page active">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-logo">
+        <div class="logo-icon">🐟</div>
+        <div>
+          <div class="header-title">首页</div>
+          <div class="header-subtitle">渔获·发现</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn" title="搜索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+        <button class="header-btn" title="通知"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+        <button class="header-btn btn-primary" title="拍照"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
+      </div>
+    </div>
+    <div class="tags-scroll">
+      <button class="tag active">全部</button>
+      <button class="tag">鲫鱼</button>
+      <button class="tag">鲤鱼</button>
+      <button class="tag">草鱼</button>
+      <button class="tag">黑坑</button>
+      <button class="tag">野钓</button>
+      <button class="tag">路亚</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="weather-mini">
+      <div class="weather-score"><span class="weather-score-num">82</span><span class="weather-score-label">适宜</span></div>
+      <div class="weather-info">
+        <div class="weather-title">今日钓况指数</div>
+        <div class="weather-desc">气压稳定，气温适宜，微风。鲫鱼开口积极，建议使用活饵。</div>
+        <div class="weather-detail">26°C · 东风3级 · 湿度65%</div>
+      </div>
+    </div>
+    <div class="card-full">
+      <div class="card-full-header">
+        <div class="avatar"><div class="avatar-placeholder">李</div></div>
+        <div class="user-info"><div class="user-name">李钓友</div><div class="user-time">2小时前 · 千岛湖</div></div>
+      </div>
+      <div class="card-full-image fish-img-1">
+        <div class="fish-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg><span>3.2斤 鲫鱼</span></div>
+      </div>
+      <div class="card-full-body">
+        <div class="card-full-text">今天手感不错，连杆了好几条！这款蓝鲫饵料真的好用。</div>
+        <div class="card-tags"><span class="card-tag">鲫鱼</span><span class="card-tag green">野钓</span><span class="card-tag orange">战报</span></div>
+      </div>
+      <div class="card-actions">
+        <div class="card-action liked"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span>128</span></div>
+        <div class="card-action"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>32</span></div>
+        <div class="card-action"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span>分享</span></div>
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="grid-item">
+        <div class="grid-item-image fish-img-2"><div class="fish-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div></div>
+        <div class="grid-item-body"><div class="grid-item-title">西湖钓点</div><div class="grid-item-meta"><span>2.8km</span><span class="dot"></span><span class="grid-item-tag">推荐</span></div></div>
+      </div>
+      <div class="grid-item">
+        <div class="grid-item-image fish-img-3"><div class="fish-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div></div>
+        <div class="grid-item-body"><div class="grid-item-title">老王钓场</div><div class="grid-item-meta"><span>5.1km</span><span class="dot"></span><span class="grid-item-tag">黑坑</span></div></div>
+      </div>
+    </div>
+    <div class="card-full">
+      <div class="card-full-header">
+        <div class="avatar"><div class="avatar-placeholder">张</div></div>
+        <div class="user-info"><div class="user-name">张大师</div><div class="user-time">5小时前 · 西湖</div></div>
+      </div>
+      <div class="card-full-image fish-img-4">
+        <div class="fish-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg><span>5.6斤 草鱼</span></div>
+      </div>
+      <div class="card-full-body">
+        <div class="card-full-text">用玉米打窝，玉米挂钩，守了两个小时终于来口了！大弯弓，爽！</div>
+        <div class="card-tags"><span class="card-tag">草鱼</span><span class="card-tag green">野钓</span></div>
+      </div>
+      <div class="card-actions">
+        <div class="card-action"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span>86</span></div>
+        <div class="card-action"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>18</span></div>
+        <div class="card-action"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span>分享</span></div>
+      </div>
+    </div>
+    <div class="card-grid">
+      <div class="grid-item">
+        <div class="grid-item-image fish-img-5"><div class="fish-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div></div>
+        <div class="grid-item-body"><div class="grid-item-title">千岛湖大坝</div><div class="grid-item-meta"><span>12km</span><span class="dot"></span><span class="grid-item-tag">免费</span></div></div>
+      </div>
+      <div class="grid-item">
+        <div class="grid-item-image fish-img-6"><div class="fish-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div></div>
+        <div class="grid-item-body"><div class="grid-item-title">龙王塘</div><div class="grid-item-meta"><span>8.3km</span><span class="dot"></span><span class="grid-item-tag">收费</span></div></div>
+      </div>
+    </div>
+  </div>
+  <button class="fab"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+</div>
+
+<!-- Page 2: 天气·潮汐 -->
+<div id="page-weather" class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-logo">
+        <div class="logo-icon">🌊</div>
+        <div>
+          <div class="header-title">天时</div>
+          <div class="header-subtitle">天气·潮汐</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn" title="搜索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+        <button class="header-btn" title="通知"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="weather-hero">
+      <div class="weather-hero-top">
+        <div>
+          <div class="weather-hero-title">杭州</div>
+          <div class="weather-hero-score">82<span style="font-size:24px;font-weight:400;opacity:0.7">分</span></div>
+          <div class="weather-hero-label">适宜出钓</div>
+        </div>
+        <div class="weather-hero-icon">🌤️</div>
+      </div>
+      <div class="weather-hero-grid">
+        <div class="weather-hero-item"><div class="weather-hero-item-label">温度</div><div class="weather-hero-item-value">26°C</div></div>
+        <div class="weather-hero-item"><div class="weather-hero-item-label">风力</div><div class="weather-hero-item-value">东风3级</div></div>
+        <div class="weather-hero-item"><div class="weather-hero-item-label">气压</div><div class="weather-hero-item-value">1013hPa</div></div>
+        <div class="weather-hero-item"><div class="weather-hero-item-label">体感</div><div class="weather-hero-item-value">24°C</div></div>
+      </div>
+    </div>
+
+    <div class="weather-factors">
+      <div class="weather-factors-title">气压趋势</div>
+      <div class="weather-factor"><span class="weather-factor-label">06:00</span><div class="weather-factor-bar"><div class="weather-factor-fill" style="width: 75%; background: var(--brand);"></div></div><span class="weather-factor-value">1010</span></div>
+      <div class="weather-factor"><span class="weather-factor-label">12:00</span><div class="weather-factor-bar"><div class="weather-factor-fill" style="width: 85%; background: var(--success);"></div></div><span class="weather-factor-value">1013</span></div>
+      <div class="weather-factor"><span class="weather-factor-label">18:00</span><div class="weather-factor-bar"><div class="weather-factor-fill" style="width: 88%; background: var(--success);"></div></div><span class="weather-factor-value">1015</span></div>
+      <div class="weather-factor"><span class="weather-factor-label">24:00</span><div class="weather-factor-bar"><div class="weather-factor-fill" style="width: 80%; background: var(--brand);"></div></div><span class="weather-factor-value">1012</span></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:8px;padding-left:58px">气压稳定偏高，鱼口活跃 ✓</div>
+    </div>
+
+    <div class="weather-factors">
+      <div class="weather-factors-title">潮汐信息</div>
+      <div style="display:flex;gap:12px;margin-bottom:12px">
+        <div style="flex:1;background:var(--tag-bg);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">🌊 高潮</div>
+          <div style="font-size:18px;font-weight:700;color:var(--text-primary)">06:42</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px">+1.8m</div>
+        </div>
+        <div style="flex:1;background:var(--tag-bg);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">🌊 低潮</div>
+          <div style="font-size:18px;font-weight:700;color:var(--text-primary)">12:15</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px">+0.3m</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);padding-left:4px">当前：涨潮中，潮差适中，适合近岸作钓</div>
+    </div>
+
+    <div class="weather-factors">
+      <div class="weather-factors-title">鱼口预测</div>
+      <div class="fish-predict-row">
+        <div class="fish-predict-name">鲫鱼</div>
+        <div class="fish-predict-status open">开口积极</div>
+        <div class="fish-predict-trend">↑</div>
+      </div>
+      <div class="fish-predict-row">
+        <div class="fish-predict-name">鲤鱼</div>
+        <div class="fish-predict-status normal">正常</div>
+        <div class="fish-predict-trend">→</div>
+      </div>
+      <div class="fish-predict-row">
+        <div class="fish-predict-name">草鱼</div>
+        <div class="fish-predict-status slow">鱼口较慢</div>
+        <div class="fish-predict-trend">↓</div>
+      </div>
+      <div class="fish-predict-row">
+        <div class="fish-predict-name">鲢鳙</div>
+        <div class="fish-predict-status slow">鱼口较慢</div>
+        <div class="fish-predict-trend">↓</div>
+      </div>
+    </div>
+
+    <div class="weather-factors">
+      <div class="weather-factors-title">钓法建议</div>
+      <div class="weather-tip"><div class="weather-tip-icon blue">🎣</div><div class="weather-tip-text">鲫鱼开口积极，建议使用活饵（蚯蚓/红虫），灵敏度高的小钩细线。</div></div>
+      <div class="weather-tip"><div class="weather-tip-icon green">🐟</div><div class="weather-tip-text">鲤鱼在底层活动频繁，可用玉米打窝，玉米或商品饵挂钩。</div></div>
+      <div class="weather-tip"><div class="weather-tip-icon orange">🌤️</div><div class="weather-tip-text">今日天气晴好，建议选择向阳背风的钓位，水深1.5-2米为佳。</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Page 3: 钓点 -->
+<div id="page-map" class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-logo">
+        <div class="logo-icon">📍</div>
+        <div>
+          <div class="header-title">钓点</div>
+          <div class="header-subtitle">钓点·钓场</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn" title="搜索"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+        <button class="header-btn" title="通知"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="map-placeholder">
+      <div class="fish-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>地图区域</span></div>
+    </div>
+    <div class="tags-scroll" style="margin-bottom: 12px;">
+      <button class="tag active">全部</button>
+      <button class="tag">路亚</button>
+      <button class="tag">台钓</button>
+      <button class="tag">海钓</button>
+    </div>
+    <div class="spot-card">
+      <div class="spot-card-top">
+        <div class="spot-card-image fish-img-2"><div class="fish-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div></div>
+        <div class="spot-card-body">
+          <div class="spot-card-name">西湖钓点</div>
+          <div class="spot-card-desc">城市近郊天然钓点，水草丰富，鲫鱼鲤鱼资源好，适合台钓和路亚。</div>
+          <div class="spot-card-meta">2.8km · 鲫鱼/鲤鱼</div>
+        </div>
+      </div>
+      <div class="spot-card-bottom">
+        <div class="spot-card-tags"><span class="spot-card-tag free">免费</span><span class="spot-card-tag wild">野钓</span><span class="spot-card-tag rating">4.8分</span></div>
+        <span class="spot-card-arrow">›</span>
+      </div>
+    </div>
+    <div class="spot-card">
+      <div class="spot-card-top">
+        <div class="spot-card-image fish-img-3"><div class="fish-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div></div>
+        <div class="spot-card-body">
+          <div class="spot-card-name">老王钓场</div>
+          <div class="spot-card-desc">专业黑坑，定期放鱼，大物频出。提供钓位、遮阳棚、餐饮服务。</div>
+          <div class="spot-card-meta">5.1km · 草鱼/鲢鳙</div>
+        </div>
+      </div>
+      <div class="spot-card-bottom">
+        <div class="spot-card-tags"><span class="spot-card-tag paid">收费</span><span class="spot-card-tag pit">黑坑</span><span class="spot-card-tag rating">4.5分</span></div>
+        <span class="spot-card-arrow">›</span>
+      </div>
+    </div>
+    <div class="spot-card">
+      <div class="spot-card-top">
+        <div class="spot-card-image fish-img-5"><div class="fish-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div></div>
+        <div class="spot-card-body">
+          <div class="spot-card-name">千岛湖大坝</div>
+          <div class="spot-card-desc">水库大坝区域，水深10米以上，大物天堂。需自带装备，注意安全。</div>
+          <div class="spot-card-meta">12km · 大物</div>
+        </div>
+      </div>
+      <div class="spot-card-bottom">
+        <div class="spot-card-tags"><span class="spot-card-tag free">免费</span><span class="spot-card-tag wild">野钓</span><span class="spot-card-tag rating">4.9分</span></div>
+        <span class="spot-card-arrow">›</span>
+      </div>
+    </div>
+    <div class="spot-card">
+      <div class="spot-card-top">
+        <div class="spot-card-image fish-img-6"><div class="fish-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div></div>
+        <div class="spot-card-body">
+          <div class="spot-card-name">龙王塘</div>
+          <div class="spot-card-desc">老牌收费鱼塘，鲫鱼为主，老板人好，提供饵料和饮用水。</div>
+          <div class="spot-card-meta">8.3km · 鲫鱼/黑鱼</div>
+        </div>
+      </div>
+      <div class="spot-card-bottom">
+        <div class="spot-card-tags"><span class="spot-card-tag paid">收费</span><span class="spot-card-tag pit">黑坑</span><span class="spot-card-tag rating">4.2分</span></div>
+        <span class="spot-card-arrow">›</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Page 4: 我的 -->
+<div id="page-mine" class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-logo">
+        <div class="logo-icon">👤</div>
+        <div>
+          <div class="header-title">我的</div>
+          <div class="header-subtitle">个人中心</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn" title="设置"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="profile-header">
+      <div class="profile-avatar">J</div>
+      <div class="profile-name">钓鱼达人</div>
+      <div class="profile-bio">热爱生活，热爱钓鱼 🎣</div>
+      <div class="profile-stats">
+        <div class="profile-stat"><div class="profile-stat-value">128</div><div class="profile-stat-label">渔获</div></div>
+        <div class="profile-stat"><div class="profile-stat-value">2.4k</div><div class="profile-stat-label">获赞</div></div>
+        <div class="profile-stat"><div class="profile-stat-value">86</div><div class="profile-stat-label">关注</div></div>
+      </div>
+    </div>
+    <div class="profile-menu">
+      <div class="profile-menu-item"><div class="profile-menu-icon blue">📷</div><div class="profile-menu-text">我的渔获</div><div class="profile-menu-arrow">›</div></div>
+      <div class="profile-menu-item"><div class="profile-menu-icon green">❤️</div><div class="profile-menu-text">我的收藏</div><div class="profile-menu-arrow">›</div></div>
+      <div class="profile-menu-item"><div class="profile-menu-icon orange">📍</div><div class="profile-menu-text">常去钓点</div><div class="profile-menu-arrow">›</div></div>
+      <div class="profile-menu-item"><div class="profile-menu-icon blue">📊</div><div class="profile-menu-text">钓鱼统计</div><div class="profile-menu-arrow">›</div></div>
+    </div>
+    <div class="profile-menu">
+      <div class="profile-menu-item"><div class="profile-menu-icon blue">⚙️</div><div class="profile-menu-text">设置</div><div class="profile-menu-arrow">›</div></div>
+      <div class="profile-menu-item"><div class="profile-menu-icon orange">💬</div><div class="profile-menu-text">意见反馈</div><div class="profile-menu-arrow">›</div></div>
+      <div class="profile-menu-item"><div class="profile-menu-icon green">📖</div><div class="profile-menu-text">关于我们</div><div class="profile-menu-arrow">›</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tabbar">
+  <div class="tab active" onclick="switchTab('home')">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>渔获</span>
+  </div>
+  <div class="tab" onclick="switchTab('weather')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span>天时</span>
+  </div>
+  <div class="tab" onclick="switchTab('map')">
+    <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span>钓点</span>
+  </div>
+  <div class="tab" onclick="switchTab('mine')">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>我的</span>
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  document.querySelectorAll('.tab')[['home','weather','map','mine'].indexOf(tab)].classList.add('active');
+}
+</script>
+
+</body>
+</html>

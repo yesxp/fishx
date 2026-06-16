@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>天时 v2</title>
+<style>
+:root{--bg:#F2F3F5;--card:#FFF;--text:#060607;--sub:#4E5058;--muted:#80848E;--brand:#5865F2;--div:#E3E5E8;--tag:#F2F3F5;--ok:#23A559;--warn:#F0B232;--err:#F23F43}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);max-width:430px;margin:0 auto;min-height:100vh}
+.header{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--div);padding:12px 16px}
+.header-top{display:flex;align-items:center;justify-content:space-between}
+.header-logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:var(--brand);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;font-weight:700}
+.ht{font-size:18px;font-weight:700;line-height:1.2}
+.hs{font-size:12px;color:var(--muted)}
+.ha{display:flex;gap:8px}
+.hb{width:36px;height:36px;border-radius:50%;background:var(--tag);border:none;display:flex;align-items:center;justify-content:center}
+.hb svg{width:18px;height:18px;stroke:var(--sub);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.content{padding:12px 12px 80px}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#5865F2,#7B68EE);border-radius:16px;padding:20px;margin-bottom:12px;color:#fff}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.hero-city{font-size:13px;opacity:.8}
+.hero-score{font-size:56px;font-weight:700;line-height:1}
+.hero-score small{font-size:20px;font-weight:400;opacity:.7}
+.hero-label{font-size:14px;opacity:.9;margin-top:2px}
+.hero-icon{font-size:44px}
+.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.hero-item{background:rgba(255,255,255,.15);border-radius:10px;padding:8px;text-align:center}
+.hero-item-label{font-size:10px;opacity:.7}
+.hero-item-value{font-size:15px;font-weight:600;margin-top:1px}
+
+/* Card */
+.card{background:var(--card);border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid var(--div)}
+.card-title{font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.card-title .badge{font-size:11px;padding:2px 8px;border-radius:100px;font-weight:500}
+.badge-ok{background:rgba(35,165,89,.1);color:var(--ok)}
+
+/* 24h Curve */
+.hourly-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.hourly-header-right{display:flex;gap:12px;font-size:12px;color:var(--muted)}
+.hourly-header-right span{display:flex;align-items:center;gap:3px}
+.hourly-chart{position:relative;height:200px;margin-bottom:8px;background:linear-gradient(180deg,rgba(88,101,242,.02) 0%,rgba(88,101,242,.06) 100%);border-radius:10px;overflow:hidden}
+.hourly-chart svg{width:100%;height:100%}
+.hourly-meta{display:flex;gap:8px;margin-bottom:8px}
+.hourly-meta-row{flex:1;display:flex;align-items:center;gap:6px}
+.hourly-meta-label{font-size:11px;color:var(--muted);width:28px;flex-shrink:0}
+.hourly-meta-blocks{display:flex;gap:2px;flex:1}
+.hourly-meta-block{flex:1;height:16px;border-radius:2px}
+.hourly-meta-block.l1{background:rgba(35,165,89,.25)}
+.hourly-meta-block.l2{background:rgba(35,165,89,.45)}
+.hourly-meta-block.l3{background:rgba(35,165,89,.7)}
+.hourly-meta-block.l4{background:rgba(35,165,89,.9)}
+.hourly-meta-block.w1{background:rgba(88,101,242,.2)}
+.hourly-meta-block.w2{background:rgba(88,101,242,.4)}
+.hourly-meta-block.w3{background:rgba(88,101,242,.6)}
+.hourly-meta-block.w4{background:rgba(88,101,242,.8)}
+.hourly-meta-text{font-size:10px;color:var(--sub);position:absolute}
+.hourly-time-axis{display:flex;justify-content:space-between;padding:0 4px}
+.hourly-time-axis span{font-size:10px;color:var(--muted)}
+
+/* Pressure vertical */
+.pressure-v{display:flex;align-items:flex-end;gap:6px;height:120px;padding:0 4px}
+.pressure-v-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.pressure-v-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px}
+.pressure-v-label{font-size:10px;color:var(--muted)}
+.pressure-v-val{font-size:10px;font-weight:600;color:var(--sub)}
+.pressure-hint{font-size:11px;color:var(--muted);margin-top:8px;text-align:center}
+
+/* 15 day */
+.fifteen-legend{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:10px;font-size:11px;color:var(--muted)}
+.fifteen-legend-line{display:flex;align-items:center;gap:4px}
+.fifteen-legend-dot{width:8px;height:8px;border-radius:50%}
+.fifteen-legend-dot.hot{background:var(--err)}
+.fifteen-legend-dot.cold{background:var(--brand)}
+.fifteen-chart{position:relative;height:220px;margin-bottom:4px}
+.fifteen-chart svg{width:100%;height:100%}
+.fifteen-rows{display:flex;flex-direction:column}
+.fifteen-row{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--div);gap:6px}
+.fifteen-row:last-child{border-bottom:none}
+.f-row-day{font-size:12px;font-weight:500;width:32px;flex-shrink:0}
+.f-row-date{font-size:10px;color:var(--muted);width:32px;flex-shrink:0}
+.f-row-weather{font-size:11px;color:var(--sub);width:32px;flex-shrink:0}
+.f-row-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+.f-row-temp{flex:1;text-align:center;font-size:12px;color:var(--sub)}
+.f-row-temp strong{color:var(--text);font-weight:600}
+.f-row-wind{font-size:10px;color:var(--muted);width:48px;flex-shrink:0;text-align:center}
+.f-row-badge{width:36px;height:20px;border-radius:4px;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.f-row-badge.b-ok{background:var(--ok)}
+.f-row-badge.b-mid{background:var(--brand)}
+.f-row-badge.b-low{background:var(--muted)}
+
+/* Tide */
+.tide-chart{position:relative;height:160px;margin:12px 0 8px;background:linear-gradient(180deg,rgba(88,101,242,.03) 0%,rgba(88,101,242,.08) 100%);border-radius:10px;overflow:hidden}
+.tide-chart svg{width:100%;height:100%}
+.tide-info{display:flex;gap:8px;margin-bottom:10px}
+.tide-info-item{flex:1;background:var(--tag);border-radius:10px;padding:10px;text-align:center}
+.tide-info-label{font-size:10px;color:var(--muted);margin-bottom:3px}
+.tide-info-time{font-size:16px;font-weight:700}
+.tide-info-val{font-size:11px;color:var(--muted);margin-top:1px}
+.tide-phase{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tide-phase-tag{padding:4px 10px;border-radius:100px;font-size:12px;font-weight:500}
+.tide-phase-tag.spring{background:rgba(88,101,242,.1);color:var(--brand)}
+.tide-phase-tag.rising{background:rgba(35,165,89,.1);color:var(--ok)}
+.tide-phase-tag.flood{background:rgba(88,101,242,.1);color:var(--brand)}
+.tide-lunar{display:flex;align-items:center;gap:8px;padding:10px;background:var(--tag);border-radius:10px;margin-bottom:10px}
+.tide-lunar-icon{font-size:28px}
+.tide-lunar-text{font-size:12px;color:var(--sub);line-height:1.5}
+.tide-lunar-text strong{color:var(--text)}
+
+/* Fish */
+.fish-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--div)}
+.fish-row:last-child{border-bottom:none}
+.fish-name{font-size:14px;font-weight:500;width:48px}
+.fish-badge{padding:3px 10px;border-radius:100px;font-size:12px;font-weight:500}
+.fish-badge.open{background:rgba(35,165,89,.1);color:var(--ok)}
+.fish-badge.normal{background:rgba(88,101,242,.1);color:var(--brand)}
+.fish-badge.slow{background:rgba(128,132,142,.1);color:var(--muted)}
+.fish-trend{margin-left:auto;font-size:16px;color:var(--muted)}
+
+/* Tip */
+.tip{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--div)}
+.tip:last-child{border-bottom:none}
+.tip-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.tip-icon.b{background:rgba(88,101,242,.1)}
+.tip-icon.g{background:rgba(35,165,89,.1)}
+.tip-icon.o{background:rgba(240,178,50,.1)}
+.tip-text{font-size:13px;color:var(--sub);line-height:1.5}
+
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--card);border-top:1px solid var(--div);display:flex;padding:8px 0;padding-bottom:max(8px,env(safe-area-inset-bottom));z-index:100}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;cursor:pointer}
+.tab svg{width:24px;height:24px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tab span{font-size:11px;font-weight:500;color:var(--muted)}
+.tab.active svg{stroke:var(--brand)}
+.tab.active span{color:var(--brand)}
+</style>
+</head>
+<body>
+<div class="header"><div class="header-top"><div class="header-logo"><div class="logo-icon">🌊</div><div><div class="ht">天时</div><div class="hs">天气·潮汐</div></div></div><div class="ha"><button class="hb"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button><button class="hb"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button></div></div></div>
+<div class="content">
+
+<!-- Hero -->
+<div class="hero"><div class="hero-top"><div><div class="hero-city">杭州 · 西湖区</div><div class="hero-score">82<small>分</small></div><div class="hero-label">适宜出钓</div></div><div class="hero-icon">🌤️</div></div><div class="hero-grid"><div class="hero-item"><div class="hero-item-label">温度</div><div class="hero-item-value">26°</div></div><div class="hero-item"><div class="hero-item-label">体感</div><div class="hero-item-value">24°</div></div><div class="hero-item"><div class="hero-item-label">气压</div><div class="hero-item-value">1013</div></div><div class="hero-item"><div class="hero-item-label">风力</div><div class="hero-item-value">东风3</div></div></div></div>
+
+<!-- 24小时曲线 -->
+<div class="card">
+  <div class="card-title">逐小时预报 <span class="badge badge-ok">鱼口活跃</span></div>
+  <div class="hourly-header">
+    <div style="font-size:12px;color:var(--muted)">气压变化</div>
+    <div class="hourly-header-right">
+      <span>☀️ 05:41</span>
+      <span>🌙 19:14</span>
+    </div>
+  </div>
+  <div class="hourly-chart">
+    <svg viewBox="0 0 380 200" preserveAspectRatio="none">
+      <!-- 温度曲线区域 -->
+      <defs>
+        <linearGradient id="tempG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#5865F2" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#5865F2" stop-opacity="0.02"/>
+        </linearGradient>
+      </defs>
+      <!-- Y轴 -->
+      <text x="2" y="30" fill="#80848E" font-size="9">30°</text>
+      <text x="2" y="100" fill="#80848E" font-size="9">26°</text>
+      <text x="2" y="170" fill="#80848E" font-size="9">22°</text>
+      <line x1="24" y1="25" x2="380" y2="25" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="3"/>
+      <line x1="24" y1="95" x2="380" y2="95" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="3"/>
+      <line x1="24" y1="165" x2="380" y2="165" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="3"/>
+      <!-- 天气色带 -->
+      <rect x="24" y="175" width="90" height="20" rx="3" fill="rgba(35,165,89,0.15)"/>
+      <text x="55" y="189" fill="#23A559" font-size="9" text-anchor="middle">晴</text>
+      <rect x="114" y="175" width="80" height="20" rx="3" fill="rgba(35,165,89,0.15)"/>
+      <text x="154" y="189" fill="#23A559" font-size="9" text-anchor="middle">多云</text>
+      <rect x="194" y="175" width="70" height="20" rx="3" fill="rgba(88,101,242,0.15)"/>
+      <text x="229" y="189" fill="#5865F2" font-size="9" text-anchor="middle">阴</text>
+      <rect x="264" y="175" width="60" height="20" rx="3" fill="rgba(88,101,242,0.2)"/>
+      <text x="294" y="189" fill="#5865F2" font-size="9" text-anchor="middle">小雨</text>
+      <rect x="324" y="175" width="56" height="20" rx="3" fill="rgba(35,165,89,0.15)"/>
+      <text x="352" y="189" fill="#23A559" font-size="9" text-anchor="middle">晴</text>
+      <!-- 温度曲线 -->
+      <path d="M24,95 C40,90 55,85 70,80 C85,75 100,70 115,72 C130,74 145,80 160,90 C175,100 190,110 205,115 C220,118 235,112 250,105 C265,98 280,90 295,85 C310,80 325,78 340,82 C355,86 370,92 380,95" fill="url(#tempG)"/>
+      <path d="M24,95 C40,90 55,85 70,80 C85,75 100,70 115,72 C130,74 145,80 160,90 C175,100 190,110 205,115 C220,118 235,112 250,105 C265,98 280,90 295,85 C310,80 325,78 340,82 C355,86 370,92 380,95" fill="none" stroke="#5865F2" stroke-width="2"/>
+      <!-- 当前时间标记 -->
+      <circle cx="160" cy="90" r="4" fill="#5865F2" stroke="#fff" stroke-width="2"/>
+      <rect x="130" y="58" width="60" height="18" rx="4" fill="#5865F2"/>
+      <text x="160" y="70" fill="#fff" font-size="8" text-anchor="middle">15日 12点 27° 阴</text>
+    </svg>
+  </div>
+  <!-- 空气/风力条 -->
+  <div class="hourly-meta" style="position:relative">
+    <div class="hourly-meta-row">
+      <span class="hourly-meta-label">空气</span>
+      <div class="hourly-meta-blocks">
+        <div class="hourly-meta-block l1"></div><div class="hourly-meta-block l2"></div><div class="hourly-meta-block l3"></div><div class="hourly-meta-block l2"></div><div class="hourly-meta-block l1"></div><div class="hourly-meta-block l1"></div><div class="hourly-meta-block l2"></div><div class="hourly-meta-block l1"></div>
+      </div>
+      <span style="font-size:10px;color:var(--ok);margin-left:4px">24</span>
+    </div>
+    <div class="hourly-meta-row">
+      <span class="hourly-meta-label">风力</span>
+      <div class="hourly-meta-blocks">
+        <div class="hourly-meta-block w1"></div><div class="hourly-meta-block w2"></div><div class="hourly-meta-block w3"></div><div class="hourly-meta-block w2"></div><div class="hourly-meta-block w1"></div><div class="hourly-meta-block w1"></div><div class="hourly-meta-block w2"></div><div class="hourly-meta-block w1"></div>
+      </div>
+      <span style="font-size:10px;color:var(--brand);margin-left:4px">1-2级</span>
+    </div>
+  </div>
+  <div class="hourly-time-axis">
+    <span>今天</span><span>04:00</span><span>08:00</span><span>12:00</span><span>16:00</span><span>20:00</span>
+  </div>
+</div>
+
+<!-- 气压垂直 -->
+<div class="card">
+  <div class="card-title">气压变化</div>
+  <div class="pressure-v">
+    <div class="pressure-v-col"><div class="pressure-v-val">1010</div><div class="pressure-v-bar" style="height:60%;background:var(--brand)"></div><div class="pressure-v-label">06</div></div>
+    <div class="pressure-v-col"><div class="pressure-v-val">1011</div><div class="pressure-v-bar" style="height:68%;background:var(--brand)"></div><div class="pressure-v-label">09</div></div>
+    <div class="pressure-v-col"><div class="pressure-v-val">1013</div><div class="pressure-v-bar" style="height:78%;background:var(--ok)"></div><div class="pressure-v-label">12</div></div>
+    <div class="pressure-v-col"><div class="pressure-v-val">1015</div><div class="pressure-v-bar" style="height:85%;background:var(--ok)"></div><div class="pressure-v-label">15</div></div>
+    <div class="pressure-v-col"><div class="pressure-v-val">1014</div><div class="pressure-v-bar" style="height:82%;background:var(--ok)"></div><div class="pressure-v-label">18</div></div>
+    <div class="pressure-v-col"><div class="pressure-v-val">1012</div><div class="pressure-v-bar" style="height:72%;background:var(--brand)"></div><div class="pressure-v-label">21</div></div>
+  </div>
+  <div class="pressure-hint">📈 气压稳定偏高（1013±3），鱼类呼吸代谢活跃</div>
+</div>
+
+<!-- 15天 -->
+<div class="card">
+  <div class="card-title">15天预报</div>
+  <div class="fifteen-legend">
+    <div class="fifteen-legend-line"><div class="fifteen-legend-dot hot"></div>高温</div>
+    <div class="fifteen-legend-line"><div class="fifteen-legend-dot cold"></div>低温</div>
+    <span style="margin-left:8px">宜钓指数</span>
+    <span style="width:60px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--ok),var(--brand),var(--warn),var(--err))"></span>
+  </div>
+  <!-- 温度曲线 SVG -->
+  <div class="fifteen-chart">
+    <svg viewBox="0 0 380 220" preserveAspectRatio="none">
+      <!-- 高温红线 -->
+      <path d="M20,40 C50,35 80,25 110,30 C140,35 170,28 200,32 C230,36 260,20 290,18 C320,16 350,22 380,20" fill="none" stroke="#F23F43" stroke-width="1.5" stroke-dasharray="0"/>
+      <circle cx="20" cy="40" r="3" fill="#F23F43"/>
+      <circle cx="110" cy="30" r="3" fill="#F23F43"/>
+      <circle cx="200" cy="32" r="3" fill="#F23F43"/>
+      <circle cx="290" cy="18" r="3" fill="#F23F43"/>
+      <circle cx="380" cy="20" r="3" fill="#F23F43"/>
+      <!-- 低温蓝线 -->
+      <path d="M20,130 C50,128 80,125 110,132 C140,138 170,135 200,130 C230,125 260,128 290,132 C320,136 350,130 380,125" fill="none" stroke="#5865F2" stroke-width="1.5"/>
+      <circle cx="20" cy="130" r="3" fill="#5865F2"/>
+      <circle cx="110" cy="132" r="3" fill="#5865F2"/>
+      <circle cx="200" cy="130" r="3" fill="#5865F2"/>
+      <circle cx="290" cy="132" r="3" fill="#5865F2"/>
+      <circle cx="380" cy="125" r="3" fill="#5865F2"/>
+      <!-- 高温值 -->
+      <text x="20" y="32" fill="#F23F43" font-size="9" text-anchor="middle">27°</text>
+      <text x="110" y="22" fill="#F23F43" font-size="9" text-anchor="middle">29°</text>
+      <text x="200" y="24" fill="#F23F43" font-size="9" text-anchor="middle">28°</text>
+      <text x="290" y="10" fill="#F23F43" font-size="9" text-anchor="middle">30°</text>
+      <text x="380" y="12" fill="#F23F43" font-size="9" text-anchor="middle">31°</text>
+      <!-- 低温值 -->
+      <text x="20" y="148" fill="#5865F2" font-size="9" text-anchor="middle">20°</text>
+      <text x="110" y="150" fill="#5865F2" font-size="9" text-anchor="middle">21°</text>
+      <text x="200" y="148" fill="#5865F2" font-size="9" text-anchor="middle">22°</text>
+      <text x="290" y="150" fill="#5865F2" font-size="9" text-anchor="middle">22°</text>
+      <text x="380" y="143" fill="#5865F2" font-size="9" text-anchor="middle">23°</text>
+    </svg>
+  </div>
+  <div class="fifteen-rows">
+    <div class="fifteen-row"><span class="f-row-day" style="color:var(--muted)">昨天</span><span class="f-row-date" style="color:var(--muted)">6/12</span><span class="f-row-weather" style="color:var(--muted)">多云</span><span class="f-row-icon" style="opacity:.5">⛅</span><span class="f-row-temp" style="color:var(--muted)"><strong>27°</strong> / 20°</span><span class="f-row-wind" style="color:var(--muted)">西南风2级</span><span class="f-row-badge b-mid">72</span></div>
+    <div class="fifteen-row"><span class="f-row-day">今天</span><span class="f-row-date">6/13</span><span class="f-row-weather">晴</span><span class="f-row-icon">🌤️</span><span class="f-row-temp"><strong>27°</strong> / 20°</span><span class="f-row-wind">东风3级</span><span class="f-row-badge b-ok">82</span></div>
+    <div class="fifteen-row"><span class="f-row-day">周六</span><span class="f-row-date">6/14</span><span class="f-row-weather">晴</span><span class="f-row-icon">☀️</span><span class="f-row-temp"><strong>29°</strong> / 21°</span><span class="f-row-wind">东南风2级</span><span class="f-row-badge b-ok">85</span></div>
+    <div class="fifteen-row"><span class="f-row-day">周日</span><span class="f-row-date">6/15</span><span class="f-row-weather">多云</span><span class="f-row-icon">⛅</span><span class="f-row-temp"><strong>28°</strong> / 22°</span><span class="f-row-wind">南风2级</span><span class="f-row-badge b-ok">78</span></div>
+    <div class="fifteen-row"><span class="f-row-day">周一</span><span class="f-row-date">6/16</span><span class="f-row-weather">中雨</span><span class="f-row-icon">🌧️</span><span class="f-row-temp"><strong>24°</strong> / 19°</span><span class="f-row-wind">南风2级</span><span class="f-row-badge b-low">45</span></div>
+    <div class="fifteen-row"><span class="f-row-day">周二</span><span class="f-row-date">6/17</span><span class="f-row-weather">小雨</span><span class="f-row-icon">🌧️</span><span class="f-row-temp"><strong>22°</strong> / 18°</span><span class="f-row-wind">东南风2级</span><span class="f-row-badge b-low">38</span></div>
+    <div class="fifteen-row"><span class="f-row-day">周三</span><span class="f-row-date">6/18</span><span class="f-row-weather">小雨</span><span class="f-row-icon">🌧️</span><span class="f-row-temp"><strong>25°</strong> / 19°</span><span class="f-row-wind">东南风3级</span><span class="f-row-badge b-mid">68</span></div>
+    <div class="fifteen-row"><span class="f-row-day">周四</span><span class="f-row-date">6/19</span><span class="f-row-weather">晴</span><span class="f-row-icon">🌤️</span><span class="f-row-temp"><strong>27°</strong> / 20°</span><span class="f-row-wind">东风3级</span><span class="f-row-badge b-ok">80</span></div>
+    <div class="fifteen-row"><span class="f-row-day">周五</span><span class="f-row-date">6/20</span><span class="f-row-weather">晴</span><span class="f-row-icon">☀️</span><span class="f-row-temp"><strong>30°</strong> / 22°</span><span class="f-row-wind">南风2级</span><span class="f-row-badge b-ok">83</span></div>
+    <div class="fifteen-row"><span class="f-row-day">周六</span><span class="f-row-date">6/21</span><span class="f-row-weather">晴</span><span class="f-row-icon">🌤️</span><span class="f-row-temp"><strong>31°</strong> / 23°</span><span class="f-row-wind">东南风3级</span><span class="f-row-badge b-ok">86</span></div>
+  </div>
+</div>
+
+<!-- 潮汐 -->
+<div class="card">
+  <div class="card-title">潮汐曲线 <span class="badge badge-ok">涨潮中</span></div>
+  <div class="tide-chart"><svg viewBox="0 0 360 160" preserveAspectRatio="none"><line x1="24" y1="40" x2="360" y2="40" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4"/><line x1="24" y1="80" x2="360" y2="80" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4"/><line x1="24" y1="120" x2="360" y2="120" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4"/><text x="4" y="38" fill="#80848E" font-size="9">2.0m</text><text x="4" y="78" fill="#80848E" font-size="9">1.0m</text><text x="4" y="118" fill="#80848E" font-size="9">0.0m</text><defs><linearGradient id="tg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5865F2" stop-opacity="0.3"/><stop offset="100%" stop-color="#5865F2" stop-opacity="0.02"/></linearGradient></defs><path d="M24,120 C44,100 54,60 74,30 C84,18 94,16 104,18 C124,22 134,50 154,80 C174,105 184,115 204,118 C224,120 234,100 254,70 C269,50 279,35 294,30 C304,27 314,30 324,40 C344,60 354,90 360,110" fill="url(#tg2)"/><path d="M24,120 C44,100 54,60 74,30 C84,18 94,16 104,18 C124,22 134,50 154,80 C174,105 184,115 204,118 C224,120 234,100 254,70 C269,50 279,35 294,30 C304,27 314,30 324,40 C344,60 354,90 360,110" fill="none" stroke="#5865F2" stroke-width="2"/><circle cx="89" cy="16" r="4" fill="#5865F2"/><text x="79" y="10" fill="#5865F2" font-size="9" font-weight="600">满潮</text><text x="74" y="148" fill="#80848E" font-size="8">06:42</text><circle cx="204" cy="118" r="4" fill="#F0B232"/><text x="189" y="135" fill="#F0B232" font-size="9" font-weight="600">干潮</text><text x="192" y="148" fill="#80848E" font-size="8">12:15</text><circle cx="294" cy="30" r="4" fill="#5865F2"/><text x="282" y="22" fill="#5865F2" font-size="9" font-weight="600">满潮</text><text x="277" y="148" fill="#80848E" font-size="8">18:56</text><circle cx="170" cy="108" r="5" fill="#23A559" stroke="#fff" stroke-width="2"/><text x="160" y="105" fill="#23A559" font-size="8" font-weight="600">现在</text><text x="24" y="158" fill="#80848E" font-size="8">0:00</text><text x="100" y="158" fill="#80848E" font-size="8">6:00</text><text x="180" y="158" fill="#80848E" font-size="8">12:00</text><text x="270" y="158" fill="#80848E" font-size="8">18:00</text><text x="340" y="158" fill="#80848E" font-size="8">24:00</text></svg></div>
+  <div class="tide-info"><div class="tide-info-item"><div class="tide-info-label">🌊 满潮</div><div class="tide-info-time">06:42</div><div class="tide-info-val">+1.8m</div></div><div class="tide-info-item"><div class="tide-info-label">🌊 干潮</div><div class="tide-info-time">12:15</div><div class="tide-info-val">+0.3m</div></div><div class="tide-info-item"><div class="tide-info-label">🌊 满潮</div><div class="tide-info-time">18:56</div><div class="tide-info-val">+1.6m</div></div></div>
+  <div class="tide-phase"><span class="tide-phase-tag spring">大潮</span><span class="tide-phase-tag rising">涨潮中</span><span class="tide-phase-tag flood">活讯</span><span class="tide-phase-tag" style="background:rgba(88,101,242,.06);color:var(--brand)">潮差 1.5m</span></div>
+  <div class="tide-lunar"><div class="tide-lunar-icon">🌒</div><div class="tide-lunar-text"><strong>农历五月十九</strong><br>新月后第4天，进入大潮期。<strong>活讯期间鱼口活跃</strong>，建议涨潮至满潮时段作钓。</div></div>
+</div>
+
+<!-- 鱼口 -->
+<div class="card"><div class="card-title">鱼口预测</div><div class="fish-row"><div class="fish-name">鲫鱼</div><div class="fish-badge open">开口积极</div><div class="fish-trend">↑</div></div><div class="fish-row"><div class="fish-name">鲤鱼</div><div class="fish-badge normal">正常</div><div class="fish-trend">→</div></div><div class="fish-row"><div class="fish-name">草鱼</div><div class="fish-badge slow">鱼口较慢</div><div class="fish-trend">↓</div></div><div class="fish-row"><div class="fish-name">鲢鳙</div><div class="fish-badge slow">鱼口较慢</div><div class="fish-trend">↓</div></div></div>
+
+<!-- 建议 -->
+<div class="card"><div class="card-title">钓法建议</div><div class="tip"><div class="tip-icon b">🎣</div><div class="tip-text">鲫鱼开口积极，建议活饵（蚯蚓/红虫），小钩细线灵敏度高。</div></div><div class="tip"><div class="tip-icon g">🐟</div><div class="tip-text">鲤鱼底层活动频繁，玉米打窝+商品饵挂钩，等口为主。</div></div><div class="tip"><div class="tip-icon o">🌊</div><div class="tip-text">当前涨潮中，满潮前后1小时是黄金窗口，近岸作钓效果好。</div></div></div>
+
+</div>
+<div class="tabbar"><div class="tab"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>渔获</span></div><div class="tab active"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>天时</span></div><div class="tab"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>钓点</span></div><div class="tab"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>我的</span></div></div>
+</body></html>
