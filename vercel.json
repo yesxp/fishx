@@ -3,6 +3,11 @@
   "outputDirectory": "dist/build/h5",
   "framework": null,
   "installCommand": "npm install",
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs22.x"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/:path*",
