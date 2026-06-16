@@ -32,7 +32,36 @@ onHide(() => {
 </script>
 
 <style>
+/* ===== Wot UI 主题覆盖 — Discord Light Mode ===== */
 page {
+  --wot-color-primary: #5865F2;
+  --wot-color-success: #23A559;
+  --wot-color-warning: #F0B232;
+  --wot-color-danger: #F23F43;
+  /* Button */
+  --wot-button-primary-bg: #5865F2;
+  --wot-button-primary-color: #FFFFFF;
+  --wot-button-border-radius: 9999px;
+  /* Tag */
+  --wot-tag-primary-bg: rgba(88,101,242,0.1);
+  --wot-tag-primary-color: #5865F2;
+  --wot-tag-success-bg: rgba(35,165,89,0.1);
+  --wot-tag-success-color: #23A559;
+  --wot-tag-danger-bg: rgba(242,63,67,0.1);
+  --wot-tag-danger-color: #F23F43;
+  --wot-tag-warning-bg: rgba(240,178,50,0.1);
+  --wot-tag-warning-color: #F0B232;
+  /* Cell */
+  --wot-cell-bg: #FFFFFF;
+  --wot-cell-border-color: #E3E5E8;
+  /* Grid */
+  --wot-grid-item-content-bg: transparent;
+  /* Input */
+  --wot-input-background: #F2F3F5;
+  --wot-input-border-radius: 10px;
+  /* Loading */
+  --wot-loading-text-color: #80848E;
+  /* Page */
   background-color: #F2F3F5;
   font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 28rpx;
@@ -49,11 +78,8 @@ uni-page-body {
   max-width: 100vw;
 }
 
+/* 去掉 button 默认边框 */
 button::after {
   border: none;
-}
-
-button {
-  border-radius: 9999px;
 }
 </style>
