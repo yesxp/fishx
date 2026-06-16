@@ -970,7 +970,6 @@ $danger: #F23F43;
 
 /* Hourly Chart */
 .hourly-chart-wrap { margin-top: 8px; }
-.hourly-chart { width: 100%; height: 240px; }
 .hourly-chart-inner { min-height: 200px; }
 .hourly-svg { display: block; }
 
@@ -1190,4 +1189,9 @@ $danger: #F23F43;
   line-height: 1.5;
   flex: 1;
 }
+</style>
+
+<!-- uni-echarts custom-class 不支持 scoped 样式，必须用非 scoped 块 -->
+<style>
+.hourly-chart { width: 100% !important; height: 240px !important; }
 </style>
