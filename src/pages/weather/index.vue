@@ -1117,7 +1117,7 @@ $danger: #F23F43;
 
 /* 竖状垂钓指数柱状图 */
 .vbar-scroll { width: 100%; white-space: nowrap; }
-.vbar-chart { display: inline-flex; align-items: flex-end; gap: 6rpx; height: 180rpx; padding-top: 24rpx; position: relative; min-width: 100%; }
+.vbar-chart { display: inline-flex; align-items: flex-end; gap: 9rpx; height: 180rpx; padding-top: 24rpx; position: relative; min-width: 100%; }
 .vbar-col { flex: 0 0 28rpx; display: flex; flex-direction: column; align-items: center; gap: 2rpx; }
 .vbar-bar { width: 100%; border-radius: 3rpx 3rpx 0 0; min-height: 4rpx; }
 .vbar-bar--excellent { background: linear-gradient(180deg, #66BB6A, #4CAF50); }
