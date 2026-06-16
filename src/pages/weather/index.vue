@@ -11,7 +11,7 @@
           </view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 21:04</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 22:07</text>
           </view>
         </view>
       </template>
