@@ -11,7 +11,7 @@
           </view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 21:58</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 22:05</text>
           </view>
         </view>
         <view class="header-actions">
@@ -500,9 +500,12 @@ const hourlyChartOption = computed(() => {
   const hourly = weatherStore.hourly.slice(0, 24)
   if (hourly.length === 0) return {}
 
-  const times = hourly.map((h, i) => i === 0 ? '现在' : h.time.slice(-5))
-  const highTemps = hourly.map(h => Number(h.temp))
-  const lowTemps = hourly.map(h => {
+  // 截取前7个点显示（卡片内足够）
+  const displayCount = Math.min(hourly.length, 7)
+  const display = hourly.slice(0, displayCount)
+  const times = display.map((h, i) => i === 0 ? '现在' : h.time.slice(-5))
+  const highTemps = display.map(h => Number(h.temp))
+  const lowTemps = display.map(h => {
     const temp = Number(h.temp)
     const hum = Number(h.humidity || 80)
     const wind = Number(h.windScale || 1)
@@ -515,7 +518,7 @@ const hourlyChartOption = computed(() => {
   const maxT = Math.ceil(Math.max(...allTemps) + 1)
 
   return {
-    grid: { left: 8, right: 35, top: 30, bottom: 40 },
+    grid: { left: 8, right: 8, top: 30, bottom: 35 },
     legend: {
       show: true,
       top: 0,
@@ -525,19 +528,6 @@ const hourlyChartOption = computed(() => {
       textStyle: { color: '#80848E', fontSize: 10 },
       data: ['高温', '低温'],
     },
-    dataZoom: [{
-      type: 'slider',
-      start: 0,
-      end: 25,
-      height: 20,
-      bottom: 4,
-      borderColor: 'transparent',
-      backgroundColor: '#F2F3F5',
-      fillerColor: 'rgba(88,101,242,0.12)',
-      handleStyle: { color: '#5865F2', borderColor: '#5865F2' },
-      textStyle: { color: '#80848E', fontSize: 10 },
-      showDetail: false,
-    }],
     xAxis: {
       type: 'category',
       data: times,
@@ -548,14 +538,13 @@ const hourlyChartOption = computed(() => {
     },
     yAxis: {
       type: 'value',
-      position: 'right',
       min: minT,
       max: maxT,
       splitNumber: 4,
       axisLine: { show: false },
       axisTick: { show: false },
       splitLine: { lineStyle: { color: '#F0F1F3', type: 'solid', width: 0.5 } },
-      axisLabel: { color: '#80848E', fontSize: 10, formatter: '{value}°' },
+      axisLabel: { show: false },
     },
     tooltip: {
       trigger: 'axis',
@@ -570,24 +559,16 @@ const hourlyChartOption = computed(() => {
         name: '高温',
         type: 'line',
         data: highTemps,
-        smooth: 0.4,
+        smooth: 0.3,
         symbol: 'circle',
-        symbolSize: 6,
+        symbolSize: 5,
         lineStyle: { color: '#FF8C42', width: 2 },
         itemStyle: { color: '#FF8C42', borderColor: '#fff', borderWidth: 1.5 },
-        label: {
-          show: true,
-          position: 'top',
-          color: '#FF8C42',
-          fontSize: 10,
-          fontWeight: 600,
-          formatter: '{c}°',
-          interval: 3,
-        },
+        label: { show: false },
         areaStyle: {
           color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(255,140,66,0.25)' },
+              { offset: 0, color: 'rgba(255,140,66,0.2)' },
               { offset: 1, color: 'rgba(255,140,66,0.02)' },
             ],
           },
@@ -597,25 +578,17 @@ const hourlyChartOption = computed(() => {
         name: '低温',
         type: 'line',
         data: lowTemps,
-        smooth: 0.4,
+        smooth: 0.3,
         symbol: 'circle',
-        symbolSize: 6,
+        symbolSize: 5,
         lineStyle: { color: '#5865F2', width: 2 },
         itemStyle: { color: '#5865F2', borderColor: '#fff', borderWidth: 1.5 },
-        label: {
-          show: true,
-          position: 'bottom',
-          color: '#5865F2',
-          fontSize: 10,
-          fontWeight: 600,
-          formatter: '{c}°',
-          interval: 3,
-        },
+        label: { show: false },
         areaStyle: {
           color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(88,101,242,0.15)' },
-              { offset: 1, color: 'rgba(88,101,242,0.02)' },
+              { offset: 0, color: 'rgba(88,101,242,0.12)' },
+              { offset: 1, color: 'rgba(88,101,242,0.01)' },
             ],
           },
         },
