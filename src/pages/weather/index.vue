@@ -98,7 +98,7 @@
             <view class="vbar-now" :style="{ left: nowHourPercent + '%' }">
               <text class="vbar-now-label">现在</text>
             </view>
-            <view v-for="(h, i) in hourlyFishingScore" :key="i" class="vbar-col" :class="{ 'vbar-highlight': i >= 6 && i <= 8 || i >= 16 && i <= 18 }">
+            <view v-for="(h, i) in hourlyFishingScore" :key="i" class="vbar-col" :class="{ 'vbar-highlight': i === nowHour }">
               <text class="vbar-score">{{ h.score }}</text>
               <view class="vbar-bar" :class="getVBarClass(h.score)" :style="{ height: (h.score / 100 * 100) + 'rpx' }" />
               <text class="vbar-time">{{ h.time }}</text>
@@ -740,13 +740,16 @@ const hourlyFishingScore = computed(() => {
     const hour = parseInt(h.time?.slice(0, 2) || '12')
     if ((hour >= 5 && hour <= 8) || (hour >= 16 && hour <= 19)) score += 10
     if (hour >= 11 && hour <= 14) score -= 10
-    return { time: h.time || '--:--', score: Math.max(0, Math.min(100, score)) }
+    // 只显示小时数，如 "07"
+    const hourLabel = h.time ? h.time.slice(0, 2) : '--'
+    return { time: hourLabel, score: Math.max(0, Math.min(100, score)) }
   })
 })
 
+const nowHour = computed(() => new Date().getHours())
+
 const nowHourPercent = computed(() => {
-  const now = new Date()
-  return (now.getHours() / 23) * 100
+  return (nowHour.value / 23) * 100
 })
 
 function getVBarClass(score: number) {
@@ -1113,7 +1116,7 @@ $danger: #F23F43;
 /* 竖状垂钓指数柱状图 */
 .vbar-chart { display: flex; align-items: flex-end; gap: 1rpx; height: 180rpx; padding-top: 24rpx; position: relative; }
 .vbar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2rpx; }
-.vbar-bar { width: 70%; border-radius: 4rpx 4rpx 0 0; min-height: 4rpx; }
+.vbar-bar { width: 55%; border-radius: 3rpx 3rpx 0 0; min-height: 4rpx; }
 .vbar-bar--excellent { background: linear-gradient(180deg, #66BB6A, #4CAF50); }
 .vbar-bar--good { background: linear-gradient(180deg, #9CCC65, #8BC34A); }
 .vbar-bar--ok { background: linear-gradient(180deg, #FFD54F, #FFC107); }
