@@ -57,6 +57,7 @@
                 <text class="hero-detail-label">气压</text>
                 <text class="hero-detail-value">{{ weatherStore.weatherNow?.pressure || '--' }} <text class="hero-detail-unit">hPa</text></text>
               </view>
+              <text class="hero-detail-tag" :class="pressureTag.class">{{ pressureTag.text }}</text>
             </view>
             <view class="hero-detail-item">
               <view class="hero-detail-icon hero-detail-icon--cyan"></view>
@@ -64,6 +65,7 @@
                 <text class="hero-detail-label">风力</text>
                 <text class="hero-detail-value">{{ weatherStore.weatherNow?.windScale || '--' }} <text class="hero-detail-unit">{{ weatherStore.weatherNow?.windDir || '' }}</text></text>
               </view>
+              <text class="hero-detail-tag" :class="windTag.class">{{ windTag.text }}</text>
             </view>
             <view class="hero-detail-item">
               <view class="hero-detail-icon hero-detail-icon--blue"></view>
@@ -71,6 +73,7 @@
                 <text class="hero-detail-label">降雨</text>
                 <text class="hero-detail-value">{{ weatherStore.hourly[0]?.pop || '0' }}<text class="hero-detail-unit">%</text></text>
               </view>
+              <text class="hero-detail-tag" :class="rainTag.class">{{ rainTag.text }}</text>
             </view>
             <view class="hero-detail-item">
               <view class="hero-detail-icon hero-detail-icon--green"></view>
@@ -78,6 +81,7 @@
                 <text class="hero-detail-label">溶氧</text>
                 <text class="hero-detail-value">-- <text class="hero-detail-unit">mg/L</text></text>
               </view>
+              <text class="hero-detail-tag hero-detail-tag--muted">待检测</text>
             </view>
           </view>
         </view>
@@ -695,6 +699,28 @@ const sunClipPath = computed(() => {
   return `polygon(0 100%, 0 ${100 - Math.sin(Math.PI * pos / 100) * 80}%, ${pos}% ${100 - Math.sin(Math.PI * pos / 100) * 80}%, ${pos}% 100%)`
 })
 
+// Hero grid tag logic
+const pressureTag = computed(() => {
+  const p = Number(weatherStore.weatherNow?.pressure || 0)
+  if (p >= 1010 && p <= 1025) return { text: '平稳', class: 'hero-detail-tag--good' }
+  if (p >= 1000 && p <= 1030) return { text: '波动', class: 'hero-detail-tag--warn' }
+  return { text: '异常', class: 'hero-detail-tag--bad' }
+})
+
+const windTag = computed(() => {
+  const w = Number(weatherStore.weatherNow?.windScale || 0)
+  if (w >= 1 && w <= 3) return { text: '适宜', class: 'hero-detail-tag--good' }
+  if (w === 4) return { text: '较大', class: 'hero-detail-tag--warn' }
+  return { text: '不建议', class: 'hero-detail-tag--bad' }
+})
+
+const rainTag = computed(() => {
+  const pop = Number(weatherStore.hourly[0]?.pop || 0)
+  if (pop === 0) return { text: '放心', class: 'hero-detail-tag--good' }
+  if (pop < 30) return { text: '可能', class: 'hero-detail-tag--warn' }
+  return { text: '不建议', class: 'hero-detail-tag--bad' }
+})
+
 // ===== 潮汐 =====
 const tideData = computed(() => weatherStore.tide)
 
@@ -1013,6 +1039,11 @@ $danger: #F23F43;
 .hero-detail-label { font-size: 10px; opacity: 0.6; display: block; }
 .hero-detail-value { font-size: 14px; font-weight: 600; display: block; line-height: 1.2; }
 .hero-detail-unit { font-size: 10px; opacity: 0.6; font-weight: 400; }
+.hero-detail-tag { font-size: 10px; font-weight: 500; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; white-space: nowrap; }
+.hero-detail-tag--good { background: rgba(76,175,80,0.25); color: #fff; }
+.hero-detail-tag--warn { background: rgba(255,193,7,0.3); color: #fff; }
+.hero-detail-tag--bad { background: rgba(244,67,54,0.25); color: #fff; }
+.hero-detail-tag--muted { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
 .hero-trend-tag { flex-shrink: 0; }
 
 /* Card */
