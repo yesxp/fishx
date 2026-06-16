@@ -509,11 +509,9 @@ const hourlyChartOption = computed(() => {
   const hourly = weatherStore.hourly.slice(0, 24)
   if (hourly.length === 0) return {}
 
-  const displayCount = Math.min(hourly.length, 7)
-  const display = hourly.slice(0, displayCount)
-  const times = display.map((h, i) => i === 0 ? '当前' : h.time.slice(-5))
-  const highTemps = display.map(h => Number(h.temp))
-  const lowTemps = display.map(h => {
+  const times = hourly.map((h, i) => i === 0 ? '现在' : h.time.slice(-5))
+  const highTemps = hourly.map(h => Number(h.temp))
+  const lowTemps = hourly.map(h => {
     const temp = Number(h.temp)
     const hum = Number(h.humidity || 80)
     const wind = Number(h.windScale || 1)
@@ -536,6 +534,20 @@ const hourlyChartOption = computed(() => {
   }
 
   return {
+    dataZoom: [{
+      type: 'slider',
+      start: 0,
+      end: 29,
+      height: 18,
+      bottom: 2,
+      borderColor: 'transparent',
+      backgroundColor: '#F2F3F5',
+      fillerColor: 'rgba(88,101,242,0.12)',
+      handleStyle: { color: '#5865F2', borderColor: '#5865F2' },
+      textStyle: { color: '#80848E', fontSize: 9 },
+      showDetail: false,
+      brushSelect: false,
+    }],
     grid: { left: 8, right: 8, top: 45, bottom: 60 },
     legend: {
       show: true,
@@ -557,15 +569,10 @@ const hourlyChartOption = computed(() => {
         fontSize: 10,
         margin: 8,
         formatter: (value, index) => {
-          const icon = getWeatherIcon(display[index].icon)
-          return `{icon|${icon}}\n${value}`
+          return `{icon|${getWeatherIcon(hourly[index].icon)}}\n${value}`
         },
         rich: {
-          icon: {
-            fontSize: 16,
-            lineHeight: 22,
-            align: 'center',
-          },
+          icon: { fontSize: 16, lineHeight: 22, align: 'center' },
         },
       },
       splitLine: {
