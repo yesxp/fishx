@@ -1,8 +1,8 @@
 <template>
   <view class="page-map">
     <!-- Header -->
-    <wd-navbar bordered custom-class="custom-navbar" custom-style="position: sticky; top: 0; z-index: 100;">
-      <template #left>
+    <view class="header">
+      <view class="header-top">
         <view class="header-logo">
           <view class="logo-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></view>
           <view>
@@ -10,8 +10,6 @@
             <text class="header-subtitle">钓点·钓场</text>
           </view>
         </view>
-      </template>
-      <template #right>
         <view class="header-actions">
           <view class="header-btn">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -20,8 +18,8 @@
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           </view>
         </view>
-      </template>
-    </wd-navbar>
+      </view>
+    </view>
 
     <!-- Content -->
     <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false" :style="{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }">
@@ -137,6 +135,10 @@ $tag-bg: #F2F3F5;
   min-height: 100vh;
   background: $bg-page;
 }
+/* Header */
+.header { position: sticky; top: 0; z-index: 100; background: $bg-card; border-bottom: 1px solid $divider; padding: 12px 16px; }
+.header-top { display: flex; align-items: center; justify-content: space-between; }
+
 
 
 
