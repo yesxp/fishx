@@ -11,7 +11,7 @@
           </view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 22:40</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 22:45</text>
           </view>
         </view>
         <view class="header-actions">
@@ -75,7 +75,11 @@
         <view class="card">
           <view class="card-title-row">
             <text class="card-title">逐小时预报</text>
-            <view class="badge" :class="badgeClass">
+            <view class="card-title-right" v-if="today">
+              <text class="card-title-sun">🌅 {{ today.sunrise || '--:--' }}</text>
+              <text class="card-title-sun">🌇 {{ today.sunset || '--:--' }}</text>
+            </view>
+            <view class="badge" :class="badgeClass" style="margin-left: 8px">
               <text class="badge-text">{{ weatherStore.indexResult.score >= 70 ? '鱼口活跃' : weatherStore.indexResult.score >= 40 ? '一般' : '鱼口较慢' }}</text>
             </view>
           </view>
@@ -984,6 +988,8 @@ $danger: #F23F43;
 .card-title { font-size: 14px; font-weight: 600; color: $text-primary; }
 .card-title--sm { font-size: 13px; }
 .card-subtitle { font-size: 11px; color: $text-muted; margin-left: auto; }
+.card-title-right { display: flex; gap: 10px; margin-left: auto; }
+.card-title-sun { font-size: 11px; color: $text-secondary; }
 .badge { padding: 2px 8px; border-radius: 100px; }
 .badge--ok { background: rgba($success, 0.1); }
 .badge--mid { background: rgba($brand, 0.1); }
