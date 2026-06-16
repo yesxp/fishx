@@ -94,16 +94,18 @@
           </view>
 
           <!-- 竖状垂钓指数柱状图 -->
-          <view class="vbar-chart">
-            <view class="vbar-now" :style="{ left: nowHourPercent + '%' }">
-              <text class="vbar-now-label">现在</text>
+          <scroll-view scroll-x class="vbar-scroll" :show-scrollbar="false">
+            <view class="vbar-chart">
+              <view class="vbar-now" :style="{ left: nowHourPercent + '%' }">
+                <text class="vbar-now-label">现在</text>
+              </view>
+              <view v-for="(h, i) in hourlyFishingScore" :key="i" class="vbar-col" :class="{ 'vbar-highlight': i === nowHour }">
+                <text class="vbar-score">{{ h.score }}</text>
+                <view class="vbar-bar" :class="getVBarClass(h.score)" :style="{ height: (h.score / 100 * 120) + 'rpx' }" />
+                <text class="vbar-time">{{ h.time }}</text>
+              </view>
             </view>
-            <view v-for="(h, i) in hourlyFishingScore" :key="i" class="vbar-col" :class="{ 'vbar-highlight': i === nowHour }">
-              <text class="vbar-score">{{ h.score }}</text>
-              <view class="vbar-bar" :class="getVBarClass(h.score)" :style="{ height: (h.score / 100 * 100) + 'rpx' }" />
-              <text class="vbar-time">{{ h.time }}</text>
-            </view>
-          </view>
+          </scroll-view>
           <view class="vbar-legend">
             <view class="vbar-legend-item"><view class="vbar-legend-dot vbar-legend-dot--excellent" /><text>极佳</text></view>
             <view class="vbar-legend-item"><view class="vbar-legend-dot vbar-legend-dot--good" /><text>良好</text></view>
@@ -1114,9 +1116,10 @@ $danger: #F23F43;
 .badge-text--danger { color: $danger; }
 
 /* 竖状垂钓指数柱状图 */
-.vbar-chart { display: flex; align-items: flex-end; gap: 1rpx; height: 180rpx; padding-top: 24rpx; position: relative; }
-.vbar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2rpx; }
-.vbar-bar { width: 55%; border-radius: 3rpx 3rpx 0 0; min-height: 4rpx; }
+.vbar-scroll { width: 100%; white-space: nowrap; }
+.vbar-chart { display: inline-flex; align-items: flex-end; gap: 2rpx; height: 180rpx; padding-top: 24rpx; position: relative; min-width: 100%; }
+.vbar-col { flex: 0 0 28rpx; display: flex; flex-direction: column; align-items: center; gap: 2rpx; }
+.vbar-bar { width: 100%; border-radius: 3rpx 3rpx 0 0; min-height: 4rpx; }
 .vbar-bar--excellent { background: linear-gradient(180deg, #66BB6A, #4CAF50); }
 .vbar-bar--good { background: linear-gradient(180deg, #9CCC65, #8BC34A); }
 .vbar-bar--ok { background: linear-gradient(180deg, #FFD54F, #FFC107); }
