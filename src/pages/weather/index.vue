@@ -67,6 +67,76 @@
           </wd-grid>
         </view>
 
+        <!-- ===== 今日垂钓建议（鱼口预测 + 钓法建议） ===== -->
+        <view class="card">
+          <view class="card-title-row">
+            <text class="card-title">🎯 今日垂钓建议</text>
+            <text class="card-subtitle">基于天气 + 潮汐</text>
+          </view>
+          <view class="fish-list">
+            <template v-for="(fish, index) in fishPredictions" :key="fish.name">
+              <wd-cell :border="false" custom-class="fish-row" center>
+                <template #prefix>
+                  <text class="fish-emoji">{{ fish.emoji }}</text>
+                </template>
+                <template #title>
+                  <text class="fish-name">{{ fish.name }}</text>
+                  <text class="fish-desc">{{ fish.desc }}</text>
+                </template>
+                <view class="fish-right">
+                  <view class="fish-badge" :class="'fish-badge--' + fish.variant">
+                    <text class="fish-badge-text">{{ fish.status }}</text>
+                  </view>
+                  <text class="fish-trend">{{ fish.trend }}</text>
+                </view>
+              </wd-cell>
+              <wd-divider v-if="index < fishPredictions.length - 1" hairline custom-style="margin: 0; padding: 0;" />
+            </template>
+          </view>
+          <wd-divider hairline custom-style="margin: 0; padding: 0;" />
+          <view class="tips">
+            <wd-cell :border="false" custom-class="tip" center>
+              <template #prefix>
+                <view class="tip-icon tip-icon--b">🎣</view>
+              </template>
+              <template #title>
+                <text class="tip-title">饵料选择</text>
+                <text class="tip-text">{{ fishingTips.bait }}</text>
+              </template>
+            </wd-cell>
+            <wd-divider hairline custom-style="margin: 0; padding: 0;" />
+            <wd-cell :border="false" custom-class="tip" center>
+              <template #prefix>
+                <view class="tip-icon tip-icon--g">🐟</view>
+              </template>
+              <template #title>
+                <text class="tip-title">目标鱼种</text>
+                <text class="tip-text">{{ fishingTips.target }}</text>
+              </template>
+            </wd-cell>
+            <wd-divider hairline custom-style="margin: 0; padding: 0;" />
+            <wd-cell :border="false" custom-class="tip" center>
+              <template #prefix>
+                <view class="tip-icon tip-icon--o">⏰</view>
+              </template>
+              <template #title>
+                <text class="tip-title">最佳时段</text>
+                <text class="tip-text">{{ fishingTips.timing }}</text>
+              </template>
+            </wd-cell>
+            <wd-divider hairline custom-style="margin: 0; padding: 0;" />
+            <wd-cell :border="false" custom-class="tip" center>
+              <template #prefix>
+                <view class="tip-icon tip-icon--p">💡</view>
+              </template>
+              <template #title>
+                <text class="tip-title">注意事项</text>
+                <text class="tip-text">{{ fishingTips.note }}</text>
+              </template>
+            </wd-cell>
+          </view>
+        </view>
+
         <!-- ===== 逐小时预报（双折线图） ===== -->
         <view class="card">
           <view class="card-title-row">
@@ -84,55 +154,13 @@
           </view>
         </view>
 
-        <!-- ===== 日出日落 + 月相 ===== -->
-        <view class="card-row">
-          <view class="card card--half">
-            <view class="card-title-row">
-              <text class="card-title card-title--sm">☀️ 日出日落</text>
-            </view>
-            <view class="sun-arc">
-              <view class="sun-arc-bg" />
-              <view class="sun-arc-fill" :style="{ clipPath: sunClipPath }" />
-              <view class="sun-dot" :style="{ left: sunPosition.left + '%', bottom: sunPosition.bottom + 'px' }">
-                <text class="sun-dot-icon">☀️</text>
-              </view>
-            </view>
-            <view class="sun-times">
-              <view class="sun-time-item">
-                <text class="sun-time-label">🌅 日出</text>
-                <text class="sun-time-val">{{ today?.sunrise || '--:--' }}</text>
-              </view>
-              <view class="sun-time-item">
-                <text class="sun-time-label">🌇 日落</text>
-                <text class="sun-time-val">{{ today?.sunset || '--:--' }}</text>
-              </view>
-            </view>
-          </view>
-          <view class="card card--half">
-            <view class="card-title-row">
-              <text class="card-title card-title--sm">🌙 月相</text>
-            </view>
-            <view class="moon-display">
-              <text class="moon-icon">{{ moonPhaseIcon }}</text>
-              <text class="moon-phase-text">{{ today?.moonPhase || '未知' }}</text>
-            </view>
-            <view class="sun-times">
-              <view class="sun-time-item">
-                <text class="sun-time-label">月出</text>
-                <text class="sun-time-val">{{ today?.moonrise || '--:--' }}</text>
-              </view>
-              <view class="sun-time-item">
-                <text class="sun-time-label">月落</text>
-                <text class="sun-time-val">{{ today?.moonset || '--:--' }}</text>
-              </view>
-            </view>
-          </view>
-        </view>
 
-        <!-- ===== 7天预报 ===== -->
+
+        <!-- ===== 天气日历（未来7天） ===== -->
         <view class="card">
           <view class="card-title-row">
-            <text class="card-title">7天预报</text>
+            <text class="card-title">天气日历</text>
+            <text class="card-subtitle">未来7天</text>
           </view>
           <view class="day-rows">
             <view v-for="(day, index) in weatherStore.daily" :key="day.date" class="day-row" :class="{ 'day-row--today': index === 0 }">
@@ -195,7 +223,7 @@
           </view>
         </view>
 
-        <!-- ===== 潮汐日历 ===== -->
+        <!-- ===== 潮汐日历（未来7天）+ 潮汐规律 ===== -->
         <view class="card">
           <view class="card-title-row">
             <text class="card-title">📅 潮汐日历</text>
@@ -222,13 +250,7 @@
               <text class="tide-cal-empty">--</text>
             </template>
           </view>
-        </view>
-
-        <!-- ===== 潮汐规律 ===== -->
-        <view class="card">
-          <view class="card-title-row">
-            <text class="card-title">🔄 潮汐规律</text>
-          </view>
+          <wd-divider hairline custom-style="margin: 12px 0; padding: 0;" />
           <view class="tide-pattern">
             <view class="tide-pattern-item">
               <view class="tide-pattern-icon tide-pattern-icon--spring">🌊</view>
@@ -354,82 +376,6 @@
           <view class="typhoon-empty">
             <text class="typhoon-empty-icon">✅</text>
             <text class="typhoon-empty-text">当前无活跃台风</text>
-          </view>
-        </view>
-
-        <!-- ===== 鱼口预测 ===== -->
-        <view class="card">
-          <view class="card-title-row">
-            <text class="card-title">🐟 鱼口预测</text>
-            <text class="card-subtitle">基于天气 + 潮汐</text>
-          </view>
-          <view class="fish-list">
-            <template v-for="(fish, index) in fishPredictions" :key="fish.name">
-              <wd-cell :border="false" custom-class="fish-row" center>
-                <template #prefix>
-                  <text class="fish-emoji">{{ fish.emoji }}</text>
-                </template>
-                <template #title>
-                  <text class="fish-name">{{ fish.name }}</text>
-                  <text class="fish-desc">{{ fish.desc }}</text>
-                </template>
-                <view class="fish-right">
-                  <view class="fish-badge" :class="'fish-badge--' + fish.variant">
-                    <text class="fish-badge-text">{{ fish.status }}</text>
-                  </view>
-                  <text class="fish-trend">{{ fish.trend }}</text>
-                </view>
-              </wd-cell>
-              <wd-divider v-if="index < fishPredictions.length - 1" hairline custom-style="margin: 0; padding: 0;" />
-            </template>
-          </view>
-        </view>
-
-        <!-- ===== 钓法建议 ===== -->
-        <view class="card">
-          <view class="card-title-row">
-            <text class="card-title">💡 钓法建议</text>
-          </view>
-          <view class="tips">
-            <wd-cell :border="false" custom-class="tip" center>
-              <template #prefix>
-                <view class="tip-icon tip-icon--b">🎣</view>
-              </template>
-              <template #title>
-                <text class="tip-title">饵料选择</text>
-                <text class="tip-text">{{ fishingTips.bait }}</text>
-              </template>
-            </wd-cell>
-            <wd-divider hairline custom-style="margin: 0; padding: 0;" />
-            <wd-cell :border="false" custom-class="tip" center>
-              <template #prefix>
-                <view class="tip-icon tip-icon--g">🐟</view>
-              </template>
-              <template #title>
-                <text class="tip-title">目标鱼种</text>
-                <text class="tip-text">{{ fishingTips.target }}</text>
-              </template>
-            </wd-cell>
-            <wd-divider hairline custom-style="margin: 0; padding: 0;" />
-            <wd-cell :border="false" custom-class="tip" center>
-              <template #prefix>
-                <view class="tip-icon tip-icon--o">⏰</view>
-              </template>
-              <template #title>
-                <text class="tip-title">最佳时段</text>
-                <text class="tip-text">{{ fishingTips.timing }}</text>
-              </template>
-            </wd-cell>
-            <wd-divider hairline custom-style="margin: 0; padding: 0;" />
-            <wd-cell :border="false" custom-class="tip" center>
-              <template #prefix>
-                <view class="tip-icon tip-icon--p">💡</view>
-              </template>
-              <template #title>
-                <text class="tip-title">注意事项</text>
-                <text class="tip-text">{{ fishingTips.note }}</text>
-              </template>
-            </wd-cell>
           </view>
         </view>
 
