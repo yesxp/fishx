@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今日垂钓建议 - 方案对比</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F2F3F5; color: #1E2028; padding: 16px; max-width: 400px; margin: 0 auto; }
+  .section-title { font-size: 18px; font-weight: 700; margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #5865F2; }
+  .section-desc { font-size: 12px; color: #80848E; margin-bottom: 12px; }
+  .card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+  /* ===== 方案A: 竖状柱状图 ===== */
+  .vbar-chart { display: flex; align-items: flex-end; gap: 3px; height: 140px; padding-top: 20px; position: relative; }
+  .vbar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
+  .vbar-bar { width: 100%; border-radius: 3px 3px 0 0; transition: height 0.3s; min-height: 2px; }
+  .vbar-bar--excellent { background: linear-gradient(180deg, #66BB6A, #4CAF50); }
+  .vbar-bar--good { background: linear-gradient(180deg, #9CCC65, #8BC34A); }
+  .vbar-bar--ok { background: linear-gradient(180deg, #FFD54F, #FFC107); }
+  .vbar-bar--bad { background: linear-gradient(180deg, #FFB74D, #FF9800); }
+  .vbar-bar--poor { background: linear-gradient(180deg, #EF5350, #F44336); }
+  .vbar-label { font-size: 8px; color: #80848E; writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); white-space: nowrap; }
+  .vbar-score { font-size: 8px; color: #1E2028; font-weight: 600; }
+  .vbar-time { font-size: 9px; color: #80848E; margin-top: 4px; }
+  .vbar-highlight { background: rgba(88,101,242,0.08); border-radius: 6px; padding: 4px 2px; margin: 0 -2px; }
+  .vbar-now { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #F23F43; z-index: 1; }
+  .vbar-now::after { content: '现在'; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 9px; color: #F23F43; white-space: nowrap; }
+  .vbar-legend { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
+  .vbar-legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #80848E; }
+  .vbar-legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  /* ===== 方案B: 时间窗口卡片 ===== */
+  .time-windows { display: flex; gap: 10px; }
+  .time-window { flex: 1; border-radius: 12px; padding: 14px 12px; position: relative; overflow: hidden; }
+  .time-window--best { background: linear-gradient(135deg, #4CAF50, #66BB6A); color: #fff; }
+  .time-window--secondary { background: linear-gradient(135deg, #FF9800, #FFB74D); color: #fff; }
+  .time-window-badge { font-size: 10px; font-weight: 600; opacity: 0.8; margin-bottom: 6px; }
+  .time-window-time { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .time-window-label { font-size: 12px; opacity: 0.85; margin-bottom: 8px; }
+  .time-window-fish { font-size: 11px; opacity: 0.7; line-height: 1.4; }
+  .time-window-icon { position: absolute; right: 8px; bottom: 8px; font-size: 28px; opacity: 0.3; }
+  .window-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .window-tag { font-size: 10px; padding: 3px 8px; border-radius: 10px; background: rgba(255,255,255,0.2); color: #1E2028; }
+
+  /* ===== 方案C: 综合仪表盘 ===== */
+  .dashboard-top { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+  .dashboard-score { width: 80px; height: 80px; border-radius: 50%; background: conic-gradient(#4CAF50 0deg, #4CAF50 calc(var(--score) * 3.6deg), #E3E5E8 calc(var(--score) * 3.6deg)); display: flex; align-items: center; justify-content: center; }
+  .dashboard-score-inner { width: 60px; height: 60px; border-radius: 50%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .dashboard-score-num { font-size: 22px; font-weight: 700; color: #4CAF50; line-height: 1; }
+  .dashboard-score-label { font-size: 10px; color: #80848E; }
+  .dashboard-summary { flex: 1; }
+  .dashboard-summary-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .dashboard-summary-desc { font-size: 12px; color: #80848E; line-height: 1.5; }
+  .tide-timeline { position: relative; height: 60px; margin: 12px 0; background: linear-gradient(90deg, #E3F2FD 0%, #BBDEFB 50%, #E3F2FD 100%); border-radius: 8px; overflow: visible; }
+  .tide-marker { position: absolute; top: 4px; transform: translateX(-50%); text-align: center; z-index: 1; }
+  .tide-marker-dot { width: 8px; height: 8px; border-radius: 50%; margin: 0 auto 2px; }
+  .tide-marker-dot--high { background: #F0B232; }
+  .tide-marker-dot--low { background: #5865F2; }
+  .tide-marker-time { font-size: 9px; color: #1E2028; font-weight: 600; }
+  .tide-marker-height { font-size: 8px; color: #80848E; }
+  .tide-now-line { position: absolute; top: 0; bottom: 0; width: 2px; background: #F23F43; z-index: 2; }
+  .tide-now-label { position: absolute; top: -14px; font-size: 9px; color: #F23F43; transform: translateX(-50%); white-space: nowrap; }
+  .fish-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .fish-card { background: #F2F3F5; border-radius: 8px; padding: 10px; display: flex; align-items: center; gap: 8px; }
+  .fish-card-emoji { font-size: 24px; }
+  .fish-card-info { flex: 1; }
+  .fish-card-name { font-size: 12px; font-weight: 600; }
+  .fish-card-status { font-size: 10px; color: #80848E; }
+  .fish-card-badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+  .fish-card-badge--open { background: #E8F5E9; color: #4CAF50; }
+  .fish-card-badge--normal { background: #F2F3F5; color: #80848E; }
+  .divider { height: 1px; background: #E3E5E8; margin: 16px 0; }
+</style>
+</head>
+<body>
+
+<!-- ===== 方案A: 竖状柱状图 ===== -->
+<div class="section-title">方案A: 竖状柱状图</div>
+<div class="section-desc">24根竖柱，高度=适宜度，颜色=好坏，左右排列</div>
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div style="font-size:15px;font-weight:600">⏰ 逐时垂钓指数</div>
+    <div style="font-size:11px;color:#80848E">基于天气+潮汐</div>
+  </div>
+  <div class="vbar-chart" id="vbarChart">
+    <div class="vbar-now" id="vbarNow"></div>
+  </div>
+  <div class="vbar-legend">
+    <div class="vbar-legend-item"><div class="vbar-legend-dot" style="background:#4CAF50"></div>极佳</div>
+    <div class="vbar-legend-item"><div class="vbar-legend-dot" style="background:#8BC34A"></div>良好</div>
+    <div class="vbar-legend-item"><div class="vbar-legend-dot" style="background:#FFC107"></div>一般</div>
+    <div class="vbar-legend-item"><div class="vbar-legend-dot" style="background:#FF9800"></div>较差</div>
+    <div class="vbar-legend-item"><div class="vbar-legend-dot" style="background:#F44336"></div>不宜</div>
+  </div>
+</div>
+
+<!-- ===== 方案B: 时间窗口卡片 ===== -->
+<div class="section-title">方案B: 时间窗口卡片</div>
+<div class="section-desc">2-3个大色块，每个窗口含推荐鱼种和条件标签</div>
+<div class="card">
+  <div style="font-size:15px;font-weight:600;margin-bottom:12px">🎯 今日垂钓窗口</div>
+  <div class="time-windows">
+    <div class="time-window time-window--best">
+      <div class="time-window-badge">🟢 最佳窗口</div>
+      <div class="time-window-time">06-09</div>
+      <div class="time-window-label">晨口时段</div>
+      <div class="time-window-fish">鲫鱼、鲤鱼<br>开口积极</div>
+      <div class="time-window-icon">🐟</div>
+    </div>
+    <div class="time-window time-window--secondary">
+      <div class="time-window-badge">🟠 次佳窗口</div>
+      <div class="time-window-time">16-19</div>
+      <div class="time-window-label">傍晚时段</div>
+      <div class="time-window-fish">草鱼、鲢鳙<br>中上层活跃</div>
+      <div class="time-window-icon">🎣</div>
+    </div>
+  </div>
+  <div class="window-tags">
+    <div class="window-tag" style="background:rgba(76,175,80,0.15)">✅ 气压稳定</div>
+    <div class="window-tag" style="background:rgba(255,193,7,0.15)">⚠️ 午后闷热</div>
+    <div class="window-tag" style="background:rgba(88,101,242,0.15)">🌊 涨潮助钓</div>
+  </div>
+</div>
+
+<!-- ===== 方案C: 综合仪表盘 ===== -->
+<div class="section-title">方案C: 综合仪表盘</div>
+<div class="section-desc">评分环+潮汐时间轴+鱼种推荐，信息最完整</div>
+<div class="card">
+  <div class="dashboard-top">
+    <div class="dashboard-score" style="--score: 74">
+      <div class="dashboard-score-inner">
+        <div class="dashboard-score-num">74</div>
+        <div class="dashboard-score-label">良好</div>
+      </div>
+    </div>
+    <div class="dashboard-summary">
+      <div class="dashboard-summary-title">今日适合出钓 🎣</div>
+      <div class="dashboard-summary-desc">气压稳定，温度适宜。建议把握晨口（06-09）和涨潮时段，鲫鱼鲤鱼开口积极。</div>
+    </div>
+  </div>
+  <div style="font-size:12px;font-weight:600;margin-bottom:6px">🌊 潮汐窗口</div>
+  <div class="tide-timeline">
+    <div class="tide-marker" style="left:15%"><div class="tide-marker-dot tide-marker-dot--high"></div><div class="tide-marker-time">05:30</div><div class="tide-marker-height">满潮 1.8m</div></div>
+    <div class="tide-marker" style="left:40%"><div class="tide-marker-dot tide-marker-dot--low"></div><div class="tide-marker-time">11:20</div><div class="tide-marker-height">干潮 0.4m</div></div>
+    <div class="tide-marker" style="left:65%"><div class="tide-marker-dot tide-marker-dot--high"></div><div class="tide-marker-time">17:45</div><div class="tide-marker-height">满潮 1.6m</div></div>
+    <div class="tide-marker" style="left:88%"><div class="tide-marker-dot tide-marker-dot--low"></div><div class="tide-marker-time">23:10</div><div class="tide-marker-height">干潮 0.5m</div></div>
+    <div class="tide-now-line" style="left:52%"><div class="tide-now-label">现在</div></div>
+  </div>
+  <div class="divider"></div>
+  <div style="font-size:12px;font-weight:600;margin-bottom:8px">🐟 推荐鱼种</div>
+  <div class="fish-cards">
+    <div class="fish-card"><div class="fish-card-emoji">🐟</div><div class="fish-card-info"><div class="fish-card-name">鲫鱼</div><div class="fish-card-status">底层觅食</div></div><div class="fish-card-badge fish-card-badge--open">开口积极</div></div>
+    <div class="fish-card"><div class="fish-card-emoji">🐠</div><div class="fish-card-info"><div class="fish-card-name">鲤鱼</div><div class="fish-card-status">频繁探底</div></div><div class="fish-card-badge fish-card-badge--open">开口积极</div></div>
+    <div class="fish-card"><div class="fish-card-emoji">🐡</div><div class="fish-card-info"><div class="fish-card-name">草鱼</div><div class="fish-card-status">中上层活动</div></div><div class="fish-card-badge fish-card-badge--normal">正常</div></div>
+    <div class="fish-card"><div class="fish-card-emoji">🎣</div><div class="fish-card-info"><div class="fish-card-name">鲢鳙</div><div class="fish-card-status">滤食活跃</div></div><div class="fish-card-badge fish-card-badge--normal">正常</div></div>
+  </div>
+</div>
+
+<script>
+const hourlyData = [
+  {time:'00',score:45},{time:'01',score:40},{time:'02',score:35},{time:'03',score:30},
+  {time:'04',score:55},{time:'05',score:75},{time:'06',score:92},{time:'07',score:88},
+  {time:'08',score:85},{time:'09',score:78},{time:'10',score:65},{time:'11',score:50},
+  {time:'12',score:35},{time:'13',score:30},{time:'14',score:45},{time:'15',score:55},
+  {time:'16',score:72},{time:'17',score:82},{time:'18',score:75},{time:'19',score:60},
+  {time:'20',score:50},{time:'21',score:45},{time:'22',score:40},{time:'23',score:38}
+];
+
+function getBarClass(s){
+  if(s>=85)return'vbar-bar--excellent';
+  if(s>=70)return'vbar-bar--good';
+  if(s>=55)return'vbar-bar--ok';
+  if(s>=40)return'vbar-bar--bad';
+  return'vbar-bar--poor';
+}
+
+const chart=document.getElementById('vbarChart');
+const nowHour=new Date().getHours();
+
+// 放置"现在"标记线
+const nowLine=document.getElementById('vbarNow');
+const nowLeft=(nowHour/23)*100;
+nowLine.style.left=nowLeft+'%';
+
+hourlyData.forEach((h,i)=>{
+  const isNow=i===nowHour;
+  const hl=(i>=6&&i<=8)||(i>=16&&i<=18);
+  const col=document.createElement('div');
+  col.className='vbar-col'+(hl?' vbar-highlight':'');
+  
+  const score=h.score;
+  const height=(score/100)*120;
+  
+  col.innerHTML=`
+    <div class="vbar-score">${score}</div>
+    <div class="vbar-bar ${getBarClass(score)}" style="height:${height}px"></div>
+    <div class="vbar-time">${h.time}</div>
+  `;
+  chart.appendChild(col);
+});
+</script>
+</body>
+</html>

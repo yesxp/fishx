@@ -86,61 +86,54 @@
           </view>
         </view>
 
-        <!-- ===== 今日垂钓建议（Redesigned） ===== -->
+        <!-- ===== 今日垂钓建议（竖状柱状图） ===== -->
         <view class="card">
           <view class="card-title-row">
             <text class="card-title">🎯 今日垂钓建议</text>
             <text class="card-subtitle">基于天气 + 潮汐</text>
           </view>
 
-          <!-- Time Window Blocks -->
-          <view class="fishing-windows">
-            <view class="fishing-window fishing-window--best">
-              <text class="fishing-window-dot">🟢</text>
-              <view class="fishing-window-info">
-                <text class="fishing-window-label">最佳窗口</text>
-                <text class="fishing-window-time">{{ fishingTips.timing }}</text>
-              </view>
+          <!-- 竖状垂钓指数柱状图 -->
+          <view class="vbar-chart">
+            <view class="vbar-now" :style="{ left: nowHourPercent + '%' }">
+              <text class="vbar-now-label">现在</text>
             </view>
-            <view class="fishing-window fishing-window--secondary">
-              <text class="fishing-window-dot">🟠</text>
-              <view class="fishing-window-info">
-                <text class="fishing-window-label">傍晚次佳</text>
-                <text class="fishing-window-time">16:00-17:30</text>
-              </view>
+            <view v-for="(h, i) in hourlyFishingScore" :key="i" class="vbar-col" :class="{ 'vbar-highlight': i >= 6 && i <= 8 || i >= 16 && i <= 18 }">
+              <text class="vbar-score">{{ h.score }}</text>
+              <view class="vbar-bar" :class="getVBarClass(h.score)" :style="{ height: (h.score / 100 * 100) + 'rpx' }" />
+              <text class="vbar-time">{{ h.time }}</text>
             </view>
           </view>
-
-          <!-- Condition Tags -->
-          <view class="fishing-tags">
-            <wd-tag type="success" size="small" round custom-style="margin-right: 6px; margin-bottom: 6px;">溶氧充足</wd-tag>
-            <wd-tag v-if="weatherStore.weatherNow?.text?.includes('雨')" type="danger" size="small" round custom-style="margin-right: 6px; margin-bottom: 6px;">雷暴风险</wd-tag>
-            <wd-tag type="primary" size="small" round custom-style="margin-right: 6px; margin-bottom: 6px;">晨口窗口</wd-tag>
-            <wd-tag type="warning" size="small" round custom-style="margin-right: 6px; margin-bottom: 6px;">{{ tideStatus.text === '涨潮中' ? '涨潮助力' : tideStatus.text === '退潮中' ? '退潮待机' : '平潮观望' }}</wd-tag>
-            <wd-tag type="default" size="small" round custom-style="margin-right: 6px; margin-bottom: 6px;">{{ fishPredictions[0]?.variant === 'open' ? '鱼口活跃' : fishPredictions[0]?.variant === 'slow' ? '鱼口较慢' : '一般' }}</wd-tag>
+          <view class="vbar-legend">
+            <view class="vbar-legend-item"><view class="vbar-legend-dot vbar-legend-dot--excellent" /><text>极佳</text></view>
+            <view class="vbar-legend-item"><view class="vbar-legend-dot vbar-legend-dot--good" /><text>良好</text></view>
+            <view class="vbar-legend-item"><view class="vbar-legend-dot vbar-legend-dot--ok" /><text>一般</text></view>
+            <view class="vbar-legend-item"><view class="vbar-legend-dot vbar-legend-dot--bad" /><text>较差</text></view>
+            <view class="vbar-legend-item"><view class="vbar-legend-dot vbar-legend-dot--poor" /><text>不宜</text></view>
           </view>
 
-          <!-- Advice Paragraph -->
-          <view class="fishing-advice">
-            <text class="fishing-advice-text">饵料：{{ fishingTips.bait }}。目标鱼种：{{ fishingTips.target }}。{{ fishingTips.note }}。建议选早晚凉爽时段作钓，使用活饵优先，味型偏腥，耐心等口不要频繁提竿。</text>
-          </view>
+          <view class="divider-simple" />
 
-          <!-- Fish Predictions (compact) -->
-          <view class="fish-compact-list">
-            <template v-for="(fish, index) in fishPredictions" :key="fish.name">
-              <view class="fish-compact-row">
-                <text class="fish-compact-emoji">{{ fish.emoji }}</text>
-                <view class="fish-compact-info">
-                  <text class="fish-compact-name">{{ fish.name }}</text>
-                  <text class="fish-compact-desc">{{ fish.desc }}</text>
-                </view>
-                <view class="fish-badge" :class="'fish-badge--' + fish.variant">
-                  <text class="fish-badge-text">{{ fish.status }}</text>
-                </view>
-                <text class="fish-trend">{{ fish.trend }}</text>
+          <!-- 推荐鱼种 -->
+          <text class="fish-section-title">🐟 推荐鱼种</text>
+          <view class="fish-card-grid">
+            <view v-for="fish in fishPredictions" :key="fish.name" class="fish-mini-card">
+              <text class="fish-mini-emoji">{{ fish.emoji }}</text>
+              <text class="fish-mini-name">{{ fish.name }}</text>
+              <text class="fish-mini-desc">{{ fish.desc }}</text>
+              <view class="fish-mini-badge" :class="'fish-mini-badge--' + fish.variant">
+                <text class="fish-mini-badge-text">{{ fish.status }}</text>
               </view>
-              <wd-divider v-if="index < fishPredictions.length - 1" hairline custom-style="margin: 0; padding: 0;" />
-            </template>
+            </view>
+          </view>
+
+          <view class="divider-simple" />
+
+          <!-- 条件标签 -->
+          <view class="tip-bar">
+            <view class="tip-tag tip-tag--green"><text>✅ 气压 {{ weatherStore.weatherNow?.pressure || '--' }}hPa</text></view>
+            <view v-if="Number(weatherStore.weatherNow?.temp) >= 30" class="tip-tag tip-tag--yellow"><text>🌡️ 午后闷热 {{ weatherStore.weatherNow?.temp }}°C</text></view>
+            <view class="tip-tag tip-tag--blue"><text>🌊 {{ tideStatus.text }}</text></view>
           </view>
         </view>
 
@@ -721,6 +714,49 @@ const rainTag = computed(() => {
   return { text: '不建议', class: 'hero-detail-tag--bad' }
 })
 
+// ===== 竖状垂钓指数柱状图 =====
+const hourlyFishingScore = computed(() => {
+  return weatherStore.hourly.slice(0, 24).map((h: any) => {
+    const temp = Number(h.temp || 25)
+    const humidity = Number(h.humidity || 70)
+    const windScale = Number(h.windScale || 1)
+    const pop = Number(h.pop || 0)
+    // 简化评分算法
+    let score = 60
+    // 温度：18-28最佳
+    if (temp >= 18 && temp <= 28) score += 15
+    else if (temp >= 15 && temp <= 32) score += 5
+    else score -= 10
+    // 风力：1-3级最佳
+    if (windScale >= 1 && windScale <= 3) score += 10
+    else if (windScale >= 4) score -= 10
+    // 降水概率
+    if (pop === 0) score += 10
+    else if (pop < 30) score += 0
+    else score -= 15
+    // 湿度
+    if (humidity >= 60 && humidity <= 80) score += 5
+    // 时间：晨昏加分
+    const hour = parseInt(h.time?.slice(0, 2) || '12')
+    if ((hour >= 5 && hour <= 8) || (hour >= 16 && hour <= 19)) score += 10
+    if (hour >= 11 && hour <= 14) score -= 10
+    return { time: h.time || '--:--', score: Math.max(0, Math.min(100, score)) }
+  })
+})
+
+const nowHourPercent = computed(() => {
+  const now = new Date()
+  return (now.getHours() / 23) * 100
+})
+
+function getVBarClass(score: number) {
+  if (score >= 85) return 'vbar-bar--excellent'
+  if (score >= 70) return 'vbar-bar--good'
+  if (score >= 55) return 'vbar-bar--ok'
+  if (score >= 40) return 'vbar-bar--bad'
+  return 'vbar-bar--poor'
+}
+
 // ===== 潮汐 =====
 const tideData = computed(() => weatherStore.tide)
 
@@ -1073,6 +1109,49 @@ $danger: #F23F43;
 .badge--medium { background: rgba($brand, 0.1); }
 .badge-text--medium { color: $brand; }
 .badge-text--danger { color: $danger; }
+
+/* 竖状垂钓指数柱状图 */
+.vbar-chart { display: flex; align-items: flex-end; gap: 3rpx; height: 200rpx; padding-top: 24rpx; position: relative; }
+.vbar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2rpx; }
+.vbar-bar { width: 100%; border-radius: 6rpx 6rpx 0 0; min-height: 4rpx; }
+.vbar-bar--excellent { background: linear-gradient(180deg, #66BB6A, #4CAF50); }
+.vbar-bar--good { background: linear-gradient(180deg, #9CCC65, #8BC34A); }
+.vbar-bar--ok { background: linear-gradient(180deg, #FFD54F, #FFC107); }
+.vbar-bar--bad { background: linear-gradient(180deg, #FFB74D, #FF9800); }
+.vbar-bar--poor { background: linear-gradient(180deg, #EF5350, #F44336); }
+.vbar-score { font-size: 16rpx; color: $header-primary; font-weight: 600; }
+.vbar-time { font-size: 18rpx; color: $text-muted; margin-top: 8rpx; }
+.vbar-highlight { background: rgba($blurple, 0.06); border-radius: 12rpx; padding: 6rpx 4rpx; margin: 0 -4rpx; }
+.vbar-now { position: absolute; top: 0; left: 0; right: 0; height: 4rpx; background: $status-red; z-index: 1; }
+.vbar-now-label { position: absolute; top: -28rpx; left: 50%; transform: translateX(-50%); font-size: 18rpx; color: $status-red; white-space: nowrap; }
+.vbar-legend { display: flex; gap: 16rpx; margin-top: 12rpx; justify-content: center; }
+.vbar-legend-item { display: flex; align-items: center; gap: 6rpx; font-size: 20rpx; color: $text-muted; }
+.vbar-legend-dot { width: 16rpx; height: 16rpx; border-radius: 4rpx; }
+.vbar-legend-dot--excellent { background: #4CAF50; }
+.vbar-legend-dot--good { background: #8BC34A; }
+.vbar-legend-dot--ok { background: #FFC107; }
+.vbar-legend-dot--bad { background: #FF9800; }
+.vbar-legend-dot--poor { background: #F44336; }
+
+/* 推荐鱼种网格 */
+.fish-section-title { font-size: 24rpx; font-weight: 600; color: $header-primary; margin-bottom: 12rpx; display: block; }
+.fish-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12rpx; }
+.fish-mini-card { background: $bg-page; border-radius: 12rpx; padding: 16rpx; display: flex; flex-direction: column; align-items: center; }
+.fish-mini-emoji { font-size: 40rpx; }
+.fish-mini-name { font-size: 22rpx; font-weight: 600; color: $header-primary; margin-top: 4rpx; }
+.fish-mini-desc { font-size: 18rpx; color: $text-muted; margin-top: 2rpx; }
+.fish-mini-badge { font-size: 18rpx; padding: 4rpx 12rpx; border-radius: 8rpx; margin-top: 8rpx; }
+.fish-mini-badge--open { background: rgba($status-green, 0.15); color: $status-green; }
+.fish-mini-badge--normal { background: rgba($text-muted, 0.1); color: $text-muted; }
+.fish-mini-badge--slow { background: rgba($status-yellow, 0.15); color: $status-yellow; }
+
+/* 条件标签 */
+.divider-simple { height: 1rpx; background: $divider; margin: 16rpx 0; }
+.tip-bar { display: flex; gap: 12rpx; flex-wrap: wrap; }
+.tip-tag { font-size: 20rpx; padding: 8rpx 16rpx; border-radius: 20rpx; background: $bg-page; color: $text-muted; }
+.tip-tag--green { background: rgba($status-green, 0.1); color: $status-green; }
+.tip-tag--yellow { background: rgba($status-yellow, 0.1); color: $status-yellow; }
+.tip-tag--blue { background: rgba($blurple, 0.1); color: $blurple; }
 
 /* Hourly Chart */
 .hourly-chart-wrap { margin-top: 8px; }
