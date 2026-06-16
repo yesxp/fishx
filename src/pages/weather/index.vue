@@ -11,7 +11,7 @@
           </view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 22:15</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 22:25</text>
           </view>
         </view>
         <view class="header-actions">
@@ -505,7 +505,6 @@ const hourlyChartOption = computed(() => {
   const hourly = weatherStore.hourly.slice(0, 24)
   if (hourly.length === 0) return {}
 
-  // 截取前7个点显示
   const displayCount = Math.min(hourly.length, 7)
   const display = hourly.slice(0, displayCount)
   const times = display.map((h, i) => i === 0 ? '现在' : h.time.slice(-5))
@@ -517,14 +516,13 @@ const hourlyChartOption = computed(() => {
     const feelsOffset = (hum > 80 ? -1 : 0) + (wind >= 4 ? -2 : wind >= 3 ? -1 : 0)
     return temp + feelsOffset
   })
-  const icons = display.map(h => getWeatherIcon(h.icon))
 
   const allTemps = [...highTemps, ...lowTemps]
-  const minT = Math.floor(Math.min(...allTemps) - 1)
-  const maxT = Math.ceil(Math.max(...allTemps) + 1)
+  const minT = Math.floor(Math.min(...allTemps) - 2)
+  const maxT = Math.ceil(Math.max(...allTemps) + 2)
 
   return {
-    grid: { left: 8, right: 8, top: 50, bottom: 35 },
+    grid: { left: 8, right: 8, top: 45, bottom: 65 },
     legend: {
       show: true,
       top: 0,
@@ -540,14 +538,20 @@ const hourlyChartOption = computed(() => {
       boundaryGap: false,
       axisLine: { lineStyle: { color: '#E3E5E8' } },
       axisTick: { show: false },
-      axisLabel: { color: '#80848E', fontSize: 10 },
-      splitLine: { show: true, lineStyle: { color: '#ECEEF1', type: 'dashed', width: 1 } },
+      axisLabel: {
+        color: '#80848E',
+        fontSize: 10,
+        margin: 8,
+      },
+      splitLine: {
+        show: true,
+        lineStyle: { color: '#ECEEF1', type: 'dashed', width: 1 },
+      },
     },
     yAxis: {
       type: 'value',
       min: minT,
       max: maxT,
-      splitNumber: 4,
       axisLine: { show: false },
       axisTick: { show: false },
       splitLine: { show: false },
@@ -568,29 +572,16 @@ const hourlyChartOption = computed(() => {
         data: highTemps,
         smooth: 0.3,
         symbol: 'circle',
-        symbolSize: 5,
+        symbolSize: 6,
         lineStyle: { color: '#FF8C42', width: 2 },
         itemStyle: { color: '#FF8C42', borderColor: '#fff', borderWidth: 1.5 },
         label: {
           show: true,
           position: 'top',
-          color: '#FF8C42',
-          fontSize: 10,
+          color: '#1E2028',
+          fontSize: 11,
           fontWeight: 600,
-          formatter: (params) => `{icon${params.dataIndex}}|{temp${params.dataIndex}}`,
-          rich: Object.fromEntries(display.map((h, i) => [
-            `icon${i}`, { height: 16, align: 'center', backgroundColor: { image: getWeatherIconUrl(h.icon) }, width: 16 }
-          ]).concat(display.map((_, i) => [
-            `temp${i}`, { color: '#FF8C42', fontSize: 10, fontWeight: 600, align: 'center', padding: [2, 0, 0, 0] }
-          ]))),
-        },
-        areaStyle: {
-          color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(255,140,66,0.18)' },
-              { offset: 1, color: 'rgba(255,140,66,0.02)' },
-            ],
-          },
+          formatter: '{c}°',
         },
       },
       {
@@ -599,27 +590,31 @@ const hourlyChartOption = computed(() => {
         data: lowTemps,
         smooth: 0.3,
         symbol: 'circle',
-        symbolSize: 5,
+        symbolSize: 6,
         lineStyle: { color: '#5865F2', width: 2 },
         itemStyle: { color: '#5865F2', borderColor: '#fff', borderWidth: 1.5 },
         label: {
           show: true,
           position: 'bottom',
-          color: '#5865F2',
+          color: '#80848E',
           fontSize: 10,
-          fontWeight: 600,
           formatter: '{c}°',
-        },
-        areaStyle: {
-          color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(88,101,242,0.10)' },
-              { offset: 1, color: 'rgba(88,101,242,0.01)' },
-            ],
-          },
         },
       },
     ],
+    // 天气图标用 markPoint 实现
+    graphic: display.map((h, i) => ({
+      type: 'text',
+      left: `${(i / (displayCount - 1)) * 80 + 10}%`,
+      bottom: 12,
+      style: {
+        text: getWeatherIcon(h.icon),
+        fontSize: 18,
+        textAlign: 'center',
+        textVerticalAlign: 'top',
+      },
+      silent: true,
+    })),
   }
 })
 
