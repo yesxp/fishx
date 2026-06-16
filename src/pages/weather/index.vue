@@ -91,7 +91,7 @@
             </view>
           </view>
           <view class="hourly-chart-wrap" v-if="weatherStore.hourly.length > 0">
-            <uni-echarts custom-class="hourly-chart" :option="hourlyChartOption" />
+            <uni-echarts custom-style="width:100%;height:240px" :option="hourlyChartOption" />
           </view>
         </view>
 
@@ -1189,9 +1189,4 @@ $danger: #F23F43;
   line-height: 1.5;
   flex: 1;
 }
-</style>
-
-<!-- uni-echarts custom-class 不支持 scoped 样式，必须用非 scoped 块 -->
-<style>
-.hourly-chart { width: 100% !important; height: 240px !important; }
 </style>
