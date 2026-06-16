@@ -1,7 +1,7 @@
 <template>
   <view class="page-home">
     <!-- Header -->
-    <wd-navbar fixed placeholder bordered custom-class="custom-navbar" safe-area-inset-top>
+    <wd-navbar bordered custom-class="custom-navbar" custom-style="position: sticky; top: 0; z-index: 100;">
       <template #left>
         <view class="header-logo">
           <view class="logo-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12C2 12 5 8 12 8C19 8 22 12 22 12C22 12 19 16 12 16C5 16 2 12 2 12Z"/><circle cx="16" cy="12" r="1.5" fill="white"/></svg></view>
