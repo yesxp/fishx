@@ -24,14 +24,19 @@
       </view>
 
       <template v-else>
-        <!-- ===== Hero Card (Redesigned) ===== -->
+        <!-- ===== Hero Card ===== -->
         <view class="hero">
-          <!-- Top Row: Date + Score Ring -->
           <view class="hero-top-row">
-            <view class="hero-date-col">
-              <text class="hero-date">📍 广州</text>
-              <text class="hero-date-full">6月16日 周二</text>
+            <!-- Left: Date + Temp (merged) -->
+            <view class="hero-left">
+              <text class="hero-date">📍 广州 · 6月16日 周二</text>
+              <view class="hero-temp-row">
+                <text class="hero-temp-big">{{ weatherStore.weatherNow?.temp || '--' }}°</text>
+                <text class="hero-icon">{{ getWeatherIcon(weatherStore.weatherNow?.icon || '100') }}</text>
+              </view>
+              <text class="hero-weather-desc">{{ weatherStore.weatherNow?.text || '' }}，体感 {{ weatherStore.weatherNow?.feelsLike || '--' }}°</text>
             </view>
+            <!-- Right: Score Ring -->
             <view class="hero-score-ring">
               <view class="score-ring-outer">
                 <view class="score-ring-inner">
@@ -41,16 +46,6 @@
               </view>
               <text class="hero-score-label">实况</text>
               <text class="hero-score-level">{{ weatherStore.indexResult.level }}</text>
-            </view>
-          </view>
-
-          <!-- Middle: Temp + Weather -->
-          <view class="hero-mid-row">
-            <text class="hero-icon">{{ getWeatherIcon(weatherStore.weatherNow?.icon || '100') }}</text>
-            <view class="hero-temp-info">
-              <text class="hero-temp-big">{{ weatherStore.weatherNow?.temp || '--' }}°</text>
-              <text class="hero-weather-text">{{ weatherStore.weatherNow?.text || '' }}</text>
-              <text class="hero-feels-like">体感 {{ weatherStore.weatherNow?.feelsLike || '--' }}°</text>
             </view>
           </view>
 
@@ -983,10 +978,13 @@ $danger: #F23F43;
 /* Hero Card (Redesigned) */
 .hero { background: linear-gradient(135deg, #5865F2, #7B68EE); border-radius: 16px; padding: 20px; margin-bottom: 12px; color: #fff; }
 
-.hero-top-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-.hero-date-col { display: flex; flex-direction: column; gap: 4px; }
-.hero-date { font-size: 14px; font-weight: 600; opacity: 0.9; display: block; }
-.hero-date-full { font-size: 12px; opacity: 0.6; display: block; }
+.hero-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0; }
+.hero-left { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.hero-date { font-size: 12px; opacity: 0.7; display: block; margin-bottom: 4px; }
+.hero-temp-row { display: flex; align-items: baseline; gap: 6px; }
+.hero-temp-big { font-size: 44px; font-weight: 700; line-height: 1; }
+.hero-icon { font-size: 32px; }
+.hero-weather-desc { font-size: 13px; opacity: 0.75; display: block; margin-top: 2px; }
 
 .hero-score-ring { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .score-ring-outer {
@@ -1005,14 +1003,9 @@ $danger: #F23F43;
 .hero-score-label { font-size: 10px; opacity: 0.6; }
 .hero-score-level { font-size: 12px; font-weight: 600; opacity: 0.9; }
 
-.hero-mid-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.15); }
-.hero-icon { font-size: 48px; }
-.hero-temp-info { display: flex; flex-direction: column; gap: 2px; }
-.hero-temp-big { font-size: 40px; font-weight: 700; line-height: 1; }
-.hero-weather-text { font-size: 14px; opacity: 0.85; }
-.hero-feels-like { font-size: 12px; opacity: 0.6; }
 
-.hero-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.hero-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
 .hero-detail-item { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.12); border-radius: 10px; padding: 10px 10px; }
 .hero-detail-icon { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; }
 .hero-detail-icon--purple { background: rgba(255,255,255,0.3); }
