@@ -1,5 +1,5 @@
 <template>
-  <wd-tabbar v-model="active" fixed bordered placeholder safe-area-inset-bottom active-color="#5865F2" inactive-color="#80848E" @change="onChange">
+  <wd-tabbar :model-value="current" fixed bordered placeholder safe-area-inset-bottom active-color="#5865F2" inactive-color="#80848E" @change="onChange">
     <wd-tabbar-item name="home" title="首页">
       <template #icon="{ active: isActive }">
         <view class="tab-icon">
@@ -58,10 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-
 const props = defineProps<{ current: string }>()
-const active = ref(props.current)
 
 const tabPages: Record<string, string> = {
   home: '/pages/index/index',
@@ -70,11 +67,9 @@ const tabPages: Record<string, string> = {
   mine: '/pages/mine/index',
 }
 
-watch(() => props.current, (val) => { active.value = val })
-
 function onChange({ value }: { value: string | number }) {
   const url = tabPages[value as string]
-  if (url && url !== tabPages[props.current]) {
+  if (url && value !== props.current) {
     uni.switchTab({ url })
   }
 }
