@@ -29,7 +29,7 @@
           <view class="hero-top-row">
             <!-- Left: Date + Temp (merged) -->
             <view class="hero-left">
-              <text class="hero-date">📍 广州 · 6月16日 周二</text>
+              <text class="hero-date">广州 · 6月16日 周二</text>
               <view class="hero-temp-row">
                 <text class="hero-temp-big">{{ weatherStore.weatherNow?.temp || '--' }}°</text>
                 <text class="hero-icon">{{ getWeatherIcon(weatherStore.weatherNow?.icon || '100') }}</text>
@@ -57,7 +57,6 @@
                 <text class="hero-detail-label">气压</text>
                 <text class="hero-detail-value">{{ weatherStore.weatherNow?.pressure || '--' }} <text class="hero-detail-unit">hPa</text></text>
               </view>
-              <wd-tag type="primary" size="small" round custom-class="hero-trend-tag">平稳</wd-tag>
             </view>
             <view class="hero-detail-item">
               <view class="hero-detail-icon hero-detail-icon--cyan"></view>
@@ -65,23 +64,20 @@
                 <text class="hero-detail-label">风力</text>
                 <text class="hero-detail-value">{{ weatherStore.weatherNow?.windScale || '--' }} <text class="hero-detail-unit">{{ weatherStore.weatherNow?.windDir || '' }}</text></text>
               </view>
-              <wd-tag type="success" size="small" round custom-class="hero-trend-tag">适宜</wd-tag>
+            </view>
+            <view class="hero-detail-item">
+              <view class="hero-detail-icon hero-detail-icon--blue"></view>
+              <view class="hero-detail-info">
+                <text class="hero-detail-label">降雨</text>
+                <text class="hero-detail-value">{{ weatherStore.hourly[0]?.pop || '0' }}<text class="hero-detail-unit">%</text></text>
+              </view>
             </view>
             <view class="hero-detail-item">
               <view class="hero-detail-icon hero-detail-icon--green"></view>
               <view class="hero-detail-info">
-                <text class="hero-detail-label">湿度</text>
-                <text class="hero-detail-value">{{ weatherStore.weatherNow?.humidity || '--' }}<text class="hero-detail-unit">%</text></text>
+                <text class="hero-detail-label">溶氧</text>
+                <text class="hero-detail-value">-- <text class="hero-detail-unit">mg/L</text></text>
               </view>
-              <wd-tag type="default" size="small" round custom-class="hero-trend-tag"></wd-tag>
-            </view>
-            <view class="hero-detail-item">
-              <view class="hero-detail-icon hero-detail-icon--orange"></view>
-              <view class="hero-detail-info">
-                <text class="hero-detail-label">能见度</text>
-                <text class="hero-detail-value">{{ weatherStore.weatherNow?.vis || '--' }} <text class="hero-detail-unit">km</text></text>
-              </view>
-              <wd-tag type="default" size="small" round custom-class="hero-trend-tag"></wd-tag>
             </view>
           </view>
         </view>
@@ -1011,6 +1007,7 @@ $danger: #F23F43;
 .hero-detail-icon--purple { background: rgba(255,255,255,0.3); }
 .hero-detail-icon--cyan { background: rgba(86,204,222,0.4); }
 .hero-detail-icon--green { background: rgba(35,165,89,0.4); }
+.hero-detail-icon--blue { background: rgba(88,101,242,0.4); }
 .hero-detail-icon--orange { background: rgba(240,178,50,0.4); }
 .hero-detail-info { flex: 1; min-width: 0; }
 .hero-detail-label { font-size: 10px; opacity: 0.6; display: block; }
