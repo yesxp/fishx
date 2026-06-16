@@ -11,7 +11,7 @@
           </view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 22:25</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 22:35</text>
           </view>
         </view>
         <view class="header-actions">
@@ -507,7 +507,7 @@ const hourlyChartOption = computed(() => {
 
   const displayCount = Math.min(hourly.length, 7)
   const display = hourly.slice(0, displayCount)
-  const times = display.map((h, i) => i === 0 ? '现在' : h.time.slice(-5))
+  const times = display.map((h, i) => i === 0 ? '当前' : h.time.slice(-5))
   const highTemps = display.map(h => Number(h.temp))
   const lowTemps = display.map(h => {
     const temp = Number(h.temp)
@@ -521,8 +521,18 @@ const hourlyChartOption = computed(() => {
   const minT = Math.floor(Math.min(...allTemps) - 2)
   const maxT = Math.ceil(Math.max(...allTemps) + 2)
 
+  // 虚线分隔：在每两个点中间画竖线
+  const separatorLines = []
+  for (let i = 0; i < displayCount - 1; i++) {
+    separatorLines.push({
+      xAxis: i + 0.5,
+      lineStyle: { color: '#ECEEF1', type: [4, 4], width: 1 },
+      label: { show: false },
+    })
+  }
+
   return {
-    grid: { left: 8, right: 8, top: 45, bottom: 65 },
+    grid: { left: 8, right: 8, top: 45, bottom: 60 },
     legend: {
       show: true,
       top: 0,
@@ -542,11 +552,19 @@ const hourlyChartOption = computed(() => {
         color: '#80848E',
         fontSize: 10,
         margin: 8,
+        formatter: (value, index) => {
+          const icon = getWeatherIcon(display[index].icon)
+          return `{icon${index}}\n${value}`
+        },
+        rich: Object.fromEntries(
+          display.map((h, i) => [`icon${i}`, {
+            fontSize: 16,
+            lineHeight: 22,
+            align: 'center',
+          }])
+        ),
       },
-      splitLine: {
-        show: true,
-        lineStyle: { color: '#ECEEF1', type: 'dashed', width: 1 },
-      },
+      splitLine: { show: false },
     },
     yAxis: {
       type: 'value',
@@ -583,6 +601,19 @@ const hourlyChartOption = computed(() => {
           fontWeight: 600,
           formatter: '{c}°',
         },
+        markLine: {
+          silent: true,
+          symbol: 'none',
+          data: [
+            // 当前时间标记（第一列高亮）
+            {
+              xAxis: 0,
+              lineStyle: { color: '#5865F2', type: 'solid', width: 2 },
+              label: { show: false },
+            },
+            ...separatorLines,
+          ],
+        },
       },
       {
         name: '低温',
@@ -602,19 +633,6 @@ const hourlyChartOption = computed(() => {
         },
       },
     ],
-    // 天气图标用 markPoint 实现
-    graphic: display.map((h, i) => ({
-      type: 'text',
-      left: `${(i / (displayCount - 1)) * 80 + 10}%`,
-      bottom: 12,
-      style: {
-        text: getWeatherIcon(h.icon),
-        fontSize: 18,
-        textAlign: 'center',
-        textVerticalAlign: 'top',
-      },
-      silent: true,
-    })),
   }
 })
 
