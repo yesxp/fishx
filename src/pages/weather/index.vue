@@ -89,7 +89,7 @@
         <!-- ===== 今日垂钓建议（竖状柱状图） ===== -->
         <view class="card">
           <view class="card-title-row">
-            <text class="card-title">🎯 今日垂钓建议</text>
+            <text class="card-title">🎯 今日垂钓指数</text>
             <text class="card-subtitle">基于天气 + 潮汐</text>
           </view>
 
@@ -1111,16 +1111,16 @@ $danger: #F23F43;
 .badge-text--danger { color: $danger; }
 
 /* 竖状垂钓指数柱状图 */
-.vbar-chart { display: flex; align-items: flex-end; gap: 3rpx; height: 200rpx; padding-top: 24rpx; position: relative; }
+.vbar-chart { display: flex; align-items: flex-end; gap: 1rpx; height: 180rpx; padding-top: 24rpx; position: relative; }
 .vbar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2rpx; }
-.vbar-bar { width: 100%; border-radius: 6rpx 6rpx 0 0; min-height: 4rpx; }
+.vbar-bar { width: 70%; border-radius: 4rpx 4rpx 0 0; min-height: 4rpx; }
 .vbar-bar--excellent { background: linear-gradient(180deg, #66BB6A, #4CAF50); }
 .vbar-bar--good { background: linear-gradient(180deg, #9CCC65, #8BC34A); }
 .vbar-bar--ok { background: linear-gradient(180deg, #FFD54F, #FFC107); }
 .vbar-bar--bad { background: linear-gradient(180deg, #FFB74D, #FF9800); }
 .vbar-bar--poor { background: linear-gradient(180deg, #EF5350, #F44336); }
-.vbar-score { font-size: 16rpx; color: $header-primary; font-weight: 600; }
-.vbar-time { font-size: 18rpx; color: $text-muted; margin-top: 8rpx; }
+.vbar-score { font-size: 14rpx; color: $header-primary; font-weight: 600; }
+.vbar-time { font-size: 16rpx; color: $text-muted; margin-top: 4rpx; }
 .vbar-highlight { background: rgba($blurple, 0.06); border-radius: 12rpx; padding: 6rpx 4rpx; margin: 0 -4rpx; }
 .vbar-now { position: absolute; top: 0; left: 0; right: 0; height: 4rpx; background: $status-red; z-index: 1; }
 .vbar-now-label { position: absolute; top: -28rpx; left: 50%; transform: translateX(-50%); font-size: 18rpx; color: $status-red; white-space: nowrap; }
