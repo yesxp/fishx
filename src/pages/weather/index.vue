@@ -204,11 +204,11 @@
                 <text class="day-text">{{ day.textDay }}</text>
               </view>
               <view class="day-temp-bar">
-                <wd-tag size="small" round plain custom-style="font-size:13px;color:#80848E;background:transparent;border:none;padding:0">{{ day.tempNight }}°</wd-tag>
+                <wd-tag size="small" round plain class="temp-tag temp-tag--low" custom-style="font-size:13px;color:#80848E;background:transparent;border:none;padding:0">{{ day.tempNight }}</wd-tag>
                 <view class="day-temp-track">
                   <view class="day-temp-fill" :style="getTempBarStyle(day.tempNight, day.tempDay)" />
                 </view>
-                <wd-tag size="small" round plain custom-style="font-size:13px;font-weight:700;color:#060607;background:transparent;border:none;padding:0">{{ day.tempDay }}°</wd-tag>
+                <wd-tag size="small" round plain class="temp-tag temp-tag--high" custom-style="font-size:13px;font-weight:700;color:#060607;background:transparent;border:none;padding:0">{{ day.tempDay }}</wd-tag>
               </view>
               <view class="day-comfort">
                  <wd-tag :type="getDayComfortType(day)" size="small" round variant="light">{{ getDayComfortText(day) }}</wd-tag>
@@ -757,7 +757,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 18:25'
+const nowStr = '2026-06-17 18:42'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -1418,6 +1418,11 @@ $danger: #F23F43;
 .day-temp-hi { font-size: 13px; font-weight: 700; color: $text-primary; flex-shrink: 0; white-space: nowrap; }
 .day-temp-track { flex: 1; height: 10px; background: #E8EAED; border-radius: 5px; position: relative; overflow: hidden; min-width: 40px; }
 .day-temp-fill { position: absolute; top: 0; height: 100%; background: linear-gradient(90deg, #5865F2, #F23F43); border-radius: 5px; }
+/* 温度数字°符号用CSS伪元素渲染，绕开uni-app文本渲染bug */
+.temp-tag--low::after,
+.temp-tag--high::after { content: '\00B0'; font-size: inherit; }
+.temp-tag--low::after { color: #80848E; }
+.temp-tag--high::after { color: #060607; }
 
 /* Tide */
 .tide-chart-wrap { margin-bottom: 12px; }
