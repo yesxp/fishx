@@ -113,22 +113,35 @@
 
           <view class="divider-simple" />
 
-          <!-- 推荐鱼种 -->
-          <text class="fish-section-title">🐟 推荐鱼种</text>
-          <view class="fish-card-grid">
-            <view v-for="(fish, idx) in fishPredictions" :key="fish.name" class="fish-mini-card">
-              <view class="fish-mini-rank">#{{ idx + 1 }}</view>
-              <text class="fish-mini-emoji">{{ fish.emoji }}</text>
-              <text class="fish-mini-name">{{ fish.name }}</text>
-              <text class="fish-mini-desc">{{ fish.desc }}</text>
-              <view class="fish-mini-score-row">
-                <text class="fish-mini-score">{{ fish.score }}分</text>
-                <view class="fish-mini-badge" :class="'fish-mini-badge--' + fish.variant">
-                  <text class="fish-mini-badge-text">{{ fish.status }}</text>
+          <!-- 按钓法推荐鱼种 -->
+          <text class="fish-section-title">🎣 按钓法推荐</text>
+          <scroll-view scroll-x class="method-scroll" :show-scrollbar="false">
+            <view class="method-list">
+              <view v-for="m in fishingMethods" :key="m.name" class="method-card">
+                <view class="method-header">
+                  <text class="method-icon">{{ m.icon }}</text>
+                  <view class="method-header-info">
+                    <text class="method-name">{{ m.name }}</text>
+                    <view class="method-score-row">
+                      <text class="method-score" :class="'method-score--' + m.level">{{ m.score }}分</text>
+                      <text class="method-level">{{ m.levelText }}</text>
+                    </view>
+                  </view>
                 </view>
+                <view class="method-fish-list">
+                  <view v-for="f in m.fish" :key="f.name" class="method-fish-row">
+                    <text class="method-fish-name">{{ f.name }}</text>
+                    <view class="method-fish-bar-wrap">
+                      <view class="method-fish-bar" :style="{ width: f.score + '%' }" :class="'method-fish-bar--' + (f.score >= 70 ? 'good' : f.score >= 50 ? 'ok' : 'low')" />
+                    </view>
+                    <text class="method-fish-score">{{ f.score }}</text>
+                    <text class="method-fish-tag" v-if="f.tag">{{ f.tag }}</text>
+                  </view>
+                </view>
+                <text class="method-tip">{{ m.tip }}</text>
               </view>
             </view>
-          </view>
+          </scroll-view>
 
           <view class="divider-simple" />
 
@@ -918,7 +931,7 @@ const typhoonPathDots = computed(() => {
 })
 
 // ===== 鱼口预测 =====
-const fishPredictions = computed(() => {
+const fishingMethods = computed(() => {
   const score = weatherStore.indexResult.score
   const tideNow = tideStatus.value.text
   const isRising = tideNow === '涨潮中'
@@ -928,127 +941,171 @@ const fishPredictions = computed(() => {
   const hour = new Date().getHours()
   const month = new Date().getMonth() + 1
 
-  // 时段评分
-  const getHourScore = (hour: number) => {
-    if (hour >= 5 && hour <= 8) return { boost: 15, period: '晨口' }
-    if (hour >= 9 && hour <= 11) return { boost: 5, period: '上午' }
-    if (hour >= 12 && hour <= 14) return { boost: -10, period: '午休' }
-    if (hour >= 15 && hour <= 18) return { boost: 10, period: '傍晚' }
-    if (hour >= 19 && hour <= 22) return { boost: 5, period: '夜钓' }
-    return { boost: -5, period: '深夜' }
+  // 基础环境分 (0-100)
+  const baseScore = score
+
+  // 各鱼种活性计算
+  const calc = (base: number, boosts: number[]) => {
+    return Math.min(100, Math.max(0, Math.round(base + boosts.reduce((a, b) => a + b, 0))))
   }
 
-  // 潮汐评分
-  const tideBoost = isRising ? 10 : isFalling ? -5 : 0
+  // ===== 台钓目标鱼 =====
+  const taiJiyu = calc(baseScore * 0.9, [
+    (hour >= 5 && hour <= 9) ? 15 : (hour >= 16 && hour <= 19) ? 10 : 0,
+    isRising ? 5 : 0,
+    temp < 15 ? 10 : 0,
+  ])
+  const taiLiyu = calc(baseScore * 0.85, [
+    (temp >= 20 && temp <= 28) ? 15 : 0,
+    isRising ? 10 : 0,
+    (hour >= 16 && hour <= 19) ? 10 : 0,
+  ])
+  const taiCaoyu = calc(baseScore * 0.7, [
+    temp >= 25 ? 20 : 0,
+    (month >= 5 && month <= 9) ? 10 : 0,
+    (hour >= 12 && hour <= 16) ? 10 : 0,
+  ])
+  const taiLianyong = calc(baseScore * 0.65, [
+    temp >= 28 ? 25 : 0,
+    (month >= 6 && month <= 8) ? 15 : 0,
+    (hour >= 10 && hour <= 15) ? 10 : 0,
+  ])
+  const taiAvg = Math.round((taiJiyu + taiLiyu + taiCaoyu + taiLianyong) / 4)
 
-  // 温度评分
-  const getTempScore = (t: number) => {
-    if (t >= 18 && t <= 28) return 10
-    if (t >= 15 && t <= 32) return 5
-    if (t < 10 || t > 35) return -15
-    return -5
+  // ===== 路亚目标鱼 =====
+  const luyaLuyu = calc(baseScore * 0.8, [
+    (hour >= 5 && hour <= 8) ? 20 : (hour >= 17 && hour <= 20) ? 15 : 0,
+    (temp >= 15 && temp <= 28) ? 10 : -5,
+    isRising ? 8 : 0,
+  ])
+  const luyaGuidiao = calc(baseScore * 0.75, [
+    (hour >= 5 && hour <= 8) ? 18 : (hour >= 18 && hour <= 21) ? 12 : 0,
+    (temp >= 18 && temp <= 26) ? 12 : -3,
+    isFalling ? 5 : 0,
+  ])
+  const luyaQiaozui = calc(baseScore * 0.7, [
+    (hour >= 6 && hour <= 9) ? 15 : (hour >= 16 && hour <= 19) ? 12 : 0,
+    (temp >= 20 && temp <= 30) ? 10 : -5,
+    wind >= 2 ? 5 : 0,
+  ])
+  const luyaMakou = calc(baseScore * 0.6, [
+    (hour >= 5 && hour <= 9) ? 15 : (hour >= 16 && hour <= 18) ? 10 : 0,
+    (temp >= 18 && temp <= 28) ? 8 : -3,
+  ])
+  const luyaAvg = Math.round((luyaLuyu + luyaGuidiao + luyaQiaozui + luyaMakou) / 4)
+
+  // ===== 伐钓目标鱼 =====
+  const faLiyu = calc(baseScore * 0.85, [
+    isRising ? 12 : 0,
+    (temp >= 20 && temp <= 28) ? 12 : 0,
+    (hour >= 6 && hour <= 10) ? 8 : (hour >= 16 && hour <= 19) ? 10 : 0,
+  ])
+  const faCaoyu = calc(baseScore * 0.7, [
+    temp >= 25 ? 18 : 0,
+    (month >= 5 && month <= 9) ? 10 : 0,
+    (hour >= 10 && hour <= 15) ? 8 : 0,
+  ])
+  const faJiyu = calc(baseScore * 0.8, [
+    (hour >= 5 && hour <= 9) ? 12 : (hour >= 16 && hour <= 19) ? 8 : 0,
+    isRising ? 5 : 0,
+  ])
+  const faQingyu = calc(baseScore * 0.6, [
+    (temp >= 22 && temp <= 30) ? 15 : 0,
+    (month >= 5 && month <= 9) ? 10 : 0,
+    pressure >= 1010 ? 5 : 0,
+  ])
+  const faAvg = Math.round((faLiyu + faCaoyu + faJiyu + faQingyu) / 4)
+
+  // ===== 矶钓目标鱼 =====
+  const jiHeidiao = calc(baseScore * 0.75, [
+    isRising ? 15 : isFalling ? -5 : 0,
+    (temp >= 18 && temp <= 28) ? 10 : -5,
+    (hour >= 6 && hour <= 9) ? 8 : (hour >= 16 && hour <= 19) ? 10 : 0,
+  ])
+  const jiZhendiao = calc(baseScore * 0.7, [
+    isRising ? 12 : 0,
+    (temp >= 20 && temp <= 27) ? 10 : -3,
+    (hour >= 5 && hour <= 8) ? 10 : (hour >= 17 && hour <= 20) ? 8 : 0,
+  ])
+  const jiLuyu = calc(baseScore * 0.65, [
+    (hour >= 5 && hour <= 8) ? 12 : (hour >= 17 && hour <= 20) ? 10 : 0,
+    (temp >= 15 && temp <= 28) ? 8 : -3,
+  ])
+  const jiAvg = Math.round((jiHeidiao + jiZhendiao + jiLuyu) / 3)
+
+  // 评分等级
+  const getLevel = (s: number) => {
+    if (s >= 70) return { level: 'excellent', levelText: '很适合' }
+    if (s >= 50) return { level: 'good', levelText: '适合' }
+    if (s >= 30) return { level: 'ok', levelText: '一般' }
+    return { level: 'low', levelText: '不太适合' }
   }
 
-  // 气压趋势（简化：用绝对值判断）
-  const pressureBoost = pressure >= 1010 && pressure <= 1025 ? 5 : -3
-
-  const hourData = getHourScore(hour)
-  const total = Math.min(100, Math.max(0, score + hourData.boost + tideBoost + getTempScore(temp) + pressureBoost))
-
-  // 鱼种活性计算
-  const fishActivity = {
-    jiyu: 0,   // 鲫鱼：适应性强，低温也能钓
-    liyu: 0,   // 鲤鱼：喜温暖，涨潮觅食积极
-    caoyu: 0,  // 草鱼：需高温+光照，午后活跃
-    lianyong: 0, // 鲢鳙：高温季节型，夏季午後最活跃
+  // 钓法提示
+  const getTip = (name: string) => {
+    if (name === '台钓') return '活饵+细线，守钓为主'
+    if (name === '路亚') return '假饵拟态，主动找鱼'
+    if (name === '伐钓') return '大水面深水区，守大物'
+    if (name === '矶钓') return '礁石钓位，涨潮前到位'
+    return ''
   }
 
-  // 鲫鱼：全天可钓，晨昏最佳，低温也能活
-  fishActivity.jiyu = total * 0.9
-  if (hour >= 5 && hour <= 9) fishActivity.jiyu += 15
-  if (hour >= 16 && hour <= 19) fishActivity.jiyu += 10
-  if (isRising) fishActivity.jiyu += 5
-  if (temp < 15) fishActivity.jiyu += 10 // 低温时鲫鱼相对活跃
-
-  // 鲤鱼：喜温暖，涨潮觅食积极
-  fishActivity.liyu = total * 0.85
-  if (temp >= 20 && temp <= 28) fishActivity.liyu += 15
-  if (isRising) fishActivity.liyu += 10
-  if (hour >= 16 && hour <= 19) fishActivity.liyu += 10
-
-  // 草鱼：需高温+光照，午后活跃
-  fishActivity.caoyu = total * 0.7
-  if (temp >= 25) fishActivity.caoyu += 20
-  if (month >= 5 && month <= 9) fishActivity.caoyu += 10 // 夏季
-  if (hour >= 12 && hour <= 16) fishActivity.caoyu += 10
-
-  // 鲢鳙：高温季节型，夏季午後最活跃
-  fishActivity.lianyong = total * 0.65
-  if (temp >= 28) fishActivity.lianyong += 25
-  if (month >= 6 && month <= 8) fishActivity.lianyong += 15 // 盛夏
-  if (hour >= 10 && hour <= 15) fishActivity.lianyong += 10
-
-  // 生成鱼种推荐（按活性排序）
-  const fishList = [
+  const methods = [
     {
-      name: '鲫鱼',
-      emoji: '🐟',
-      score: Math.min(100, Math.round(fishActivity.jiyu)),
-      get status() { return this.score >= 70 ? '开口积极' : this.score >= 50 ? '正常' : '鱼口较慢' },
-      get variant() { return this.score >= 70 ? 'open' : this.score >= 50 ? 'normal' : 'slow' },
-      get trend() { return this.score >= 70 ? '↑' : this.score >= 50 ? '→' : '↓' },
-      get desc() {
-        if (isRising && hour >= 5 && hour <= 9) return '晨口+涨黄金'
-        if (isRising) return '涨潮觅食积极'
-        if (hour >= 5 && hour <= 9) return '晨口时段活跃'
-        if (temp < 15) return '低温仍能钓'
-        return '底层觅食'
-      }
+      name: '台钓',
+      icon: '🎣',
+      score: taiAvg,
+      ...getLevel(taiAvg),
+      fish: [
+        { name: '鲫鱼', score: taiJiyu, tag: taiJiyu >= 70 ? '首选' : '' },
+        { name: '鲤鱼', score: taiLiyu, tag: taiLiyu >= 70 ? '首选' : '' },
+        { name: '草鱼', score: taiCaoyu, tag: taiCaoyu >= 70 ? '首选' : '' },
+        { name: '鲢鳙', score: taiLianyong, tag: taiLianyong >= 70 ? '首选' : '' },
+      ],
+      tip: getTip('台钓'),
     },
     {
-      name: '鲤鱼',
-      emoji: '🐠',
-      score: Math.min(100, Math.round(fishActivity.liyu)),
-      get status() { return this.score >= 70 ? '开口积极' : this.score >= 50 ? '正常' : '鱼口较慢' },
-      get variant() { return this.score >= 70 ? 'open' : this.score >= 50 ? 'normal' : 'slow' },
-      get trend() { return this.score >= 70 ? '↑' : this.score >= 50 ? '→' : '↓' },
-      get desc() {
-        if (isRising && temp >= 20) return '涨潮+温暖活跃'
-        if (isRising) return '涨潮觅食积极'
-        if (temp >= 20) return '温暖时段活跃'
-        return '偶尔探底'
-      }
+      name: '路亚',
+      icon: '🐠',
+      score: luyaAvg,
+      ...getLevel(luyaAvg),
+      fish: [
+        { name: '鲈鱼', score: luyaLuyu, tag: luyaLuyu >= 70 ? '首选' : '' },
+        { name: '鳜鱼', score: luyaGuidiao, tag: luyaGuidiao >= 70 ? '首选' : '' },
+        { name: '翘嘴', score: luyaQiaozui, tag: luyaQiaozui >= 70 ? '首选' : '' },
+        { name: '马口', score: luyaMakou, tag: luyaMakou >= 70 ? '首选' : '' },
+      ],
+      tip: getTip('路亚'),
     },
     {
-      name: '草鱼',
-      emoji: '🐡',
-      score: Math.min(100, Math.round(fishActivity.caoyu)),
-      get status() { return this.score >= 70 ? '开口积极' : this.score >= 50 ? '正常' : '鱼口较慢' },
-      get variant() { return this.score >= 70 ? 'open' : this.score >= 50 ? 'normal' : 'slow' },
-      get trend() { return this.score >= 70 ? '↑' : this.score >= 50 ? '→' : '↓' },
-      get desc() {
-        if (temp >= 28 && hour >= 12) return '高温午后活跃'
-        if (temp >= 25) return '中上层活动'
-        return '活动减少'
-      }
+      name: '伐钓',
+      icon: '🚣',
+      score: faAvg,
+      ...getLevel(faAvg),
+      fish: [
+        { name: '鲤鱼', score: faLiyu, tag: faLiyu >= 70 ? '首选' : '' },
+        { name: '草鱼', score: faCaoyu, tag: faCaoyu >= 70 ? '首选' : '' },
+        { name: '鲫鱼', score: faJiyu, tag: faJiyu >= 70 ? '首选' : '' },
+        { name: '青鱼', score: faQingyu, tag: faQingyu >= 70 ? '首选' : '' },
+      ],
+      tip: getTip('伐钓'),
     },
     {
-      name: '鲢鳙',
-      emoji: '🎣',
-      score: Math.min(100, Math.round(fishActivity.lianyong)),
-      get status() { return this.score >= 70 ? '开口积极' : this.score >= 50 ? '正常' : '鱼口较慢' },
-      get variant() { return this.score >= 70 ? 'open' : this.score >= 50 ? 'normal' : 'slow' },
-      get trend() { return this.score >= 70 ? '↑' : this.score >= 50 ? '→' : '↓' },
-      get desc() {
-        if (temp >= 30 && month >= 6) return '盛夏滤食旺盛'
-        if (temp >= 28) return '高温滤食活跃'
-        return '滤食一般'
-      }
+      name: '矶钓',
+      icon: '🪨',
+      score: jiAvg,
+      ...getLevel(jiAvg),
+      fish: [
+        { name: '黑鲷', score: jiHeidiao, tag: jiHeidiao >= 70 ? '首选' : '' },
+        { name: '真鲷', score: jiZhendiao, tag: jiZhendiao >= 70 ? '首选' : '' },
+        { name: '鲈鱼', score: jiLuyu, tag: jiLuyu >= 70 ? '首选' : '' },
+      ],
+      tip: getTip('矶钓'),
     },
   ]
 
-  // 按活性排序，返回前4个
-  return fishList.sort((a, b) => b.score - a.score).slice(0, 4)
+  // 按评分排序，推荐的在前
+  return methods.sort((a, b) => b.score - a.score)
 })
 
 // ===== 钓法建议 =====
@@ -1230,20 +1287,42 @@ $danger: #F23F43;
 .vbar-legend-dot--bad { background: #FF9800; }
 .vbar-legend-dot--poor { background: #F44336; }
 
-/* 推荐鱼种网格 */
+/* 按钓法推荐 */
 .fish-section-title { font-size: 24rpx; font-weight: 600; color: $header-primary; margin-bottom: 12rpx; display: block; }
-.fish-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12rpx; }
-.fish-mini-card { background: $bg-page; border-radius: 12rpx; padding: 16rpx; display: flex; flex-direction: column; align-items: center; position: relative; }
-.fish-mini-rank { position: absolute; top: 8rpx; left: 10rpx; font-size: 18rpx; color: $blurple; font-weight: 600; }
-.fish-mini-emoji { font-size: 36rpx; margin-top: 8rpx; }
-.fish-mini-name { font-size: 22rpx; font-weight: 600; color: $header-primary; margin-top: 4rpx; }
-.fish-mini-desc { font-size: 16rpx; color: $text-muted; margin-top: 2rpx; }
-.fish-mini-score-row { display: flex; align-items: center; gap: 8rpx; margin-top: 8rpx; }
-.fish-mini-score { font-size: 20rpx; color: $blurple; font-weight: 600; }
-.fish-mini-badge { font-size: 16rpx; padding: 4rpx 10rpx; border-radius: 8rpx; }
-.fish-mini-badge--open { background: rgba($status-green, 0.15); color: $status-green; }
-.fish-mini-badge--normal { background: rgba($text-muted, 0.1); color: $text-muted; }
-.fish-mini-badge--slow { background: rgba($status-yellow, 0.15); color: $status-yellow; }
+.method-scroll { white-space: nowrap; margin: 0 -24rpx; padding: 0 24rpx; }
+.method-list { display: inline-flex; gap: 16rpx; padding-right: 24rpx; }
+.method-card {
+  width: 320rpx; min-width: 320rpx; background: $bg-page; border-radius: 16rpx;
+  padding: 20rpx; display: inline-flex; flex-direction: column; gap: 14rpx;
+  flex-shrink: 0; white-space: normal;
+}
+.method-header { display: flex; align-items: center; gap: 12rpx; }
+.method-icon { font-size: 36rpx; }
+.method-header-info { flex: 1; }
+.method-name { font-size: 26rpx; font-weight: 700; color: $header-primary; display: block; }
+.method-score-row { display: flex; align-items: center; gap: 8rpx; margin-top: 2rpx; }
+.method-score { font-size: 22rpx; font-weight: 700; }
+.method-score--excellent { color: $status-green; }
+.method-score--good { color: $blurple; }
+.method-score--ok { color: $status-yellow; }
+.method-score--low { color: $text-muted; }
+.method-level { font-size: 18rpx; color: $text-muted; }
+.method-fish-list { display: flex; flex-direction: column; gap: 10rpx; }
+.method-fish-row { display: flex; align-items: center; gap: 8rpx; }
+.method-fish-name { font-size: 22rpx; color: $header-primary; width: 64rpx; flex-shrink: 0; }
+.method-fish-bar-wrap {
+  flex: 1; height: 8rpx; background: rgba($text-muted, 0.1); border-radius: 4rpx; overflow: hidden;
+}
+.method-fish-bar { height: 100%; border-radius: 4rpx; transition: width 0.3s ease; }
+.method-fish-bar--good { background: $status-green; }
+.method-fish-bar--ok { background: $blurple; }
+.method-fish-bar--low { background: rgba($text-muted, 0.3); }
+.method-fish-score { font-size: 20rpx; color: $text-muted; width: 48rpx; text-align: right; flex-shrink: 0; }
+.method-fish-tag {
+  font-size: 16rpx; padding: 2rpx 8rpx; border-radius: 6rpx;
+  background: rgba($status-green, 0.12); color: $status-green; flex-shrink: 0;
+}
+.method-tip { font-size: 18rpx; color: $text-muted; line-height: 1.4; }
 
 /* 条件标签 */
 .divider-simple { height: 1rpx; background: $divider; margin: 16rpx 0; }
