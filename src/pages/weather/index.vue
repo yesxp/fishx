@@ -802,7 +802,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 20:10'
+const nowStr = '2026-06-17 20:25'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
