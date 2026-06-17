@@ -261,15 +261,15 @@
               <line :x1="tideNowX" :y1="TP" :x2="tideNowX" :y2="TP + TCH" stroke="#F23F43" stroke-width="1.5"/>
               <circle :cx="tideNowX" :cy="TP + TCH" r="3" fill="#F23F43" stroke="white" stroke-width="1.5"/>
             </svg>
-            </scroll-view>
-            <!-- 时间轴 -->
-            <view class="tide-time-axis">
+            <!-- 时间轴(跟曲线同步滚动) -->
+            <view class="tide-time-axis" :style="{ width: TW + 'px' }">
               <text class="tide-time-label">00:00</text>
               <text class="tide-time-label">06:00</text>
               <text class="tide-time-label">12:00</text>
               <text class="tide-time-label">18:00</text>
               <text class="tide-time-label">24:00</text>
             </view>
+            </scroll-view>
           </view>
           <!-- 当前实况行 -->
           <view class="tide-now-row">
@@ -799,7 +799,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 19:50'
+const nowStr = '2026-06-17 19:55'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
