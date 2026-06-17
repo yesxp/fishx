@@ -224,25 +224,17 @@
             <wd-tag :type="tideStatus.tagType" size="small" round>{{ tideStatus.text }}</wd-tag>
           </view>
           <view class="tide-chart-wrap">
-            <scroll-view scroll-x :style="{ width: '100%' }" enhanced :show-scrollbar="false" class="tide-scroll">
-            <svg viewBox="0 0 680 140" width="680" height="140" class="tide-svg">
-              <!-- 水平网格线 -->
-              <line v-for="i in 5" :key="'gl'+i" :x1="0" :y1="10 + (i-1) * 30" :x2="680" :y2="10 + (i-1) * 30" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4,4"/>
-              <!-- 垂直时间网格线(每3h) -->
-              <line v-for="(_, gi) in tideTimeLabels" :key="'vl'+gi" :x1="gi * (680 / (tideTimeLabels.length - 1))" :y1="10" :x2="gi * (680 / (tideTimeLabels.length - 1))" :y2="130" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4,4"/>
+            <svg viewBox="0 0 340 100" width="100%" height="100" class="tide-svg">
+              <!-- Fishing-friendly zone overlays -->
+              <rect v-for="i in 4" :key="'tz'+i" :x="(i*70) - 15" y="0" width="30" height="100" fill="#23A559" opacity="0.06" rx="4"/>
+              <line v-for="i in 4" :key="'gl'+i" :x1="0" :y1="i*25" :x2="340" :y2="i*25" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4,4"/>
               <path :d="tidePath" fill="none" stroke="#5865F2" stroke-width="2"/>
               <path :d="tideAreaPath" fill="url(#tideFillGrad)" opacity="0.15"/>
-              <!-- 潮汐标记点 + 高度标签 -->
               <g v-for="(pt, i) in tideMarkers" :key="'tm'+i">
-                <circle :cx="pt.x" :cy="pt.y" r="4" :fill="pt.type === 'H' ? '#F0B232' : '#5865F2'" stroke="white" stroke-width="1.5"/>
-                <rect :x="pt.x - 16" :y="pt.y - 22" width="32" height="14" rx="3" :fill="pt.type === 'H' ? 'rgba(240,178,50,0.12)' : 'rgba(88,101,242,0.12)'"/>
-                <text :x="pt.x" :y="pt.y - 12" text-anchor="middle" font-size="9" font-weight="600" :fill="pt.type === 'H' ? '#E09520' : '#4752CC'">{{ pt.height }}m</text>
+                <circle :cx="pt.x" :cy="pt.y" r="3" :fill="pt.type === 'H' ? '#F0B232' : '#5865F2'"/>
+                <text :x="pt.x" :y="pt.y - 8" text-anchor="middle" font-size="8" :fill="pt.type === 'H' ? '#F0B232' : '#5865F2'">{{ pt.height }}m</text>
               </g>
-              <!-- 当前时间红线 -->
-              <line :x1="0" :y1="10" :x2="0" :y2="130" stroke="#F23F43" stroke-width="2"/>
-              <circle cx="0" cy="130" r="4" fill="#F23F43" stroke="white" stroke-width="1.5"/>
-              <rect x="2" y="14" width="30" height="14" rx="3" fill="#F23F43"/>
-              <text x="17" y="24" text-anchor="middle" font-size="8" fill="white" font-weight="600">现在</text>
+              <line v-if="tideNowX" :x1="tideNowX" :y1="0" :x2="tideNowX" :y2="100" stroke="#F23F43" stroke-width="1" stroke-dasharray="3,3"/>
               <defs>
                 <linearGradient id="tideFillGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#5865F2"/>
@@ -250,9 +242,12 @@
                 </linearGradient>
               </defs>
             </svg>
-            </scroll-view>
             <view class="tide-time-axis">
-              <text v-for="(lbl, li) in tideTimeLabels" :key="'tl'+li" class="tide-time-label">{{ lbl }}</text>
+              <text class="tide-time-label">00:00</text>
+              <text class="tide-time-label">06:00</text>
+              <text class="tide-time-label">12:00</text>
+              <text class="tide-time-label">18:00</text>
+              <text class="tide-time-label">24:00</text>
             </view>
           </view>
           <!-- Compact Tide Info Badges -->
@@ -762,7 +757,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 19:25'
+const nowStr = '2026-06-17 19:08'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -865,38 +860,16 @@ const tideStatus = computed(() => {
   return { text: '平潮', tagType: 'primary' }
 })
 
-// 潮汐时间窗口：从当前时间前1小时到后17小时（共18h）
-const TIDE_W = 680, TIDE_PAD = 10, TIDE_CH = 120, TIDE_WINDOW = 18
-const tideWindow = computed(() => {
-  const now = new Date()
-  const startH = now.getHours() - 1
-  return { startH, endH: startH + TIDE_WINDOW }
-})
-const filteredTideHourly = computed(() => {
-  if (!tideData.value?.tideHourly) return []
-  const { startH, endH } = tideWindow.value
-  return tideData.value.tideHourly.filter((h: any) => {
-    const hr = parseInt(h.fxTime.slice(11, 13))
-    return hr >= startH && hr <= endH
-  })
-})
 const tidePath = computed(() => {
-  const hourly = filteredTideHourly.value
-  if (hourly.length === 0) return ''
-  const allH = tideData.value?.tideHourly || []
-  const maxH = Math.max(...allH.map((h: any) => Number(h.height)))
-  const minH = Math.min(...allH.map((h: any) => Number(h.height)))
+  if (!tideData.value?.tideHourly) return ''
+  const hourly = tideData.value.tideHourly
+  const maxH = Math.max(...hourly.map((h: any) => Number(h.height)))
+  const minH = Math.min(...hourly.map((h: any) => Number(h.height)))
   const range = maxH - minH || 1
-  const { startH } = tideWindow.value
-  const points = hourly.map((h: any) => {
-    const hr = parseInt(h.fxTime.slice(11, 13))
-    const mn = parseInt(h.fxTime.slice(14, 16))
-    const hFrac = hr + mn / 60
-    return {
-      x: ((hFrac - startH) / TIDE_WINDOW) * TIDE_W,
-      y: TIDE_PAD + (1 - (Number(h.height) - minH) / range) * TIDE_CH
-    }
-  })
+  const points = hourly.map((h: any, i: number) => ({
+    x: (i / (hourly.length - 1)) * 340,
+    y: 5 + (1 - (Number(h.height) - minH) / range) * 80
+  }))
   if (points.length === 0) return ''
   let d = `M ${points[0].x} ${points[0].y}`
   for (let i = 1; i < points.length; i++) {
@@ -906,42 +879,28 @@ const tidePath = computed(() => {
   return d
 })
 
-const tideAreaPath = computed(() => tidePath.value ? tidePath.value + ` L ${TIDE_W} 140 L 0 140 Z` : '')
+const tideAreaPath = computed(() => tidePath.value ? tidePath.value + ' L 340 100 L 0 100 Z' : '')
 
 const tideMarkers = computed(() => {
   if (!tideData.value?.tideTable || !tideData.value?.tideHourly) return []
-  const allH = tideData.value.tideHourly
-  const maxH = Math.max(...allH.map((h: any) => Number(h.height)))
-  const minH = Math.min(...allH.map((h: any) => Number(h.height)))
+  const hourly = tideData.value.tideHourly
+  const maxH = Math.max(...hourly.map((h: any) => Number(h.height)))
+  const minH = Math.min(...hourly.map((h: any) => Number(h.height)))
   const range = maxH - minH || 1
-  const { startH } = tideWindow.value
-  return tideData.value.tideTable
-    .filter((t: any) => {
-      const hr = parseInt(t.fxTime.slice(11, 13))
-      return hr >= startH && hr <= startH + TIDE_WINDOW
-    })
-    .map((t: any) => {
-      const h = parseInt(t.fxTime.slice(11, 13))
-      const m = parseInt(t.fxTime.slice(14, 16))
-      const hFrac = h + m / 60
-      return {
-        x: ((hFrac - startH) / TIDE_WINDOW) * TIDE_W,
-        y: TIDE_PAD + (1 - (Number(t.height) - minH) / range) * TIDE_CH,
-        height: t.height, type: t.type
-      }
-    })
+  return tideData.value.tideTable.map((t: any) => {
+    const h = parseInt(t.fxTime.slice(11, 13))
+    const m = parseInt(t.fxTime.slice(14, 16))
+    return {
+      x: (Math.min(h + (m > 0 ? 1 : 0), 23) / 23) * 340,
+      y: 5 + (1 - (Number(t.height) - minH) / range) * 80,
+      height: t.height, type: t.type
+    }
+  })
 })
 
-// 红线固定在左侧 x=0（窗口起点 = 当前时间前1h）
-const tideNowX = computed(() => 0)
-const tideTimeLabels = computed(() => {
-  const { startH } = tideWindow.value
-  const labels = []
-  for (let i = 0; i <= TIDE_WINDOW; i += 3) {
-    const h = (startH + i + 24) % 24
-    labels.push(`${String(h).padStart(2, '0')}:00`)
-  }
-  return labels
+const tideNowX = computed(() => {
+  const now = new Date()
+  return (now.getHours() / 23) * 340
 })
 
 // ===== 潮汐日历 =====
@@ -1466,7 +1425,6 @@ $danger: #F23F43;
 
 /* Tide */
 .tide-chart-wrap { margin-bottom: 12px; }
-.tide-scroll { white-space: nowrap; }
 .tide-svg { display: block; }
 .tide-time-axis { display: flex; justify-content: space-between; padding: 4px 0; }
 .tide-time-label { font-size: 10px; color: $text-muted; }
