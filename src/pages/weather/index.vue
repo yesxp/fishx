@@ -251,13 +251,13 @@
                 <path :d="tideAreaPath" fill="url(#tideFillGrad)" opacity="0.15"/>
                 <path :d="tidePath" fill="none" stroke="#5865F2" stroke-width="2"/>
                 <!-- 满潮/干潮圆点 -->
-                <circle v-for="(pt, i) in tideMarkers" :key="'tm'+i" :cx="pt.x" :cy="pt.y" r="5" :fill="pt.type === 'H' ? '#5865F2' : '#23A559'" stroke="white" stroke-width="2"/>
+                <circle v-for="(pt, i) in tideMarkers" :key="'tm'+i" :cx="pt.x" :cy="pt.y" r="5" :fill="pt.type === 'H' ? '#5865F2' : 'white'" :stroke="pt.type === 'H' ? '#5865F2' : '#F0B232'" stroke-width="2"/>
                 <!-- 当前时间红线 -->
                 <line :x1="tideNowX" :y1="TP" :x2="tideNowX" :y2="TP + TCH" stroke="#F23F43" stroke-width="1.5"/>
                 <circle :cx="tideNowX" :cy="TP + TCH" r="3" fill="#F23F43" stroke="white" stroke-width="1.5"/>
               </svg>
               <!-- HTML文字覆盖层 -->
-              <view v-for="(pt, i) in tideMarkers" :key="'tl'+i" class="tide-marker-label" :style="{ left: pt.x + 'px', top: (pt.type === 'H' ? pt.y - 18 : pt.y + 10) + 'px', color: pt.type === 'H' ? '#5865F2' : '#23A559' }">
+              <view v-for="(pt, i) in tideMarkers" :key="'tl'+i" class="tide-marker-label" :style="{ left: pt.x + 'px', top: (pt.type === 'H' ? pt.y - 18 : pt.y + 10) + 'px', color: pt.type === 'H' ? '#5865F2' : '#F0B232' }">
                 {{ pt.height }}m
               </view>
             </view>
@@ -802,7 +802,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 20:25'
+const nowStr = '2026-06-17 20:30'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
