@@ -204,11 +204,11 @@
                 <text class="day-text">{{ day.textDay }}</text>
               </view>
               <view class="day-temp-bar">
-                <view class="day-temp-lo">{{ day.tempNight }}°</view>
+                <wd-tag size="small" round plain custom-style="font-size:13px;color:#80848E;background:transparent;border:none;padding:0">{{ day.tempNight }}°</wd-tag>
                 <view class="day-temp-track">
                   <view class="day-temp-fill" :style="getTempBarStyle(day.tempNight, day.tempDay)" />
                 </view>
-                <view class="day-temp-hi">{{ day.tempDay }}°</view>
+                <wd-tag size="small" round plain custom-style="font-size:13px;font-weight:700;color:#060607;background:transparent;border:none;padding:0">{{ day.tempDay }}°</wd-tag>
               </view>
               <view class="day-comfort">
                  <wd-tag :type="getDayComfortType(day)" size="small" round variant="light">{{ getDayComfortText(day) }}</wd-tag>
@@ -757,7 +757,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 18:15'
+const nowStr = '2026-06-17 18:25'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
