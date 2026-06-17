@@ -340,6 +340,9 @@
               <text class="tide-cal-empty">--</text>
             </template>
           </view>
+          <view class="tide-tip">
+            <text class="tide-tip-text">💡 {{ tidePattern.suggestion }}</text>
+          </view>
         </view>
 
         <!-- ===== 台风路径 ===== -->
