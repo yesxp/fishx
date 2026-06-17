@@ -750,7 +750,7 @@ const hourlyFishingScore = computed(() => {
 
 const nowHour = computed(() => new Date().getHours())
 // 部署时间戳：每次提交时更新
-const nowStr = '2026-06-17 16:40'
+const nowStr = '2026-06-17 16:45'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -792,7 +792,7 @@ const getAlertType = (text: string) => {
 }
 
 const getAlertText = (text: string) => {
-  if (!text) return '—'
+  if (!text) return text || '—'
   if (/暴雨|大暴雨|特大暴雨/.test(text)) return '暴雨'
   if (/雷阵雨|雷暴/.test(text)) return '雷暴'
   if (/雷/.test(text)) return '雷电'
@@ -805,7 +805,7 @@ const getAlertText = (text: string) => {
   if (/雨夹雪/.test(text)) return '雨雪'
   if (/雪/.test(text)) return '降雪'
   if (/雾/.test(text)) return '大雾'
-  return '—'
+  return text || '—'
 }
 
 // ===== 潮汐 =====
