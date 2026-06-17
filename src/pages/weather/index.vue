@@ -162,7 +162,7 @@
                   <view class="hourly-temp-bar" :style="{ height: getHourlyBarHeight(h) + 'px' }" />
                 </view>
                 <text class="hourly-wind">{{ h.windDir }} {{ h.windScale }}级</text>
-                <wd-tag :type="getAlertType(h.text)" size="small" round>{{ getAlertText(h.text) }}</wd-tag>
+                <wd-tag type="info" size="small" round :custom-style="getAlertStyle(h.text)">{{ getAlertText(h.text) }}</wd-tag>
               </view>
             </view>
           </scroll-view>
@@ -785,13 +785,13 @@ const getHourlyBarHeight = (h: any) => {
 }
 
 // 天气预警等级
-const getAlertType = (text: string): 'danger' | 'warning' | 'primary' | 'info' => {
-  if (!text) return 'info'
-  if (/暴雨|大暴雨|特大暴雨/.test(text)) return 'danger'
-  if (/雷|冰雹|大风/.test(text)) return 'warning'
-  if (/中雨|大雨|冻雨/.test(text)) return 'warning'
-  if (/小雨|阵雨|雨夹雪/.test(text)) return 'primary'
-  return 'info'
+const getAlertStyle = (text: string) => {
+  if (/暴雨|大暴雨|特大暴雨/.test(text)) return { background: 'rgba(242,63,67,0.12)', color: '#F23F43' }
+  if (/雷|冰雹|大风/.test(text)) return { background: 'rgba(240,178,50,0.12)', color: '#B8860B' }
+  if (/中雨|大雨|冻雨/.test(text)) return { background: 'rgba(240,178,50,0.12)', color: '#B8860B' }
+  if (/小雨|阵雨|雨夹雪/.test(text)) return { background: 'rgba(88,101,242,0.12)', color: '#5865F2' }
+  if (/雪|雾/.test(text)) return { background: 'rgba(88,101,242,0.12)', color: '#5865F2' }
+  return { background: '#F2F3F5', color: '#80848E' }
 }
 
 const getAlertText = (text: string) => {
@@ -1343,12 +1343,6 @@ $danger: #F23F43;
 .hourly-temp-bar { width: 10rpx; border-radius: 5rpx; background: $blurple; }
 .hourly-wind { font-size: 18rpx; color: $text-muted; text-align: center; }
 
-// 预警标签：深色文字
-.hourly-scroll :deep(.wd-tag--primary) { background: rgba($brand, 0.12) !important; color: $brand !important; }
-.hourly-scroll :deep(.wd-tag--danger) { background: rgba($danger, 0.12) !important; color: $danger !important; }
-.hourly-scroll :deep(.wd-tag--warning) { background: rgba($warning, 0.12) !important; color: #B8860B !important; }
-.hourly-scroll :deep(.wd-tag--success) { background: rgba($success, 0.12) !important; color: $success !important; }
-.hourly-scroll :deep(.wd-tag--info) { background: $tag-bg !important; color: $text-muted !important; }
 
 .hourly-empty { padding: 30rpx 0; text-align: center; }
 .hourly-empty-text { font-size: 26rpx; color: $text-muted; }
