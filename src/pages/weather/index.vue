@@ -146,38 +146,33 @@
             </view>
           </view>
           <!-- 横向滑动小时卡片 -->
-          <scroll-view v-if="filteredHourly.length > 0" scroll-x class="hourly-scroll" :show-scrollbar="false">
-            <view class="hourly-row">
-              <view
-                v-for="(h, i) in filteredHourly"
-                :key="i"
-                class="hourly-card"
-                :class="{ 'hourly-card--now': i === 0 && selectedDayIdx === 0 }"
-              >
-                <text class="hourly-time">{{ i === 0 && selectedDayIdx === 0 ? '现在' : h.time.slice(-5, -3) + '点' }}</text>
-                <text class="hourly-icon">{{ getWeatherIcon(h.icon) }}</text>
-                <text class="hourly-temp">{{ h.temp }}°</text>
-                <!-- 温度下方：左侧接线 + 圆点 + 右侧接线 -->
-                <view class="hourly-line-area">
-                  <view v-if="hourlyDots[i]" class="hourly-line-svg">
-                    <svg viewBox="0 0 65 80" :style="{ width: '100%', height: '100%', overflow: 'visible' }">
-                      <!-- 右侧线段：自己圆点→下一个卡片圆点 -->
-                      <line
-                        v-if="i < hourlyDots.length - 1"
-                        :x1="32" :y1="hourlyDots[i].localY"
-                        :x2="97" :y2="hourlyDots[i + 1].localY"
-                        stroke="#FF8C42" stroke-width="1.5" stroke-linecap="round"
-                      />
-                      <!-- 圆点 -->
-                      <circle cx="32" :cy="hourlyDots[i].localY" r="3.5" fill="#FF8C42" />
-                    </svg>
-                  </view>
+          <view v-if="filteredHourly.length > 0" class="hourly-outer">
+            <!-- 温度曲线 SVG 覆盖层 -->
+            <svg v-if="hourlyDots.length > 1" class="hourly-svg" :style="{ transform: 'translateX(' + hourlyScrollX + 'px)' }">
+              <polyline
+                :points="hourlyDots.map(d => d.x + ',' + d.y).join(' ')"
+                fill="none" stroke="#FF8C42" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              />
+              <circle v-for="(d, i) in hourlyDots" :key="i" :cx="d.x" :cy="d.y" r="4" fill="#FF8C42" stroke="#fff" stroke-width="2" />
+            </svg>
+            <scroll-view scroll-x class="hourly-scroll" :show-scrollbar="false" @scroll="onHourlyScroll">
+              <view class="hourly-row">
+                <view
+                  v-for="(h, i) in filteredHourly"
+                  :key="i"
+                  class="hourly-card"
+                  :class="{ 'hourly-card--now': i === 0 && selectedDayIdx === 0 }"
+                >
+                  <text class="hourly-time">{{ i === 0 && selectedDayIdx === 0 ? '现在' : h.time.slice(-5, -3) + '点' }}</text>
+                  <text class="hourly-icon">{{ getWeatherIcon(h.icon) }}</text>
+                  <text class="hourly-temp">{{ h.temp }}°</text>
+                  <view class="hourly-spacer" />
+                  <text class="hourly-wind">{{ h.windDir }} {{ h.windScale }}级</text>
+                  <view class="hourly-bar" :class="getHourlyBarClass(h)" />
                 </view>
-                <text class="hourly-wind">{{ h.windDir }} {{ h.windScale }}级</text>
-                <view class="hourly-bar" :class="getHourlyBarClass(h)" />
               </view>
-            </view>
-          </scroll-view>
+            </scroll-view>
+          </view>
           <view v-else class="hourly-empty">
             <text class="hourly-empty-text">暂无该日逐时数据</text>
           </view>
@@ -658,6 +653,9 @@ const filteredHourly = computed(() => {
 })
 
 // ===== 逐小时温度曲线 =====
+const hourlyScrollRef = ref()
+const hourlyScrollX = ref(0)
+
 const hourlyDots = computed(() => {
   const data = filteredHourly.value
   if (data.length < 2) return []
@@ -667,15 +665,19 @@ const hourlyDots = computed(() => {
   const range = maxT - minT || 1
   const svgH = 80
   const padY = 10
+  const cardW = 65 // 130rpx ≈ 65px
 
-  // 先算全局 Y 坐标
   const globalY = temps.map(t => padY + (1 - (t - minT) / range) * (svgH - padY * 2))
 
   return data.map((_, i) => ({
-    globalY: globalY[i],
-    localY: globalY[i],
+    x: i * cardW + cardW / 2,
+    y: globalY[i],
   }))
 })
+
+function onHourlyScroll(e: any) {
+  hourlyScrollX.value = -(e.detail?.scrollLeft || 0)
+}
 
 const moonPhaseIcon = computed(() => {
   const phase = today.value?.moonPhase || ''
@@ -1298,6 +1300,11 @@ $danger: #F23F43;
 .tip-tag--blue { background: rgba($blurple, 0.1); color: $blurple; }
 
 /* Hourly Scroll Cards */
+.hourly-outer { position: relative; overflow: hidden; }
+.hourly-svg {
+  position: absolute; top: 0; left: 0; width: 100%; height: 80px;
+  pointer-events: none; z-index: 1; transition: transform 0.05s linear;
+}
 .hourly-scroll { white-space: nowrap; }
 .hourly-row { display: inline-flex; gap: 0; }
 .hourly-card {
@@ -1310,8 +1317,7 @@ $danger: #F23F43;
 .hourly-icon { font-size: 36rpx; }
 .hourly-temp { font-size: 32rpx; font-weight: 700; color: $header-primary; }
 .hourly-card--now .hourly-temp { font-size: 36rpx; }
-.hourly-line-area { width: 130rpx; height: 80px; }
-.hourly-line-svg { width: 100%; height: 100%; }
+.hourly-spacer { flex: 1; min-height: 80px; }
 .hourly-wind { font-size: 18rpx; color: $text-muted; text-align: center; }
 .hourly-bar { width: 32rpx; height: 6rpx; border-radius: 3rpx; margin-top: 2rpx; }
 .hourly-bar--sun { background: $status-green; }
