@@ -224,17 +224,23 @@
             <wd-tag :type="tideStatus.tagType" size="small" round>{{ tideStatus.text }}</wd-tag>
           </view>
           <view class="tide-chart-wrap">
-            <svg viewBox="0 0 340 100" width="100%" height="100" class="tide-svg">
-              <!-- Fishing-friendly zone overlays -->
-              <rect v-for="i in 4" :key="'tz'+i" :x="(i*70) - 15" y="0" width="30" height="100" fill="#23A559" opacity="0.06" rx="4"/>
-              <line v-for="i in 4" :key="'gl'+i" :x1="0" :y1="i*25" :x2="340" :y2="i*25" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4,4"/>
+            <scroll-view scroll-x :style="{ width: '100%' }" enhanced :show-scrollbar="false" class="tide-scroll">
+            <svg viewBox="0 0 680 140" width="680" height="140" class="tide-svg">
+              <!-- 水平网格线 -->
+              <line v-for="i in 5" :key="'gl'+i" :x1="0" :y1="10 + (i-1) * 30" :x2="680" :y2="10 + (i-1) * 30" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4,4"/>
+              <!-- 垂直时间网格线 -->
+              <line v-for="h in [0,6,12,18]" :key="'vl'+h" :x1="h/23*680" :y1="10" :x2="h/23*680" :y2="130" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4,4"/>
               <path :d="tidePath" fill="none" stroke="#5865F2" stroke-width="2"/>
               <path :d="tideAreaPath" fill="url(#tideFillGrad)" opacity="0.15"/>
+              <!-- 潮汐标记点 + 高度标签 -->
               <g v-for="(pt, i) in tideMarkers" :key="'tm'+i">
-                <circle :cx="pt.x" :cy="pt.y" r="3" :fill="pt.type === 'H' ? '#F0B232' : '#5865F2'"/>
-                <text :x="pt.x" :y="pt.y - 8" text-anchor="middle" font-size="8" :fill="pt.type === 'H' ? '#F0B232' : '#5865F2'">{{ pt.height }}m</text>
+                <circle :cx="pt.x" :cy="pt.y" r="4" :fill="pt.type === 'H' ? '#F0B232' : '#5865F2'" stroke="white" stroke-width="1.5"/>
+                <rect :x="pt.x - 16" :y="pt.y - 22" width="32" height="14" rx="3" :fill="pt.type === 'H' ? 'rgba(240,178,50,0.12)' : 'rgba(88,101,242,0.12)'"/>
+                <text :x="pt.x" :y="pt.y - 12" text-anchor="middle" font-size="9" font-weight="600" :fill="pt.type === 'H' ? '#E09520' : '#4752CC'">{{ pt.height }}m</text>
               </g>
-              <line v-if="tideNowX" :x1="tideNowX" :y1="0" :x2="tideNowX" :y2="100" stroke="#F23F43" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- 当前时间红线 -->
+              <line v-if="tideNowX" :x1="tideNowX" :y1="10" :x2="tideNowX" :y2="130" stroke="#F23F43" stroke-width="1.5" stroke-dasharray="4,3"/>
+              <circle v-if="tideNowX" :cx="tideNowX" cy="130" r="3" fill="#F23F43"/>
               <defs>
                 <linearGradient id="tideFillGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#5865F2"/>
@@ -242,11 +248,14 @@
                 </linearGradient>
               </defs>
             </svg>
+            </scroll-view>
             <view class="tide-time-axis">
               <text class="tide-time-label">00:00</text>
-              <text class="tide-time-label">06:00</text>
+              <text class="tide-time-label">04:00</text>
+              <text class="tide-time-label">08:00</text>
               <text class="tide-time-label">12:00</text>
-              <text class="tide-time-label">18:00</text>
+              <text class="tide-time-label">16:00</text>
+              <text class="tide-time-label">20:00</text>
               <text class="tide-time-label">24:00</text>
             </view>
           </view>
@@ -757,7 +766,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 19:08'
+const nowStr = '2026-06-17 19:18'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -866,9 +875,10 @@ const tidePath = computed(() => {
   const maxH = Math.max(...hourly.map((h: any) => Number(h.height)))
   const minH = Math.min(...hourly.map((h: any) => Number(h.height)))
   const range = maxH - minH || 1
+  const W = 680, PAD = 10, CH = 120
   const points = hourly.map((h: any, i: number) => ({
-    x: (i / (hourly.length - 1)) * 340,
-    y: 5 + (1 - (Number(h.height) - minH) / range) * 80
+    x: (i / (hourly.length - 1)) * W,
+    y: PAD + (1 - (Number(h.height) - minH) / range) * CH
   }))
   if (points.length === 0) return ''
   let d = `M ${points[0].x} ${points[0].y}`
@@ -879,7 +889,7 @@ const tidePath = computed(() => {
   return d
 })
 
-const tideAreaPath = computed(() => tidePath.value ? tidePath.value + ' L 340 100 L 0 100 Z' : '')
+const tideAreaPath = computed(() => tidePath.value ? tidePath.value + ' L 680 140 L 0 140 Z' : '')
 
 const tideMarkers = computed(() => {
   if (!tideData.value?.tideTable || !tideData.value?.tideHourly) return []
@@ -887,12 +897,13 @@ const tideMarkers = computed(() => {
   const maxH = Math.max(...hourly.map((h: any) => Number(h.height)))
   const minH = Math.min(...hourly.map((h: any) => Number(h.height)))
   const range = maxH - minH || 1
+  const W = 680, PAD = 10, CH = 120
   return tideData.value.tideTable.map((t: any) => {
     const h = parseInt(t.fxTime.slice(11, 13))
     const m = parseInt(t.fxTime.slice(14, 16))
     return {
-      x: (Math.min(h + (m > 0 ? 1 : 0), 23) / 23) * 340,
-      y: 5 + (1 - (Number(t.height) - minH) / range) * 80,
+      x: (Math.min(h + (m > 0 ? 1 : 0), 23) / 23) * W,
+      y: PAD + (1 - (Number(t.height) - minH) / range) * CH,
       height: t.height, type: t.type
     }
   })
@@ -900,7 +911,7 @@ const tideMarkers = computed(() => {
 
 const tideNowX = computed(() => {
   const now = new Date()
-  return (now.getHours() / 23) * 340
+  return (now.getHours() / 23) * 680
 })
 
 // ===== 潮汐日历 =====
@@ -1425,6 +1436,7 @@ $danger: #F23F43;
 
 /* Tide */
 .tide-chart-wrap { margin-bottom: 12px; }
+.tide-scroll { white-space: nowrap; }
 .tide-svg { display: block; }
 .tide-time-axis { display: flex; justify-content: space-between; padding: 4px 0; }
 .tide-time-label { font-size: 10px; color: $text-muted; }
