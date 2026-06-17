@@ -1289,11 +1289,11 @@ $danger: #F23F43;
 
 /* 按钓法推荐 */
 .fish-section-title { font-size: 24rpx; font-weight: 600; color: $header-primary; margin-bottom: 12rpx; display: block; }
-.method-scroll { white-space: nowrap; margin: 0 -24rpx; padding: 0 24rpx; }
+.method-scroll { width: 100%; white-space: nowrap; }
 .method-list { display: inline-flex; gap: 16rpx; padding-right: 24rpx; }
 .method-card {
   width: 320rpx; min-width: 320rpx; background: $bg-page; border-radius: 16rpx;
-  padding: 20rpx; display: inline-flex; flex-direction: column; gap: 14rpx;
+  padding: 20rpx; display: flex; flex-direction: column; gap: 14rpx;
   flex-shrink: 0; white-space: normal;
 }
 .method-header { display: flex; align-items: center; gap: 12rpx; }
