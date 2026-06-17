@@ -145,36 +145,49 @@
               <text class="card-title-sun">🌇 {{ today.sunset || '--:--' }}</text>
             </view>
           </view>
-          <!-- 横向滑动小时卡片 + 温度曲线 -->
-          <view v-if="filteredHourly.length > 0" class="hourly-wrap">
-            <view class="hourly-scroll-wrap">
-              <!-- 温度曲线 SVG -->
-              <svg v-if="hourlyDots.length > 1" class="hourly-svg" :style="{ transform: 'translateX(' + hourlyScrollX + 'px)' }">
-                <polyline
-                  :points="hourlyDots.map(d => d.x + ',' + d.y).join(' ')"
-                  fill="none" stroke="#FF8C42" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                />
-                <circle v-for="(d, i) in hourlyDots" :key="i" :cx="d.x" :cy="d.y" r="3" fill="#FF8C42" />
-              </svg>
-              <!-- 卡片 -->
-              <scroll-view scroll-x ref="hourlyScrollRef" class="hourly-scroll" :show-scrollbar="false" @scroll="onHourlyScroll">
-                <view class="hourly-row">
-                  <view
-                    v-for="(h, i) in filteredHourly"
-                    :key="i"
-                    class="hourly-card"
-                    :class="{ 'hourly-card--now': i === 0 && selectedDayIdx === 0 }"
-                  >
-                    <text class="hourly-time">{{ i === 0 && selectedDayIdx === 0 ? '现在' : h.time.slice(-5, -3) + '点' }}</text>
-                    <text class="hourly-icon">{{ getWeatherIcon(h.icon) }}</text>
-                    <text class="hourly-temp">{{ h.temp }}°</text>
-                    <text class="hourly-wind">{{ h.windDir }} {{ h.windScale }}级</text>
-                    <view class="hourly-bar" :class="getHourlyBarClass(h)" />
+          <!-- 横向滑动小时卡片 -->
+          <scroll-view v-if="filteredHourly.length > 0" scroll-x class="hourly-scroll" :show-scrollbar="false">
+            <view class="hourly-row">
+              <view
+                v-for="(h, i) in filteredHourly"
+                :key="i"
+                class="hourly-card"
+                :class="{ 'hourly-card--now': i === 0 && selectedDayIdx === 0 }"
+              >
+                <text class="hourly-time">{{ i === 0 && selectedDayIdx === 0 ? '现在' : h.time.slice(-5, -3) + '点' }}</text>
+                <text class="hourly-icon">{{ getWeatherIcon(h.icon) }}</text>
+                <text class="hourly-temp">{{ h.temp }}°</text>
+                <!-- 温度下方：左侧接线 + 圆点 + 右侧接线 -->
+                <view class="hourly-line-area">
+                  <view v-if="hourlyDots[i]" class="hourly-line-svg">
+                    <svg viewBox="0 0 65 80" :style="{ width: '100%', height: '100%' }">
+                      <line
+                        v-if="i > 0 && hourlyDots[i - 1]"
+                        :x1="0" :y1="hourlyDots[i].localY"
+                        :x2="32" :y2="hourlyDots[i].localY"
+                        stroke="#FF8C42" stroke-width="1.5" stroke-linecap="round"
+                      />
+                      <line
+                        v-if="i < hourlyDots.length - 1"
+                        :x1="32" :y1="hourlyDots[i].localY"
+                        :x2="65" :y2="hourlyDots[i].nextY"
+                        stroke="#FF8C42" stroke-width="1.5" stroke-linecap="round"
+                      />
+                      <line
+                        v-if="i === 0 && hourlyDots.length > 1"
+                        :x1="0" :y1="hourlyDots[i].localY"
+                        :x2="32" :y2="hourlyDots[i].localY"
+                        stroke="#FF8C42" stroke-width="1.5" stroke-linecap="round"
+                      />
+                      <circle cx="32" :cy="hourlyDots[i].localY" r="3" fill="#FF8C42" />
+                    </svg>
                   </view>
                 </view>
-              </scroll-view>
+                <text class="hourly-wind">{{ h.windDir }} {{ h.windScale }}级</text>
+                <view class="hourly-bar" :class="getHourlyBarClass(h)" />
+              </view>
             </view>
-          </view>
+          </scroll-view>
           <view v-else class="hourly-empty">
             <text class="hourly-empty-text">暂无该日逐时数据</text>
           </view>
@@ -655,9 +668,6 @@ const filteredHourly = computed(() => {
 })
 
 // ===== 逐小时温度曲线 =====
-const hourlyScrollRef = ref()
-const hourlyScrollX = ref(0)
-
 const hourlyDots = computed(() => {
   const data = filteredHourly.value
   if (data.length < 2) return []
@@ -665,18 +675,18 @@ const hourlyDots = computed(() => {
   const minT = Math.min(...temps)
   const maxT = Math.max(...temps)
   const range = maxT - minT || 1
-  const cardW = 65 // 130rpx ≈ 65px
-  const svgH = 80  // 曲线区域高度
-  const padY = 12
-  return data.map((h, i) => ({
-    x: i * cardW + cardW / 2,
-    y: padY + (1 - (Number(h.temp) - minT) / range) * (svgH - padY * 2),
+  const svgH = 80
+  const padY = 10
+
+  // 先算全局 Y 坐标
+  const globalY = temps.map(t => padY + (1 - (t - minT) / range) * (svgH - padY * 2))
+
+  return data.map((_, i) => ({
+    globalY: globalY[i],
+    localY: globalY[i],       // 在自己卡片内的 Y
+    nextY: globalY[i + 1] ?? globalY[i], // 下一个卡片的 Y（用于右侧连线斜率）
   }))
 })
-
-function onHourlyScroll(e: any) {
-  hourlyScrollX.value = -(e.detail?.scrollLeft || 0)
-}
 
 const moonPhaseIcon = computed(() => {
   const phase = today.value?.moonPhase || ''
@@ -1299,17 +1309,11 @@ $danger: #F23F43;
 .tip-tag--blue { background: rgba($blurple, 0.1); color: $blurple; }
 
 /* Hourly Scroll Cards */
-.hourly-wrap { overflow: hidden; }
-.hourly-scroll-wrap { position: relative; }
-.hourly-svg {
-  position: absolute; top: 0; left: 0; width: 100%; height: 80px;
-  pointer-events: none; z-index: 1; transition: transform 0.05s linear;
-}
 .hourly-scroll { white-space: nowrap; }
 .hourly-row { display: inline-flex; gap: 0; }
 .hourly-card {
   width: 130rpx; min-width: 130rpx; display: flex; flex-direction: column;
-  align-items: center; padding: 12rpx 8rpx 16rpx; gap: 8rpx;
+  align-items: center; padding: 12rpx 8rpx 16rpx; gap: 6rpx;
 }
 .hourly-card--now { background: rgba($blurple, 0.06); border-radius: 16rpx; }
 .hourly-time { font-size: 22rpx; color: $text-muted; font-weight: 500; }
@@ -1317,6 +1321,8 @@ $danger: #F23F43;
 .hourly-icon { font-size: 36rpx; }
 .hourly-temp { font-size: 32rpx; font-weight: 700; color: $header-primary; }
 .hourly-card--now .hourly-temp { font-size: 36rpx; }
+.hourly-line-area { width: 130rpx; height: 80px; }
+.hourly-line-svg { width: 100%; height: 100%; }
 .hourly-wind { font-size: 18rpx; color: $text-muted; text-align: center; }
 .hourly-bar { width: 32rpx; height: 6rpx; border-radius: 3rpx; margin-top: 2rpx; }
 .hourly-bar--sun { background: $status-green; }
