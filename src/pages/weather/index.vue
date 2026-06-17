@@ -145,39 +145,10 @@
               <text class="card-title-sun">🌇 {{ today.sunset || '--:--' }}</text>
             </view>
           </view>
-          <!-- 横向滑动小时卡片 -->
-          <scroll-view v-if="filteredHourly.length > 0" scroll-x class="hourly-scroll" :show-scrollbar="false">
-            <view class="hourly-row">
-              <view
-                v-for="(h, i) in filteredHourly"
-                :key="i"
-                class="hourly-card"
-                :class="{ 'hourly-card--now': i === 0 && selectedDayIdx === 0 }"
-              >
-                <text class="hourly-time">{{ i === 0 && selectedDayIdx === 0 ? '现在' : h.time.slice(-5, -3) + '点' }}</text>
-                <text class="hourly-icon">{{ getWeatherIcon(h.icon) }}</text>
-                <text class="hourly-temp">{{ h.temp }}°</text>
-                <!-- 温度下方：左侧接线 + 圆点 + 右侧接线 -->
-                <view class="hourly-line-area">
-                  <view v-if="hourlyDots[i]" class="hourly-line-svg">
-                    <svg viewBox="0 0 65 80" :style="{ width: '100%', height: '100%', overflow: 'visible' }">
-                      <!-- 右侧线段：自己圆点→下一个卡片圆点 -->
-                      <line
-                        v-if="i < hourlyDots.length - 1"
-                        :x1="32" :y1="hourlyDots[i].localY"
-                        :x2="97" :y2="hourlyDots[i + 1].localY"
-                        stroke="#FF8C42" stroke-width="1.5" stroke-linecap="round"
-                      />
-                      <!-- 圆点 -->
-                      <circle cx="32" :cy="hourlyDots[i].localY" r="3.5" fill="#FF8C42" />
-                    </svg>
-                  </view>
-                </view>
-                <text class="hourly-wind">{{ h.windDir }} {{ h.windScale }}级</text>
-                <view class="hourly-bar" :class="getHourlyBarClass(h)" />
-              </view>
-            </view>
-          </scroll-view>
+          <!-- ECharts温度曲线 -->
+          <view class="hourly-chart-wrap" v-if="filteredHourly.length > 0">
+            <uni-echarts custom-style="width:100%;height:220px" :option="hourlyChartOption" />
+          </view>
           <view v-else class="hourly-empty">
             <text class="hourly-empty-text">暂无该日逐时数据</text>
           </view>
@@ -516,7 +487,7 @@ const hourlyChartOption = computed(() => {
   const hourly = filteredHourly.value
   if (hourly.length === 0) return {}
 
-  const times = hourly.map((h, i) => i === 0 ? '现在' : h.time.slice(-5))
+  const times = hourly.map((h, i) => i === 0 ? '现在' : h.time.slice(-5, -3) + '点')
   const temps = hourly.map(h => Number(h.temp))
 
   const minT = Math.floor(Math.min(...temps) - 2)
@@ -526,40 +497,33 @@ const hourlyChartOption = computed(() => {
     dataZoom: [{
       type: 'slider',
       start: 0,
-      end: 29,
-      height: 18,
-      bottom: 2,
-      borderColor: 'transparent',
-      backgroundColor: '#F2F3F5',
-      fillerColor: 'rgba(88,101,242,0.12)',
-      handleStyle: { color: '#5865F2', borderColor: '#5865F2' },
-      textStyle: { color: '#80848E', fontSize: 9 },
+      end: hourly.length > 8 ? Math.round(8 / hourly.length * 100) : 100,
+      height: 0,
+      bottom: 0,
       showDetail: false,
       brushSelect: false,
     }],
-    grid: { left: 8, right: 8, top: 30, bottom: 60 },
+    grid: { left: 4, right: 4, top: 48, bottom: 24 },
     legend: { show: false },
     xAxis: {
       type: 'category',
       data: times,
       boundaryGap: false,
-      axisLine: { lineStyle: { color: '#E3E5E8' } },
+      axisLine: { show: false },
       axisTick: { show: false },
       axisLabel: {
         color: '#80848E',
-        fontSize: 10,
-        margin: 8,
-        formatter: (value, index) => {
-          return `{icon|${getWeatherIcon(hourly[index].icon)}}\n${value}`
+        fontSize: 11,
+        margin: 4,
+        formatter: (value: string, index: number) => {
+          return `{icon|${getWeatherIcon(hourly[index].icon)}}\n{time|${value}}`
         },
         rich: {
-          icon: { fontSize: 16, lineHeight: 22, align: 'center' },
+          icon: { fontSize: 18, lineHeight: 24, align: 'center' },
+          time: { fontSize: 11, color: '#80848E', lineHeight: 16, align: 'center' },
         },
       },
-      splitLine: {
-        show: true,
-        lineStyle: { color: '#ECEEF1', type: 'dashed', width: 1 },
-      },
+      splitLine: { show: false },
     },
     yAxis: {
       type: 'value',
@@ -576,22 +540,26 @@ const hourlyChartOption = computed(() => {
       borderColor: '#E3E5E8',
       borderWidth: 1,
       textStyle: { color: '#1E2028', fontSize: 12 },
-      axisPointer: { type: 'line', lineStyle: { color: '#D0D0D0', type: 'dashed' } },
+      axisPointer: { type: 'line', lineStyle: { color: '#FF8C42', type: 'solid', width: 1 } },
+      formatter: (params: any) => {
+        const p = params[0]
+        const h = hourly[p.dataIndex]
+        return `${p.axisValue}\n${getWeatherIcon(h.icon)} ${p.value}°`
+      },
     },
     series: [{
-      name: '温度',
       type: 'line',
       data: temps,
-      smooth: 0.3,
+      smooth: 0.4,
       symbol: 'circle',
-      symbolSize: 6,
-      lineStyle: { color: '#FF8C42', width: 2 },
-      itemStyle: { color: '#FF8C42', borderColor: '#fff', borderWidth: 1.5 },
+      symbolSize: 8,
+      lineStyle: { color: '#FF8C42', width: 2.5 },
+      itemStyle: { color: '#FF8C42', borderColor: '#fff', borderWidth: 2 },
       areaStyle: {
         color: {
           type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
           colorStops: [
-            { offset: 0, color: 'rgba(255,140,66,0.15)' },
+            { offset: 0, color: 'rgba(255,140,66,0.18)' },
             { offset: 1, color: 'rgba(255,140,66,0.01)' },
           ],
         },
@@ -600,8 +568,8 @@ const hourlyChartOption = computed(() => {
         show: true,
         position: 'top',
         color: '#1E2028',
-        fontSize: 11,
-        fontWeight: 600,
+        fontSize: 12,
+        fontWeight: 700,
         formatter: '{c}°',
       },
     }],
@@ -655,26 +623,6 @@ const filteredHourly = computed(() => {
   // 非今天：API 只返回未来24-72小时，按时间偏移截取
   const start = selectedDayIdx.value * 24
   return allHourly.slice(start, start + 24)
-})
-
-// ===== 逐小时温度曲线 =====
-const hourlyDots = computed(() => {
-  const data = filteredHourly.value
-  if (data.length < 2) return []
-  const temps = data.map(h => Number(h.temp))
-  const minT = Math.min(...temps)
-  const maxT = Math.max(...temps)
-  const range = maxT - minT || 1
-  const svgH = 80
-  const padY = 10
-
-  // 先算全局 Y 坐标
-  const globalY = temps.map(t => padY + (1 - (t - minT) / range) * (svgH - padY * 2))
-
-  return data.map((_, i) => ({
-    globalY: globalY[i],
-    localY: globalY[i],
-  }))
 })
 
 const moonPhaseIcon = computed(() => {
@@ -1310,8 +1258,6 @@ $danger: #F23F43;
 .hourly-icon { font-size: 36rpx; }
 .hourly-temp { font-size: 32rpx; font-weight: 700; color: $header-primary; }
 .hourly-card--now .hourly-temp { font-size: 36rpx; }
-.hourly-line-area { width: 130rpx; height: 80px; }
-.hourly-line-svg { width: 100%; height: 100%; }
 .hourly-wind { font-size: 18rpx; color: $text-muted; text-align: center; }
 .hourly-bar { width: 32rpx; height: 6rpx; border-radius: 3rpx; margin-top: 2rpx; }
 .hourly-bar--sun { background: $status-green; }
