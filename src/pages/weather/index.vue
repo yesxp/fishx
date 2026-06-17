@@ -757,7 +757,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 17:55'
+const nowStr = '2026-06-17 18:00'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -1413,9 +1413,9 @@ $danger: #F23F43;
 .day-weather { display: flex; align-items: center; gap: 6px; width: 80px; flex-shrink: 0; }
 .day-icon { font-size: 20px; }
 .day-text { font-size: 12px; color: $text-secondary; }
-.day-temp-bar { flex: 1; display: flex; align-items: center; gap: 8px; }
-.day-temp-lo { font-size: 12px; color: $text-muted; width: 28px; text-align: right; flex-shrink: 0; }
-.day-temp-hi { font-size: 12px; font-weight: 600; color: $text-primary; width: 28px; flex-shrink: 0; }
+.day-temp-bar { flex: 1; display: flex; align-items: center; gap: 6px; min-width: 0; }
+.day-temp-lo { font-size: 13px; color: $text-muted; width: 40px; text-align: right; flex-shrink: 0; }
+.day-temp-hi { font-size: 13px; font-weight: 700; color: $text-primary; width: 40px; flex-shrink: 0; }
 .day-temp-track { flex: 1; height: 10px; background: #E8EAED; border-radius: 5px; position: relative; overflow: hidden; }
 .day-temp-fill { position: absolute; top: 0; height: 100%; background: linear-gradient(90deg, #5865F2, #F23F43); border-radius: 5px; }
 
