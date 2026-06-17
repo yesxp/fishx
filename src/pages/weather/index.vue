@@ -162,7 +162,7 @@
                   <view class="hourly-temp-bar" :style="{ height: getHourlyBarHeight(h) + 'px' }" />
                 </view>
                 <text class="hourly-wind">{{ h.windDir }} {{ h.windScale }}级</text>
-                <wd-tag type="info" size="small" round :custom-style="getAlertStyle(h.text)">{{ getAlertText(h.text) }}</wd-tag>
+                <wd-tag :type="getAlertType(h.text)" variant="light" size="small" round>{{ getAlertText(h.text) }}</wd-tag>
               </view>
             </view>
           </scroll-view>
@@ -750,7 +750,7 @@ const hourlyFishingScore = computed(() => {
 
 const nowHour = computed(() => new Date().getHours())
 // 部署时间戳：每次提交时更新
-const nowStr = '2026-06-17 16:30'
+const nowStr = '2026-06-17 16:40'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -782,13 +782,13 @@ const getHourlyBarHeight = (h: any) => {
 }
 
 // 天气预警等级
-const getAlertStyle = (text: string) => {
-  if (/暴雨|大暴雨|特大暴雨/.test(text)) return { background: 'rgba(242,63,67,0.12)', color: '#F23F43' }
-  if (/雷|冰雹|大风/.test(text)) return { background: 'rgba(240,178,50,0.12)', color: '#B8860B' }
-  if (/中雨|大雨|冻雨/.test(text)) return { background: 'rgba(240,178,50,0.12)', color: '#B8860B' }
-  if (/小雨|阵雨|雨夹雪/.test(text)) return { background: 'rgba(88,101,242,0.12)', color: '#5865F2' }
-  if (/雪|雾/.test(text)) return { background: 'rgba(88,101,242,0.12)', color: '#5865F2' }
-  return { background: '#F2F3F5', color: '#80848E' }
+const getAlertType = (text: string) => {
+  if (/暴雨|大暴雨|特大暴雨/.test(text)) return 'danger'
+  if (/雷|冰雹|大风/.test(text)) return 'warning'
+  if (/中雨|大雨|冻雨/.test(text)) return 'warning'
+  if (/小雨|阵雨|雨夹雪/.test(text)) return 'primary'
+  if (/雪|雾/.test(text)) return 'primary'
+  return 'default'
 }
 
 const getAlertText = (text: string) => {
