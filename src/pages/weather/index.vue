@@ -1061,7 +1061,13 @@ const tidePhase = computed(() => {
 const tideCalendar = computed(() => weatherStore.tideCalendar)
 
 function padTideTable(table: any[], len: number) {
-  const result = [...table]
+  // 按类型排序：H(满潮)在前，L(干潮)在后
+  const sorted = [...table].sort((a, b) => {
+    if (a.type === 'H' && b.type !== 'H') return -1
+    if (a.type !== 'H' && b.type === 'H') return 1
+    return 0
+  })
+  const result = sorted
   while (result.length < len) result.push(null)
   return result.slice(0, len)
 }
