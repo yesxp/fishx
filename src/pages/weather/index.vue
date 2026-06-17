@@ -217,31 +217,50 @@
           </view>
         </view>
 
-        <!-- ===== 天文潮汐 Redesigned ===== -->
+        <!-- ===== 天文潮汐 v2 ===== -->
         <view class="card" v-if="tideData">
           <view class="card-title-row">
             <text class="card-title">🌊 天文潮汐</text>
             <wd-tag :type="tideStatus.tagType" size="small" round>{{ tideStatus.text }}</wd-tag>
           </view>
+          <!-- 图例 -->
+          <view class="tide-legend">
+            <view class="tide-legend-item"><view class="tide-legend-dot" style="background:#5865F2"></view><text class="tide-legend-text">潮高</text></view>
+            <view class="tide-legend-item"><view class="tide-legend-dot" style="background:rgba(242,63,67,0.25)"></view><text class="tide-legend-text">垂钓(宜)</text></view>
+            <view class="tide-legend-item"><view class="tide-legend-dot" style="background:rgba(0,180,216,0.2)"></view><text class="tide-legend-text">赶海(宜)</text></view>
+          </view>
+          <!-- 图表 -->
           <view class="tide-chart-wrap">
-            <svg viewBox="0 0 340 100" width="100%" height="100" class="tide-svg">
-              <!-- Fishing-friendly zone overlays -->
-              <rect v-for="i in 4" :key="'tz'+i" :x="(i*70) - 15" y="0" width="30" height="100" fill="#23A559" opacity="0.06" rx="4"/>
-              <line v-for="i in 4" :key="'gl'+i" :x1="0" :y1="i*25" :x2="340" :y2="i*25" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4,4"/>
-              <path :d="tidePath" fill="none" stroke="#5865F2" stroke-width="2"/>
-              <path :d="tideAreaPath" fill="url(#tideFillGrad)" opacity="0.15"/>
-              <g v-for="(pt, i) in tideMarkers" :key="'tm'+i">
-                <circle :cx="pt.x" :cy="pt.y" r="3" :fill="pt.type === 'H' ? '#F0B232' : '#5865F2'"/>
-                <text :x="pt.x" :y="pt.y - 8" text-anchor="middle" font-size="8" :fill="pt.type === 'H' ? '#F0B232' : '#5865F2'">{{ pt.height }}m</text>
-              </g>
-              <line v-if="tideNowX" :x1="tideNowX" :y1="0" :x2="tideNowX" :y2="100" stroke="#F23F43" stroke-width="1" stroke-dasharray="3,3"/>
+            <svg :viewBox="'0 0 ' + TW + ' ' + TH" :width="TW" :height="TH" class="tide-svg">
               <defs>
                 <linearGradient id="tideFillGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#5865F2"/>
                   <stop offset="100%" stop-color="#5865F2" stop-opacity="0"/>
                 </linearGradient>
               </defs>
+              <!-- 垂钓窗口色带(满潮前后2h) -->
+              <rect v-for="(z, zi) in tideFishingZones" :key="'fz'+zi" :x="z.x" :y="TP" :width="z.w" :height="TCH" fill="rgba(242,63,67,0.1)" rx="4"/>
+              <!-- 赶海窗口色带(干潮前后2h) -->
+              <rect v-for="(z, zi) in tideBeachZones" :key="'bz'+zi" :x="z.x" :y="TP" :width="z.w" :height="TCH" fill="rgba(0,180,216,0.08)" rx="4"/>
+              <!-- 水平网格线 + Y轴标签 -->
+              <template v-for="(yl, yi) in tideYLabels" :key="'yl'+yi">
+                <line :x1="0" :y1="yl.y" :x2="TW" :y2="yl.y" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4,4"/>
+                <text :x="-4" :y="yl.y + 3" text-anchor="end" font-size="8" fill="#A0A4AB">{{ yl.label }}</text>
+              </template>
+              <!-- 潮汐曲线 + 面积 -->
+              <path :d="tideAreaPath" fill="url(#tideFillGrad)" opacity="0.15"/>
+              <path :d="tidePath" fill="none" stroke="#5865F2" stroke-width="2"/>
+              <!-- 满潮/干潮标记 -->
+              <g v-for="(pt, i) in tideMarkers" :key="'tm'+i">
+                <circle :cx="pt.x" :cy="pt.y" r="16" :fill="pt.type === 'H' ? '#5865F2' : '#5865F2'" opacity="0.12"/>
+                <circle :cx="pt.x" :cy="pt.y" r="11" :fill="pt.type === 'H' ? '#5865F2' : 'white'" :stroke="pt.type === 'H' ? 'none' : '#5865F2'" stroke-width="2"/>
+                <text :x="pt.x" :y="pt.y + 4" text-anchor="middle" font-size="8" font-weight="700" fill="white">{{ pt.height }}</text>
+              </g>
+              <!-- 当前时间红线 -->
+              <line :x1="tideNowX" :y1="TP" :x2="tideNowX" :y2="TP + TCH" stroke="#F23F43" stroke-width="1.5"/>
+              <circle :cx="tideNowX" :cy="TP + TCH" r="3" fill="#F23F43" stroke="white" stroke-width="1.5"/>
             </svg>
+            <!-- 时间轴 -->
             <view class="tide-time-axis">
               <text class="tide-time-label">00:00</text>
               <text class="tide-time-label">06:00</text>
@@ -250,18 +269,39 @@
               <text class="tide-time-label">24:00</text>
             </view>
           </view>
-          <!-- Compact Tide Info Badges -->
-          <view class="tide-info-compact">
-            <template v-for="(entry, i) in tideTable" :key="i">
-              <view class="tide-badge" :class="entry.type === 'H' ? 'tide-badge--high' : 'tide-badge--low'">
-                <text class="tide-badge-icon">{{ entry.type === 'H' ? '🌊' : '🌊' }}</text>
-                <view class="tide-badge-info">
-                  <text class="tide-badge-label">{{ entry.type === 'H' ? '满潮' : '干潮' }}</text>
-                  <text class="tide-badge-time">{{ entry.time }}</text>
-                </view>
-                <text class="tide-badge-val">{{ entry.height }}m</text>
+          <!-- 当前实况行 -->
+          <view class="tide-now-row">
+            <text class="tide-now-time">{{ tideNowTime }}</text>
+            <view class="tide-now-item">
+              <text class="tide-now-label">天气</text>
+              <text class="tide-now-val">{{ weatherStore.weatherNow?.text || '--' }}</text>
+            </view>
+            <view class="tide-now-item">
+              <text class="tide-now-label">温湿</text>
+              <text class="tide-now-val">{{ weatherStore.weatherNow?.temp || '--' }}° {{ weatherStore.weatherNow?.humidity || '--' }}%</text>
+            </view>
+            <view class="tide-now-item">
+              <text class="tide-now-label">气压</text>
+              <text class="tide-now-val">{{ weatherStore.weatherNow?.pressure || '--' }}hPa</text>
+            </view>
+            <view class="tide-now-item">
+              <text class="tide-now-label">风</text>
+              <text class="tide-now-val">{{ weatherStore.weatherNow?.windDir || '' }}{{ weatherStore.weatherNow?.windScale || '' }}级</text>
+            </view>
+            <view class="tide-now-item">
+              <text class="tide-now-label">潮汐</text>
+              <text class="tide-now-val" :style="{ color: tideStatus.tagType === 'success' ? '#23A559' : tideStatus.tagType === 'warning' ? '#F0B232' : '#5865F2' }">{{ tideStatus.text }}</text>
+            </view>
+          </view>
+          <!-- 满潮干潮卡片 -->
+          <view class="tide-event-grid">
+            <view v-for="(entry, i) in tideTable" :key="i" class="tide-event-card" :class="entry.type === 'H' ? 'tide-event-card--high' : 'tide-event-card--low'">
+              <view class="tide-event-badge" :class="entry.type === 'H' ? 'tide-event-badge--high' : 'tide-event-badge--low'">
+                <text class="tide-event-badge-text">{{ entry.type === 'H' ? '▲ 满潮' : '▼ 干潮' }}</text>
               </view>
-            </template>
+              <text class="tide-event-time">{{ entry.time }}</text>
+              <text class="tide-event-height">{{ entry.height }}m</text>
+            </view>
           </view>
         </view>
 
@@ -757,7 +797,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 19:08'
+const nowStr = '2026-06-17 19:42'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -834,6 +874,8 @@ function getDayComfortText(day: any) {
 
 // ===== 潮汐 =====
 const tideData = computed(() => weatherStore.tide)
+const TW = 360, TP = 10, TCH = 100, TH = 130  // 图表尺寸常量
+const tideHour2x = (h: number) => (h / 24) * TW
 
 const tideTable = computed(() => {
   if (!tideData.value?.tideTable) return []
@@ -859,17 +901,21 @@ const tideStatus = computed(() => {
   }
   return { text: '平潮', tagType: 'primary' }
 })
-
 const tidePath = computed(() => {
   if (!tideData.value?.tideHourly) return ''
   const hourly = tideData.value.tideHourly
-  const maxH = Math.max(...hourly.map((h: any) => Number(h.height)))
-  const minH = Math.min(...hourly.map((h: any) => Number(h.height)))
+  const allH = tideData.value.tideHourly
+  const maxH = Math.max(...allH.map((h: any) => Number(h.height)))
+  const minH = Math.min(...allH.map((h: any) => Number(h.height)))
   const range = maxH - minH || 1
-  const points = hourly.map((h: any, i: number) => ({
-    x: (i / (hourly.length - 1)) * 340,
-    y: 5 + (1 - (Number(h.height) - minH) / range) * 80
-  }))
+  const points = hourly.map((h: any) => {
+    const hr = parseInt(h.fxTime.slice(11, 13))
+    const mn = parseInt(h.fxTime.slice(14, 16))
+    return {
+      x: tideHour2x(hr + mn / 60),
+      y: TP + (1 - (Number(h.height) - minH) / range) * TCH
+    }
+  })
   if (points.length === 0) return ''
   let d = `M ${points[0].x} ${points[0].y}`
   for (let i = 1; i < points.length; i++) {
@@ -879,7 +925,7 @@ const tidePath = computed(() => {
   return d
 })
 
-const tideAreaPath = computed(() => tidePath.value ? tidePath.value + ' L 340 100 L 0 100 Z' : '')
+const tideAreaPath = computed(() => tidePath.value ? tidePath.value + ` L ${TW} ${TP + TCH} L 0 ${TP + TCH} Z` : '')
 
 const tideMarkers = computed(() => {
   if (!tideData.value?.tideTable || !tideData.value?.tideHourly) return []
@@ -891,8 +937,8 @@ const tideMarkers = computed(() => {
     const h = parseInt(t.fxTime.slice(11, 13))
     const m = parseInt(t.fxTime.slice(14, 16))
     return {
-      x: (Math.min(h + (m > 0 ? 1 : 0), 23) / 23) * 340,
-      y: 5 + (1 - (Number(t.height) - minH) / range) * 80,
+      x: tideHour2x(h + m / 60),
+      y: TP + (1 - (Number(t.height) - minH) / range) * TCH,
       height: t.height, type: t.type
     }
   })
@@ -900,7 +946,47 @@ const tideMarkers = computed(() => {
 
 const tideNowX = computed(() => {
   const now = new Date()
-  return (now.getHours() / 23) * 340
+  return tideHour2x(now.getHours() + now.getMinutes() / 60)
+})
+const tideNowTime = computed(() => {
+  const now = new Date()
+  return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+})
+// Y轴刻度标签
+const tideYLabels = computed(() => {
+  if (!tideData.value?.tideHourly) return []
+  const hourly = tideData.value.tideHourly
+  const maxH = Math.max(...hourly.map((h: any) => Number(h.height)))
+  const minH = Math.min(...hourly.map((h: any) => Number(h.height)))
+  const step = Math.ceil((maxH - minH) / 4 * 10) / 10
+  const labels = []
+  for (let v = Math.floor(minH * 10) / 10; v <= maxH + 0.01; v += step) {
+    const y = TP + (1 - (v - minH) / (maxH - minH || 1)) * TCH
+    labels.push({ y, label: v.toFixed(1) })
+  }
+  return labels
+})
+// 垂钓窗口(满潮前后2h)
+const tideFishingZones = computed(() => {
+  if (!tideData.value?.tideTable) return []
+  return tideData.value.tideTable
+    .filter((t: any) => t.type === 'H')
+    .map((t: any) => {
+      const h = parseInt(t.fxTime.slice(11, 13)) + parseInt(t.fxTime.slice(14, 16)) / 60
+      return { x: tideHour2x(h - 2), w: (4 / 24) * TW }
+    })
+    .filter(z => z.x + z.w > 0 && z.x < TW)
+})
+// 赶海窗口(干潮前后2h)
+const tideBeachZones = computed(() => {
+  if (!tideData.value?.tideTable) return []
+  return tideData.value.tideTable
+    .filter((t: any) => t.type === 'L')
+    .map((t: any) => {
+      const h = parseInt(t.fxTime.slice(11, 13)) + parseInt(t.fxTime.slice(14, 16)) / 60
+      return { x: tideHour2x(h - 2), w: (4 / 24) * TW }
+    })
+    .filter(z => z.x + z.w > 0 && z.x < TW)
 })
 
 // ===== 潮汐日历 =====
@@ -1423,29 +1509,32 @@ $danger: #F23F43;
 .temp-num--low { color: #80848E; }
 .temp-num--high { color: #060607; font-weight: 700; }
 
-/* Tide */
-.tide-chart-wrap { margin-bottom: 12px; }
+/* Tide v2 */
+.tide-legend { display: flex; gap: 16px; margin-bottom: 8px; }
+.tide-legend-item { display: flex; align-items: center; gap: 4px; }
+.tide-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+.tide-legend-text { font-size: 11px; color: $text-muted; }
+.tide-chart-wrap { margin-bottom: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .tide-svg { display: block; }
 .tide-time-axis { display: flex; justify-content: space-between; padding: 4px 0; }
 .tide-time-label { font-size: 10px; color: $text-muted; }
-.tide-info { display: flex; gap: 8px; }
-.tide-info-item { flex: 1; background: $tag-bg; border-radius: 10px; padding: 10px; text-align: center; }
-.tide-info-label { font-size: 10px; color: $text-muted; display: block; }
-.tide-info-time { font-size: 16px; font-weight: 700; color: $text-primary; display: block; margin-top: 2px; }
-.tide-info-val { font-size: 11px; color: $text-muted; display: block; }
-
-/* Tide Compact Badges (Redesigned) */
-.tide-info-compact { display: flex; flex-wrap: wrap; gap: 6px; }
-.tide-badge { display: flex; align-items: center; gap: 6px; border-radius: 8px; padding: 6px 10px; flex: 1; min-width: 120px; }
-.tide-badge--high { background: rgba($warning, 0.08); }
-.tide-badge--low { background: rgba($brand, 0.08); }
-.tide-badge-icon { font-size: 16px; }
-.tide-badge-info { flex: 1; }
-.tide-badge-label { font-size: 10px; color: $text-muted; display: block; }
-.tide-badge-time { font-size: 13px; font-weight: 600; color: $text-primary; display: block; }
-.tide-badge-val { font-size: 12px; font-weight: 600; }
-.tide-badge--high .tide-badge-val { color: $warning; }
-.tide-badge--low .tide-badge-val { color: $brand; }
+/* 当前实况行 */
+.tide-now-row { display: flex; align-items: center; gap: 6px; padding: 8px 0; border-top: 1px solid $divider; border-bottom: 1px solid $divider; margin-bottom: 10px; overflow-x: auto; }
+.tide-now-time { font-size: 14px; font-weight: 700; color: $text-primary; flex-shrink: 0; padding-right: 6px; border-right: 1px solid $divider; }
+.tide-now-item { flex-shrink: 0; text-align: center; min-width: 48px; }
+.tide-now-label { font-size: 9px; color: $text-muted; display: block; }
+.tide-now-val { font-size: 11px; font-weight: 500; color: $text-primary; display: block; white-space: nowrap; }
+/* 满潮干潮卡片 */
+.tide-event-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.tide-event-card { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; border-radius: 10px; background: $tag-bg; }
+.tide-event-badge { padding: 3px 10px; border-radius: 12px; }
+.tide-event-badge--high { background: rgba($brand, 0.1); }
+.tide-event-badge--low { background: rgba($warning, 0.1); }
+.tide-event-badge-text { font-size: 11px; font-weight: 600; }
+.tide-event-badge--high .tide-event-badge-text { color: $brand; }
+.tide-event-badge--low .tide-event-badge-text { color: $warning; }
+.tide-event-time { font-size: 16px; font-weight: 700; color: $text-primary; }
+.tide-event-height { font-size: 13px; color: $text-secondary; }
 
 /* Tide Calendar */
 .tide-cal-header { display: flex; padding: 6px 0; border-bottom: 1px solid $divider; }
