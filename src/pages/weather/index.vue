@@ -146,33 +146,23 @@
             </view>
           </view>
           <!-- 横向滑动小时卡片 -->
-          <view v-if="filteredHourly.length > 0" class="hourly-outer">
-            <!-- 温度曲线 SVG 覆盖层 -->
-            <svg v-if="hourlyDots.length > 1" class="hourly-svg" :style="{ transform: 'translateX(' + hourlyScrollX + 'px)' }">
-              <polyline
-                :points="hourlyDots.map(d => d.x + ',' + d.y).join(' ')"
-                fill="none" stroke="#FF8C42" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              />
-              <circle v-for="(d, i) in hourlyDots" :key="i" :cx="d.x" :cy="d.y" r="4" fill="#FF8C42" stroke="#fff" stroke-width="2" />
-            </svg>
-            <scroll-view scroll-x class="hourly-scroll" :show-scrollbar="false" @scroll="onHourlyScroll">
-              <view class="hourly-row">
-                <view
-                  v-for="(h, i) in filteredHourly"
-                  :key="i"
-                  class="hourly-card"
-                  :class="{ 'hourly-card--now': i === 0 && selectedDayIdx === 0 }"
-                >
-                  <text class="hourly-time">{{ i === 0 && selectedDayIdx === 0 ? '现在' : h.time.slice(-5, -3) + '点' }}</text>
-                  <text class="hourly-icon">{{ getWeatherIcon(h.icon) }}</text>
-                  <text class="hourly-temp">{{ h.temp }}°</text>
-                  <view class="hourly-spacer" />
-                  <text class="hourly-wind">{{ h.windDir }} {{ h.windScale }}级</text>
-                  <view class="hourly-bar" :class="getHourlyBarClass(h)" />
+          <scroll-view v-if="filteredHourly.length > 0" scroll-x class="hourly-scroll" :show-scrollbar="false">
+            <view class="hourly-row">
+              <view
+                v-for="(h, i) in filteredHourly"
+                :key="i"
+                class="hourly-card"
+                :class="{ 'hourly-card--now': i === 0 && selectedDayIdx === 0 }"
+              >
+                <text class="hourly-temp">{{ h.temp }}°</text>
+                <view class="hourly-bar-wrap">
+                  <view class="hourly-vbar" :style="{ height: getHourlyBarHeight(h) + 'px' }" />
                 </view>
+                <text class="hourly-icon">{{ getWeatherIcon(h.icon) }}</text>
+                <text class="hourly-time">{{ i === 0 && selectedDayIdx === 0 ? '现在' : h.time.slice(-5, -3) + '点' }}</text>
               </view>
-            </scroll-view>
-          </view>
+            </view>
+          </scroll-view>
           <view v-else class="hourly-empty">
             <text class="hourly-empty-text">暂无该日逐时数据</text>
           </view>
@@ -652,31 +642,17 @@ const filteredHourly = computed(() => {
   return allHourly.slice(start, start + 24)
 })
 
-// ===== 逐小时温度曲线 =====
-const hourlyScrollRef = ref()
-const hourlyScrollX = ref(0)
-
-const hourlyDots = computed(() => {
+// ===== 逐小时温度竖条高度 =====
+function getHourlyBarHeight(h: any): number {
   const data = filteredHourly.value
-  if (data.length < 2) return []
-  const temps = data.map(h => Number(h.temp))
+  if (data.length === 0) return 20
+  const temps = data.map(d => Number(d.temp))
   const minT = Math.min(...temps)
   const maxT = Math.max(...temps)
   const range = maxT - minT || 1
-  const svgH = 80
-  const padY = 10
-  const cardW = 65 // 130rpx ≈ 65px
-
-  const globalY = temps.map(t => padY + (1 - (t - minT) / range) * (svgH - padY * 2))
-
-  return data.map((_, i) => ({
-    x: i * cardW + cardW / 2,
-    y: globalY[i],
-  }))
-})
-
-function onHourlyScroll(e: any) {
-  hourlyScrollX.value = -(e.detail?.scrollLeft || 0)
+  const t = Number(h.temp)
+  // 20px ~ 80px
+  return Math.round(20 + ((t - minT) / range) * 60)
 }
 
 const moonPhaseIcon = computed(() => {
@@ -775,13 +751,6 @@ function getVBarClass(score: number) {
   if (score >= 55) return 'vbar-bar--ok'
   if (score >= 40) return 'vbar-bar--bad'
   return 'vbar-bar--poor'
-}
-
-function getHourlyBarClass(h: any) {
-  const pop = Number(h.pop || 0)
-  if (pop >= 50) return 'hourly-bar--rain'
-  if (pop >= 20) return 'hourly-bar--cloud'
-  return 'hourly-bar--sun'
 }
 
 // ===== 潮汐 =====
@@ -1300,29 +1269,23 @@ $danger: #F23F43;
 .tip-tag--blue { background: rgba($blurple, 0.1); color: $blurple; }
 
 /* Hourly Scroll Cards */
-.hourly-outer { position: relative; overflow: hidden; }
-.hourly-svg {
-  position: absolute; top: 0; left: 0; width: 100%; height: 80px;
-  pointer-events: none; z-index: 1; transition: transform 0.05s linear;
-}
 .hourly-scroll { white-space: nowrap; }
 .hourly-row { display: inline-flex; gap: 0; }
 .hourly-card {
-  width: 130rpx; min-width: 130rpx; display: flex; flex-direction: column;
-  align-items: center; padding: 12rpx 8rpx 16rpx; gap: 6rpx;
+  width: 110rpx; min-width: 110rpx; display: flex; flex-direction: column;
+  align-items: center; padding: 12rpx 6rpx; gap: 6rpx;
 }
 .hourly-card--now { background: rgba($blurple, 0.06); border-radius: 16rpx; }
-.hourly-time { font-size: 22rpx; color: $text-muted; font-weight: 500; }
+.hourly-temp { font-size: 28rpx; font-weight: 700; color: $header-primary; }
+.hourly-card--now .hourly-temp { font-size: 32rpx; color: $blurple; }
+.hourly-bar-wrap { width: 12rpx; display: flex; align-items: flex-end; justify-content: center; }
+.hourly-vbar {
+  width: 10rpx; border-radius: 5rpx; background: $blurple;
+  transition: height 0.3s ease;
+}
+.hourly-icon { font-size: 32rpx; }
+.hourly-time { font-size: 20rpx; color: $text-muted; font-weight: 500; }
 .hourly-card--now .hourly-time { color: $blurple; font-weight: 700; }
-.hourly-icon { font-size: 36rpx; }
-.hourly-temp { font-size: 32rpx; font-weight: 700; color: $header-primary; }
-.hourly-card--now .hourly-temp { font-size: 36rpx; }
-.hourly-spacer { flex: 1; min-height: 80px; }
-.hourly-wind { font-size: 18rpx; color: $text-muted; text-align: center; }
-.hourly-bar { width: 32rpx; height: 6rpx; border-radius: 3rpx; margin-top: 2rpx; }
-.hourly-bar--sun { background: $status-green; }
-.hourly-bar--cloud { background: $status-yellow; }
-.hourly-bar--rain { background: $blurple; }
 .hourly-empty { padding: 30rpx 0; text-align: center; }
 .hourly-empty-text { font-size: 26rpx; color: $text-muted; }
 
