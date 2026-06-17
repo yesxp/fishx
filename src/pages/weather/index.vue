@@ -757,7 +757,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 18:00'
+const nowStr = '2026-06-17 18:10'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -1366,7 +1366,7 @@ $danger: #F23F43;
 .hourly-empty-text { font-size: 26rpx; color: $text-muted; }
 
 /* 7-day comfort tag */
-.day-comfort { margin-left: auto; flex-shrink: 0; }
+.day-comfort { flex-shrink: 0; }
 
 /* 图例 */
 .chart-legend {
@@ -1410,13 +1410,13 @@ $danger: #F23F43;
 .day-left { width: 50px; flex-shrink: 0; }
 .day-label { font-size: 13px; font-weight: 500; color: $text-primary; display: block; }
 .day-date { font-size: 10px; color: $text-muted; display: block; }
-.day-weather { display: flex; align-items: center; gap: 6px; width: 80px; flex-shrink: 0; }
+.day-weather { display: flex; align-items: center; gap: 6px; width: 70px; flex-shrink: 0; }
 .day-icon { font-size: 20px; }
 .day-text { font-size: 12px; color: $text-secondary; }
-.day-temp-bar { flex: 1; display: flex; align-items: center; gap: 6px; min-width: 0; }
-.day-temp-lo { font-size: 13px; color: $text-muted; width: 40px; text-align: right; flex-shrink: 0; }
-.day-temp-hi { font-size: 13px; font-weight: 700; color: $text-primary; width: 40px; flex-shrink: 0; }
-.day-temp-track { flex: 1; height: 10px; background: #E8EAED; border-radius: 5px; position: relative; overflow: hidden; }
+.day-temp-bar { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; }
+.day-temp-lo { font-size: 13px; color: $text-muted; flex-shrink: 0; }
+.day-temp-hi { font-size: 13px; font-weight: 700; color: $text-primary; flex-shrink: 0; }
+.day-temp-track { flex: 1; height: 10px; background: #E8EAED; border-radius: 5px; position: relative; overflow: hidden; min-width: 40px; }
 .day-temp-fill { position: absolute; top: 0; height: 100%; background: linear-gradient(90deg, #5865F2, #F23F43); border-radius: 5px; }
 
 /* Tide */
