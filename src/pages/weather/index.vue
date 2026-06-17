@@ -162,7 +162,7 @@
                   <view class="hourly-temp-bar" :style="{ height: getHourlyBarHeight(h) + 'px' }" />
                 </view>
                 <text class="hourly-wind">{{ h.windDir }} {{ h.windScale }}级</text>
-                <view class="hourly-bar" :class="getHourlyBarClass(h)" />
+                <text class="hourly-pressure">{{ h.pressure || '--' }}</text>
               </view>
             </view>
           </scroll-view>
@@ -1315,10 +1315,7 @@ $danger: #F23F43;
 .hourly-line-area { width: 130rpx; height: 80px; display: flex; align-items: flex-end; justify-content: center; }
 .hourly-temp-bar { width: 10rpx; border-radius: 5rpx; background: $blurple; }
 .hourly-wind { font-size: 18rpx; color: $text-muted; text-align: center; }
-.hourly-bar { width: 32rpx; height: 6rpx; border-radius: 3rpx; margin-top: 2rpx; }
-.hourly-bar--sun { background: $status-green; }
-.hourly-bar--cloud { background: $status-yellow; }
-.hourly-bar--rain { background: $blurple; }
+.hourly-pressure { font-size: 18rpx; color: $text-muted; text-align: center; letter-spacing: 0.5rpx; }
 .hourly-empty { padding: 30rpx 0; text-align: center; }
 .hourly-empty-text { font-size: 26rpx; color: $text-muted; }
 
