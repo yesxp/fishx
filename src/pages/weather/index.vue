@@ -231,34 +231,36 @@
           </view>
           <!-- 图表 -->
           <view class="tide-chart-wrap">
-            <svg :viewBox="'0 0 ' + TW + ' ' + TH" :width="TW" :height="TH" class="tide-svg">
-              <defs>
-                <linearGradient id="tideFillGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#5865F2"/>
-                  <stop offset="100%" stop-color="#5865F2" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-              <!-- 垂钓窗口色带(满潮前后2h) -->
-              <rect v-for="(z, zi) in tideFishingZones" :key="'fz'+zi" :x="z.x" :y="TP" :width="z.w" :height="TCH" fill="rgba(242,63,67,0.1)" rx="4"/>
-              <!-- 赶海窗口色带(干潮前后2h) -->
-              <rect v-for="(z, zi) in tideBeachZones" :key="'bz'+zi" :x="z.x" :y="TP" :width="z.w" :height="TCH" fill="rgba(0,180,216,0.08)" rx="4"/>
-              <!-- 水平网格线 + Y轴标签 -->
-              <template v-for="(yl, yi) in tideYLabels" :key="'yl'+yi">
-                <line :x1="0" :y1="yl.y" :x2="TW" :y2="yl.y" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4,4"/>
-                <text :x="-4" :y="yl.y + 3" text-anchor="end" font-size="8" fill="#A0A4AB">{{ yl.label }}</text>
-              </template>
-              <!-- 潮汐曲线 + 面积 -->
-              <path :d="tideAreaPath" fill="url(#tideFillGrad)" opacity="0.15"/>
-              <path :d="tidePath" fill="none" stroke="#5865F2" stroke-width="2"/>
-              <!-- 满潮/干潮标记：圆点 + 旁边文字 -->
-              <g v-for="(pt, i) in tideMarkers" :key="'tm'+i">
-                <circle :cx="pt.x" :cy="pt.y" r="5" :fill="pt.type === 'H' ? '#5865F2' : '#23A559'" stroke="white" stroke-width="2"/>
-                <text :x="pt.x" :y="pt.type === 'H' ? pt.y - 10 : pt.y + 16" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700" :fill="pt.type === 'H' ? '#5865F2' : '#23A559'">{{ pt.height }}m</text>
-              </g>
-              <!-- 当前时间红线 -->
-              <line :x1="tideNowX" :y1="TP" :x2="tideNowX" :y2="TP + TCH" stroke="#F23F43" stroke-width="1.5"/>
-              <circle :cx="tideNowX" :cy="TP + TCH" r="3" fill="#F23F43" stroke="white" stroke-width="1.5"/>
-            </svg>
+            <view class="tide-chart-container">
+              <svg :viewBox="'0 0 ' + TW + ' ' + TH" :width="TW" :height="TH" class="tide-svg">
+                <defs>
+                  <linearGradient id="tideFillGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#5865F2"/>
+                    <stop offset="100%" stop-color="#5865F2" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <!-- 垂钓窗口色带(满潮前后2h) -->
+                <rect v-for="(z, zi) in tideFishingZones" :key="'fz'+zi" :x="z.x" :y="TP" :width="z.w" :height="TCH" fill="rgba(242,63,67,0.1)" rx="4"/>
+                <!-- 赶海窗口色带(干潮前后2h) -->
+                <rect v-for="(z, zi) in tideBeachZones" :key="'bz'+zi" :x="z.x" :y="TP" :width="z.w" :height="TCH" fill="rgba(0,180,216,0.08)" rx="4"/>
+                <!-- 水平网格线 -->
+                <template v-for="(yl, yi) in tideYLabels" :key="'yl'+yi">
+                  <line :x1="0" :y1="yl.y" :x2="TW" :y2="yl.y" stroke="#E3E5E8" stroke-width="0.5" stroke-dasharray="4,4"/>
+                </template>
+                <!-- 潮汐曲线 + 面积 -->
+                <path :d="tideAreaPath" fill="url(#tideFillGrad)" opacity="0.15"/>
+                <path :d="tidePath" fill="none" stroke="#5865F2" stroke-width="2"/>
+                <!-- 满潮/干潮圆点 -->
+                <circle v-for="(pt, i) in tideMarkers" :key="'tm'+i" :cx="pt.x" :cy="pt.y" r="5" :fill="pt.type === 'H' ? '#5865F2' : '#23A559'" stroke="white" stroke-width="2"/>
+                <!-- 当前时间红线 -->
+                <line :x1="tideNowX" :y1="TP" :x2="tideNowX" :y2="TP + TCH" stroke="#F23F43" stroke-width="1.5"/>
+                <circle :cx="tideNowX" :cy="TP + TCH" r="3" fill="#F23F43" stroke="white" stroke-width="1.5"/>
+              </svg>
+              <!-- HTML文字覆盖层 -->
+              <view v-for="(pt, i) in tideMarkers" :key="'tl'+i" class="tide-marker-label" :style="{ left: pt.x + 'px', top: (pt.type === 'H' ? pt.y - 18 : pt.y + 10) + 'px', color: pt.type === 'H' ? '#5865F2' : '#23A559' }">
+                {{ pt.height }}m
+              </view>
+            </view>
             <!-- 时间轴(跟曲线同步滚动) -->
             <view class="tide-time-axis">
               <text class="tide-time-label">00:00</text>
@@ -1567,6 +1569,8 @@ $danger: #F23F43;
 .tide-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
 .tide-legend-text { font-size: 11px; color: $text-muted; }
 .tide-chart-wrap { margin-bottom: 12px; }
+.tide-chart-container { position: relative; width: 360px; height: 130px; }
+.tide-marker-label { position: absolute; font-size: 10px; font-weight: 700; transform: translateX(-50%); white-space: nowrap; pointer-events: none; }
 .tide-scroll { white-space: nowrap; }
 .tide-svg { display: block; }
 .tide-time-axis { display: flex; justify-content: space-between; padding: 4px 0; }
