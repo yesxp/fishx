@@ -162,7 +162,9 @@
                   <view class="hourly-temp-bar" :style="{ height: getHourlyBarHeight(h) + 'px' }" />
                 </view>
                 <text class="hourly-wind">{{ h.windDir }} {{ h.windScale }}级</text>
-                <text class="hourly-pressure">{{ h.pressure || '--' }}hPa</text>
+                <view class="hourly-alert" :class="getAlertClass(h.text)">
+                  <text class="hourly-alert-text">{{ getAlertText(h.text) }}</text>
+                </view>
               </view>
             </view>
           </scroll-view>
@@ -784,6 +786,33 @@ const getHourlyBarHeight = (h: any) => {
   return minH + ((temp - min) / range) * (maxH - minH)
 }
 
+// 天气预警等级
+const getAlertClass = (text: string) => {
+  if (!text) return 'hourly-alert--none'
+  if (/暴雨|大暴雨|特大暴雨/.test(text)) return 'hourly-alert--red'
+  if (/雷|冰雹|大风/.test(text)) return 'hourly-alert--orange'
+  if (/中雨|大雨|冻雨/.test(text)) return 'hourly-alert--yellow'
+  if (/小雨|阵雨|雨夹雪/.test(text)) return 'hourly-alert--blue'
+  return 'hourly-alert--none'
+}
+
+const getAlertText = (text: string) => {
+  if (!text) return '—'
+  if (/暴雨|大暴雨|特大暴雨/.test(text)) return '暴雨'
+  if (/雷阵雨|雷暴/.test(text)) return '雷暴'
+  if (/雷/.test(text)) return '雷电'
+  if (/冰雹/.test(text)) return '冰雹'
+  if (/大风/.test(text)) return '大风'
+  if (/大雨/.test(text)) return '大雨'
+  if (/中雨/.test(text)) return '中雨'
+  if (/冻雨/.test(text)) return '冻雨'
+  if (/小雨|阵雨/.test(text)) return '小雨'
+  if (/雨夹雪/.test(text)) return '雨雪'
+  if (/雪/.test(text)) return '降雪'
+  if (/雾/.test(text)) return '大雾'
+  return '—'
+}
+
 // ===== 潮汐 =====
 const tideData = computed(() => weatherStore.tide)
 
@@ -1315,7 +1344,18 @@ $danger: #F23F43;
 .hourly-line-area { width: 107rpx; height: 53px; display: flex; align-items: flex-end; justify-content: center; }
 .hourly-temp-bar { width: 10rpx; border-radius: 5rpx; background: $blurple; }
 .hourly-wind { font-size: 18rpx; color: $text-muted; text-align: center; }
-.hourly-pressure { font-size: 18rpx; color: $text-muted; text-align: center; letter-spacing: 0.5rpx; }
+.hourly-alert { padding: 2rpx 8rpx; border-radius: 6rpx; text-align: center; max-width: 90rpx; }
+.hourly-alert-text { font-size: 16rpx; font-weight: 600; }
+.hourly-alert--red { background: rgba($danger, 0.12); }
+.hourly-alert--red .hourly-alert-text { color: $danger; }
+.hourly-alert--orange { background: rgba($warning, 0.12); }
+.hourly-alert--orange .hourly-alert-text { color: $warning; }
+.hourly-alert--yellow { background: rgba(#F0B232, 0.12); }
+.hourly-alert--yellow .hourly-alert-text { color: #D4920A; }
+.hourly-alert--blue { background: rgba($brand, 0.1); }
+.hourly-alert--blue .hourly-alert-text { color: $brand; }
+.hourly-alert--none { background: $tag-bg; }
+.hourly-alert--none .hourly-alert-text { color: $text-muted; }
 .hourly-empty { padding: 30rpx 0; text-align: center; }
 .hourly-empty-text { font-size: 26rpx; color: $text-muted; }
 
