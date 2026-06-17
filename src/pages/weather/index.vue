@@ -1343,6 +1343,13 @@ $danger: #F23F43;
 .hourly-temp-bar { width: 10rpx; border-radius: 5rpx; background: $blurple; }
 .hourly-wind { font-size: 18rpx; color: $text-muted; text-align: center; }
 
+// 预警标签：深色文字
+.hourly-scroll :deep(.wd-tag--primary) { background: rgba($brand, 0.12) !important; color: $brand !important; }
+.hourly-scroll :deep(.wd-tag--danger) { background: rgba($danger, 0.12) !important; color: $danger !important; }
+.hourly-scroll :deep(.wd-tag--warning) { background: rgba($warning, 0.12) !important; color: #B8860B !important; }
+.hourly-scroll :deep(.wd-tag--success) { background: rgba($success, 0.12) !important; color: $success !important; }
+.hourly-scroll :deep(.wd-tag--info) { background: $tag-bg !important; color: $text-muted !important; }
+
 .hourly-empty { padding: 30rpx 0; text-align: center; }
 .hourly-empty-text { font-size: 26rpx; color: $text-muted; }
 
