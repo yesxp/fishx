@@ -271,26 +271,29 @@
           </view>
           <!-- 当前实况行 -->
           <view class="tide-now-row">
-            <text class="tide-now-time">{{ tideNowTime }}</text>
             <view class="tide-now-item">
               <text class="tide-now-label">天气</text>
               <text class="tide-now-val">{{ weatherStore.weatherNow?.text || '--' }}</text>
             </view>
             <view class="tide-now-item">
-              <text class="tide-now-label">温湿</text>
-              <text class="tide-now-val">{{ weatherStore.weatherNow?.temp || '--' }}° {{ weatherStore.weatherNow?.humidity || '--' }}%</text>
+              <text class="tide-now-label">温度</text>
+              <text class="tide-now-val">{{ weatherStore.weatherNow?.temp || '--' }}°</text>
             </view>
             <view class="tide-now-item">
               <text class="tide-now-label">气压</text>
-              <text class="tide-now-val">{{ weatherStore.weatherNow?.pressure || '--' }}hPa</text>
+              <text class="tide-now-val">{{ weatherStore.weatherNow?.pressure || '--' }}</text>
             </view>
             <view class="tide-now-item">
               <text class="tide-now-label">风</text>
               <text class="tide-now-val">{{ weatherStore.weatherNow?.windDir || '' }}{{ weatherStore.weatherNow?.windScale || '' }}级</text>
             </view>
             <view class="tide-now-item">
+              <text class="tide-now-label">潮差</text>
+              <text class="tide-now-val">{{ tideRange ? tideRange.diff + 'm' : '--' }}</text>
+            </view>
+            <view class="tide-now-item">
               <text class="tide-now-label">潮汐</text>
-              <text class="tide-now-val" :style="{ color: tideStatus.tagType === 'success' ? '#23A559' : tideStatus.tagType === 'warning' ? '#F0B232' : '#5865F2' }">{{ tideStatus.text }}</text>
+              <text class="tide-now-val tide-now-tide">{{ tidePhase.size }}<text v-if="tidePhase.flow" class="tide-now-flow">({{ tidePhase.flow }})</text></text>
             </view>
           </view>
           <!-- 满潮干潮卡片 -->
@@ -948,10 +951,6 @@ const tideNowX = computed(() => {
   const now = new Date()
   return tideHour2x(now.getHours() + now.getMinutes() / 60)
 })
-const tideNowTime = computed(() => {
-  const now = new Date()
-  return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
-})
 // Y轴刻度标签
 const tideYLabels = computed(() => {
   if (!tideData.value?.tideHourly) return []
@@ -987,6 +986,55 @@ const tideBeachZones = computed(() => {
       return { x: tideHour2x(h - 2), w: (4 / 24) * TW }
     })
     .filter(z => z.x + z.w > 0 && z.x < TW)
+})
+
+// ===== 潮差 + 潮汛 =====
+const tideRange = computed(() => {
+  if (!tideData.value?.tideTable) return null
+  const tbl = tideData.value.tideTable
+  const heights = tbl.map((t: any) => Number(t.height))
+  const max = Math.max(...heights)
+  const min = Math.min(...heights)
+  return { diff: +(max - min).toFixed(2), max: +max.toFixed(2), min: +min.toFixed(2) }
+})
+
+const tidePhase = computed(() => {
+  const range = tideRange.value
+  if (!range) return { size: '--', flow: '' }
+  // 用 tideCalendar 算7天平均潮差做基准
+  const cal = tideCalendar.value
+  if (cal && cal.length > 1) {
+    const avgRanges = cal.map((day: any) => {
+      if (!day.data?.tideTable) return null
+      const hs = day.data.tideTable.map((t: any) => Number(t.height))
+      return Math.max(...hs) - Math.min(...hs)
+    }).filter((r: any) => r != null) as number[]
+    if (avgRanges.length > 0) {
+      const avg = avgRanges.reduce((a: number, b: number) => a + b, 0) / avgRanges.length
+      const ratio = range.diff / (avg || 1)
+      let size = '中潮'
+      if (ratio >= 0.85) size = '大潮'
+      else if (ratio >= 0.6) size = '中潮'
+      else size = '小潮'
+      // 活汛/死汛: 今天潮差 vs 昨天
+      const todayIdx = cal.findIndex((d: any) => d.data?.tideTable)
+      let flow = '活汛'
+      if (todayIdx > 0) {
+        const prevDay = cal[todayIdx - 1]
+        if (prevDay?.data?.tideTable) {
+          const prevHs = prevDay.data.tideTable.map((t: any) => Number(t.height))
+          const prevRange = Math.max(...prevHs) - Math.min(...prevHs)
+          flow = range.diff > prevRange ? '活汛' : '死汛'
+        }
+      }
+      return { size, flow }
+    }
+  }
+  // fallback: 绝对阈值
+  const diff = range.diff
+  if (diff >= 3.5) return { size: '大潮', flow: '活汛' }
+  if (diff >= 2.0) return { size: '中潮', flow: '活汛' }
+  return { size: '小潮', flow: '死汛' }
 })
 
 // ===== 潮汐日历 =====
@@ -1521,10 +1569,11 @@ $danger: #F23F43;
 .tide-time-label { font-size: 10px; color: $text-muted; }
 /* 当前实况行 */
 .tide-now-row { display: flex; align-items: center; gap: 6px; padding: 8px 0; border-top: 1px solid $divider; border-bottom: 1px solid $divider; margin-bottom: 10px; overflow-x: auto; }
-.tide-now-time { font-size: 14px; font-weight: 700; color: $text-primary; flex-shrink: 0; padding-right: 6px; border-right: 1px solid $divider; }
-.tide-now-item { flex-shrink: 0; text-align: center; min-width: 48px; }
+.tide-now-item { flex-shrink: 0; text-align: center; min-width: 42px; }
 .tide-now-label { font-size: 9px; color: $text-muted; display: block; }
 .tide-now-val { font-size: 11px; font-weight: 500; color: $text-primary; display: block; white-space: nowrap; }
+.tide-now-tide { color: $blurple; font-weight: 700; }
+.tide-now-flow { font-size: 9px; font-weight: 500; color: $text-muted; }
 /* 满潮干潮卡片 */
 .tide-event-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .tide-event-card { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; border-radius: 10px; background: $tag-bg; }
