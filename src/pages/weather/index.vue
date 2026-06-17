@@ -231,7 +231,7 @@
           </view>
           <!-- 图表 -->
           <view class="tide-chart-wrap">
-            <svg :viewBox="'0 0 ' + TW + ' ' + TH" :width="TW" :height="TH" class="tide-svg">
+            <svg :viewBox="'0 0 ' + TW + ' ' + TH" :width="TW" :height="TH" class="tide-svg" overflow="visible">
               <defs>
                 <linearGradient id="tideFillGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stop-color="#5865F2"/>
@@ -254,7 +254,7 @@
               <g v-for="(pt, i) in tideMarkers" :key="'tm'+i">
                 <circle :cx="pt.x" :cy="pt.y" r="16" :fill="pt.type === 'H' ? 'rgba(88,101,242,0.15)' : 'rgba(88,101,242,0.08)'"/>
                 <circle :cx="pt.x" :cy="pt.y" r="12" :fill="pt.type === 'H' ? '#5865F2' : 'white'" :stroke="pt.type === 'H' ? 'none' : '#5865F2'" stroke-width="2"/>
-                <text :x="pt.x" :y="pt.y + 3.5" text-anchor="middle" font-size="9" font-weight="700" :fill="pt.type === 'H' ? 'white' : '#5865F2'">{{ pt.height }}</text>
+                <text :x="pt.x" :y="pt.y" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700" :fill="pt.type === 'H' ? 'white' : '#5865F2'">{{ pt.height }}</text>
               </g>
               <!-- 当前时间红线 -->
               <line :x1="tideNowX" :y1="TP" :x2="tideNowX" :y2="TP + TCH" stroke="#F23F43" stroke-width="1.5"/>
