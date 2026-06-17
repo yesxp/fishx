@@ -7,7 +7,7 @@
           <view class="logo-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg></view>
           <view>
             <text class="header-title">天时</text>
-            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · 2026-06-16 23:11</text>
+            <text class="header-subtitle">天气 · 潮汐 · 钓鱼 · {{ nowStr }}</text>
           </view>
         </view>
         <view class="header-actions">
@@ -746,6 +746,11 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
+const nowStr = computed(() => {
+  const d = new Date()
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+})
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
