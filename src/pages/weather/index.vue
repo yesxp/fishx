@@ -757,7 +757,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 18:45'
+const nowStr = '2026-06-17 18:55'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -1419,7 +1419,7 @@ $danger: #F23F43;
 .day-temp-track { flex: 1; height: 10px; background: #E8EAED; border-radius: 5px; position: relative; overflow: hidden; min-width: 40px; }
 .day-temp-fill { position: absolute; top: 0; height: 100%; background: linear-gradient(90deg, #5865F2, #F23F43); border-radius: 5px; }
 /* 温度数字样式 */
-.temp-num { font-size: 13px; flex-shrink: 0; white-space: nowrap; display: inline-block; }
+.temp-num { font-size: 14px; flex-shrink: 0; white-space: nowrap; }
 .temp-num--low { color: #80848E; }
 .temp-num--high { color: #060607; font-weight: 700; }
 
