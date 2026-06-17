@@ -749,11 +749,8 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = computed(() => {
-  const d = new Date()
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
-})
+// 部署时间戳：每次提交时更新
+const nowStr = '2026-06-17 16:30'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
