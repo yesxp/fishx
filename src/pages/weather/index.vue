@@ -203,6 +203,9 @@
                 <text class="day-icon">{{ getWeatherIcon(day.iconDay) }}</text>
                 <text class="day-text">{{ day.textDay }}</text>
               </view>
+              <view class="day-wind">
+                <text class="day-wind-text">{{ day.windDirDay }} {{ day.windScaleDay }}级</text>
+              </view>
               <view class="day-temp-bar">
                 <text class="day-temp-lo">{{ day.tempNight }}°</text>
                 <view class="day-temp-track">
@@ -210,14 +213,11 @@
                 </view>
                 <text class="day-temp-hi">{{ day.tempDay }}°</text>
               </view>
+              <view class="day-moon">
+                <text class="day-moon-text">{{ getMoonPhaseEmoji(day.moonPhase) }}</text>
+              </view>
               <view class="day-comfort">
-                <wd-tag
-                  :type="Number(day.tempDay) >= 35 ? 'danger' : Number(day.tempDay) >= 30 ? 'warning' : Number(day.tempDay) >= 20 ? 'success' : 'primary'"
-                  size="small"
-                  round
-                >
-                  {{ Number(day.tempDay) >= 35 ? '闷热' : Number(day.tempDay) >= 30 ? '热' : Number(day.tempDay) >= 20 ? '温暖' : '凉爽' }}
-                </wd-tag>
+                <wd-tag :type="getDayComfortType(day)" size="small" round variant="light">{{ getDayComfortText(day) }}</wd-tag>
               </view>
             </view>
           </view>
@@ -512,6 +512,37 @@ function getTempBarStyle(lo: number, hi: number) {
   const range = max - min || 1
   return { left: ((lo - min) / range) * 100 + '%', width: Math.max(((hi - lo) / range) * 100, 8) + '%' }
 }
+// 月相emoji
+function getMoonPhaseEmoji(phase: string) {
+  if (!phase) return '🌑'
+  if (/新月/.test(phase)) return '🌑'
+  if (/蛾眉/.test(phase)) return '🌒'
+  if (/上弦/.test(phase)) return '🌓'
+  if (/盈凸/.test(phase)) return '🌔'
+  if (/满月/.test(phase)) return '🌕'
+  if (/亏凸/.test(phase)) return '🌖'
+  if (/下弦/.test(phase)) return '🌗'
+  if (/残月/.test(phase)) return '🌘'
+  return '🌙'
+}
+
+// 每日舒适度
+function getDayComfortType(day: any) {
+  const hi = Number(day.tempDay)
+  if (hi >= 35) return 'danger'
+  if (hi >= 30) return 'warning'
+  if (hi >= 20) return 'success'
+  return 'primary'
+}
+
+function getDayComfortText(day: any) {
+  const hi = Number(day.tempDay)
+  if (hi >= 35) return '闷热'
+  if (hi >= 30) return '热'
+  if (hi >= 20) return '温暖'
+  return '凉爽'
+}
+
 
 // ===== ECharts 逐小时双折线图 =====
 const hourlyChartOption = computed(() => {
@@ -764,7 +795,7 @@ const hourlyFishingScore = computed(() => {
 
 const nowHour = computed(() => new Date().getHours())
 // 部署时间戳：每次提交时更新
-const nowStr = '2026-06-17 17:05'
+const nowStr = '2026-06-17 17:15'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -1406,11 +1437,15 @@ $danger: #F23F43;
 .day-weather { display: flex; align-items: center; gap: 6px; width: 80px; flex-shrink: 0; }
 .day-icon { font-size: 20px; }
 .day-text { font-size: 12px; color: $text-secondary; }
+.day-wind { width: 70px; flex-shrink: 0; }
+.day-wind-text { font-size: 10px; color: $text-muted; display: block; }
 .day-temp-bar { flex: 1; display: flex; align-items: center; gap: 8px; }
 .day-temp-lo { font-size: 12px; color: $text-muted; width: 28px; text-align: right; flex-shrink: 0; }
 .day-temp-hi { font-size: 12px; font-weight: 600; color: $text-primary; width: 28px; flex-shrink: 0; }
 .day-temp-track { flex: 1; height: 4px; background: rgba($brand, 0.08); border-radius: 2px; position: relative; overflow: hidden; }
 .day-temp-fill { position: absolute; top: 0; height: 100%; background: linear-gradient(90deg, $brand, $warning); border-radius: 2px; }
+.day-moon { width: 28px; flex-shrink: 0; text-align: center; }
+.day-moon-text { font-size: 16px; }
 
 /* Tide */
 .tide-chart-wrap { margin-bottom: 12px; }
