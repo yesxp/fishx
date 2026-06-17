@@ -96,12 +96,9 @@
           <!-- 竖状垂钓指数柱状图 -->
           <scroll-view scroll-x class="vbar-scroll" :show-scrollbar="false">
             <view class="vbar-chart">
-              <view class="vbar-now" :style="{ left: nowHourPercent + '%' }">
-                <text class="vbar-now-label">现在</text>
-              </view>
               <view v-for="(h, i) in hourlyFishingScore" :key="i" class="vbar-col" :class="{ 'vbar-highlight': i === nowHour }">
                 <text class="vbar-score">{{ h.score }}</text>
-                <view class="vbar-bar" :class="getVBarClass(h.score)" :style="{ height: (h.score / 100 * 120) + 'rpx' }" />
+                <view class="vbar-bar" :class="getVBarClass(h.score)" :style="{ height: (h.score / 100 * 60) + 'rpx' }" />
                 <text class="vbar-time">{{ h.time }}</text>
               </view>
             </view>
@@ -750,10 +747,6 @@ const hourlyFishingScore = computed(() => {
 
 const nowHour = computed(() => new Date().getHours())
 
-const nowHourPercent = computed(() => {
-  return (nowHour.value / 23) * 100
-})
-
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
   if (score >= 70) return 'vbar-bar--good'
@@ -1117,7 +1110,7 @@ $danger: #F23F43;
 
 /* 竖状垂钓指数柱状图 */
 .vbar-scroll { width: 100%; white-space: nowrap; }
-.vbar-chart { display: inline-flex; align-items: flex-end; gap: 9rpx; height: 180rpx; padding-top: 24rpx; position: relative; min-width: 100%; }
+.vbar-chart { display: inline-flex; align-items: flex-end; gap: 9rpx; height: 100rpx; padding-top: 16rpx; position: relative; min-width: 100%; }
 .vbar-col { flex: 0 0 28rpx; display: flex; flex-direction: column; align-items: center; gap: 2rpx; }
 .vbar-bar { width: 100%; border-radius: 3rpx 3rpx 0 0; min-height: 4rpx; }
 .vbar-bar--excellent { background: linear-gradient(180deg, #66BB6A, #4CAF50); }
@@ -1128,8 +1121,6 @@ $danger: #F23F43;
 .vbar-score { font-size: 14rpx; color: $header-primary; font-weight: 600; }
 .vbar-time { font-size: 16rpx; color: $text-muted; margin-top: 4rpx; }
 .vbar-highlight { background: rgba($blurple, 0.06); border-radius: 12rpx; padding: 6rpx 4rpx; margin: 0 -4rpx; }
-.vbar-now { position: absolute; top: 0; left: 0; right: 0; height: 4rpx; background: $status-red; z-index: 1; }
-.vbar-now-label { position: absolute; top: -28rpx; left: 50%; transform: translateX(-50%); font-size: 18rpx; color: $status-red; white-space: nowrap; }
 .vbar-legend { display: flex; gap: 16rpx; margin-top: 12rpx; justify-content: center; }
 .vbar-legend-item { display: flex; align-items: center; gap: 6rpx; font-size: 20rpx; color: $text-muted; }
 .vbar-legend-dot { width: 16rpx; height: 16rpx; border-radius: 4rpx; }
