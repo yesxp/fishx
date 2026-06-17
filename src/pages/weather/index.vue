@@ -203,8 +203,6 @@
                 <text class="day-icon">{{ getWeatherIcon(day.iconDay) }}</text>
                 <text class="day-text">{{ day.textDay }}</text>
               </view>
-              <view class="day-wind">
-                <text class="day-wind-text">{{ day.windDirDay }} {{ day.windScaleDay }}级</text>
               </view>
               <view class="day-temp-bar">
                 <text class="day-temp-lo">{{ day.tempNight }}°</text>
@@ -212,9 +210,6 @@
                   <view class="day-temp-fill" :style="getTempBarStyle(day.tempNight, day.tempDay)" />
                 </view>
                 <text class="day-temp-hi">{{ day.tempDay }}°</text>
-              </view>
-              <view class="day-moon">
-                <text class="day-moon-text">{{ getMoonPhaseEmoji(day.moonPhase) }}</text>
               </view>
               <view class="day-comfort">
                 <wd-tag :type="getDayComfortType(day)" size="small" round variant="light">{{ getDayComfortText(day) }}</wd-tag>
@@ -513,18 +508,6 @@ function getTempBarStyle(lo: number, hi: number) {
   return { left: ((lo - min) / range) * 100 + '%', width: Math.max(((hi - lo) / range) * 100, 8) + '%' }
 }
 // 月相emoji
-function getMoonPhaseEmoji(phase: string) {
-  if (!phase) return '🌑'
-  if (/新月/.test(phase)) return '🌑'
-  if (/蛾眉/.test(phase)) return '🌒'
-  if (/上弦/.test(phase)) return '🌓'
-  if (/盈凸/.test(phase)) return '🌔'
-  if (/满月/.test(phase)) return '🌕'
-  if (/亏凸/.test(phase)) return '🌖'
-  if (/下弦/.test(phase)) return '🌗'
-  if (/残月/.test(phase)) return '🌘'
-  return '🌙'
-}
 
 // 每日舒适度
 function getDayComfortType(day: any) {
@@ -795,7 +778,7 @@ const hourlyFishingScore = computed(() => {
 
 const nowHour = computed(() => new Date().getHours())
 // 部署时间戳：每次提交时更新
-const nowStr = '2026-06-17 17:20'
+const nowStr = '2026-06-17 17:25'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -1437,222 +1420,10 @@ $danger: #F23F43;
 .day-weather { display: flex; align-items: center; gap: 6px; width: 80px; flex-shrink: 0; }
 .day-icon { font-size: 20px; }
 .day-text { font-size: 12px; color: $text-secondary; }
-.day-wind { width: 70px; flex-shrink: 0; }
-.day-wind-text { font-size: 10px; color: $text-muted; display: block; }
+
 .day-temp-bar { flex: 1; display: flex; align-items: center; gap: 8px; }
 .day-temp-lo { font-size: 12px; color: $text-muted; width: 28px; text-align: right; flex-shrink: 0; }
 .day-temp-hi { font-size: 12px; font-weight: 600; color: $text-primary; width: 28px; flex-shrink: 0; }
 .day-temp-track { flex: 1; height: 10px; background: #E8EAED; border-radius: 5px; position: relative; overflow: hidden; }
 .day-temp-fill { position: absolute; top: 0; height: 100%; background: linear-gradient(90deg, #5865F2, #9B8AFB, #F0B232); border-radius: 5px; }
-.day-moon { width: 28px; flex-shrink: 0; text-align: center; }
-.day-moon-text { font-size: 16px; }
-
-/* Tide */
-.tide-chart-wrap { margin-bottom: 12px; }
-.tide-svg { display: block; }
-.tide-time-axis { display: flex; justify-content: space-between; padding: 4px 0; }
-.tide-time-label { font-size: 10px; color: $text-muted; }
-.tide-info { display: flex; gap: 8px; }
-.tide-info-item { flex: 1; background: $tag-bg; border-radius: 10px; padding: 10px; text-align: center; }
-.tide-info-label { font-size: 10px; color: $text-muted; display: block; }
-.tide-info-time { font-size: 16px; font-weight: 700; color: $text-primary; display: block; margin-top: 2px; }
-.tide-info-val { font-size: 11px; color: $text-muted; display: block; }
-
-/* Tide Compact Badges (Redesigned) */
-.tide-info-compact { display: flex; flex-wrap: wrap; gap: 6px; }
-.tide-badge { display: flex; align-items: center; gap: 6px; border-radius: 8px; padding: 6px 10px; flex: 1; min-width: 120px; }
-.tide-badge--high { background: rgba($warning, 0.08); }
-.tide-badge--low { background: rgba($brand, 0.08); }
-.tide-badge-icon { font-size: 16px; }
-.tide-badge-info { flex: 1; }
-.tide-badge-label { font-size: 10px; color: $text-muted; display: block; }
-.tide-badge-time { font-size: 13px; font-weight: 600; color: $text-primary; display: block; }
-.tide-badge-val { font-size: 12px; font-weight: 600; }
-.tide-badge--high .tide-badge-val { color: $warning; }
-.tide-badge--low .tide-badge-val { color: $brand; }
-
-/* Tide Calendar */
-.tide-cal-header { display: flex; padding: 6px 0; border-bottom: 1px solid $divider; }
-.tide-cal-row { display: flex; padding: 8px 0; border-bottom: 1px solid rgba($divider, 0.5); &:last-child { border-bottom: none; } }
-.tide-cal-row--alt { background: rgba($bg-page, 0.5); margin: 0 -8px; padding: 8px; border-radius: 6px; }
-.tide-cal-row--today { background: rgba($brand, 0.04); margin: 0 -8px; padding: 8px; border-radius: 6px; }
-.tide-cal-col { text-align: center; }
-.tide-cal-col--day { width: 48px; flex-shrink: 0; }
-.tide-cal-col--hl { flex: 1; }
-.tide-cal-date { font-size: 12px; font-weight: 500; color: $text-primary; display: block; }
-.tide-cal-time { font-size: 11px; color: $text-secondary; display: block; }
-.tide-cal-h { font-size: 11px; font-weight: 600; display: block; }
-.tide-cal-h--hi { color: $warning; }
-.tide-cal-h--lo { color: $brand; }
-.tide-cal-empty { font-size: 12px; color: $text-muted; text-align: center; width: 100%; display: block; }
-
-/* Tide Pattern */
-.tide-pattern { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-.tide-pattern-item { display: flex; align-items: center; gap: 10px; }
-.tide-pattern-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-.tide-pattern-icon--spring { background: rgba($brand, 0.1); }
-.tide-pattern-icon--diff { background: rgba($warning, 0.1); }
-.tide-pattern-icon--best { background: rgba($success, 0.1); }
-.tide-pattern-name { font-size: 13px; font-weight: 600; color: $text-primary; display: block; }
-.tide-pattern-desc { font-size: 11px; color: $text-muted; display: block; }
-.tide-tip { background: rgba($brand, 0.04); border-radius: 8px; padding: 10px; }
-.tide-tip-text { font-size: 12px; color: $text-secondary; line-height: 1.5; }
-
-/* Typhoon */
-.typhoon-map { margin-bottom: 12px; }
-.typhoon-svg { display: block; border-radius: 8px; overflow: hidden; }
-.typhoon-info { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
-.typhoon-info-item { background: $tag-bg; border-radius: 8px; padding: 8px; text-align: center; }
-.typhoon-info-label { font-size: 10px; color: $text-muted; display: block; }
-.typhoon-info-val { font-size: 13px; font-weight: 600; color: $text-primary; display: block; margin-top: 2px; }
-.typhoon-empty { text-align: center; padding: 20px 0; }
-.typhoon-empty-icon { font-size: 24px; display: block; }
-.typhoon-empty-text { font-size: 13px; color: $text-muted; display: block; margin-top: 6px; }
-.typhoon-tip { background: rgba($danger, 0.05); border-radius: 8px; padding: 10px; }
-
-/* Fish */
-.fish-list { display: flex; flex-direction: column; }
-.fish-row { display: flex !important; align-items: center; justify-content: space-between; padding: 10px 0 !important; background: transparent !important; }
-.fish-row :deep(.wd-cell__wrapper) { padding: 0 !important; }
-.fish-row :deep(.wd-cell__left) { gap: 10px; }
-.fish-left { display: flex; align-items: center; gap: 10px; }
-.fish-emoji { font-size: 24px; }
-.fish-name { font-size: 14px; font-weight: 600; color: $text-primary; display: block; }
-.fish-desc { font-size: 11px; color: $text-muted; display: block; }
-.fish-right { display: flex; align-items: center; gap: 8px; }
-.fish-badge { padding: 3px 10px; border-radius: 100px; &--open { background: rgba($success, 0.1); } &--normal { background: rgba($brand, 0.1); } &--slow { background: rgba(128, 132, 142, 0.1); } }
-.fish-badge-text { font-size: 12px; font-weight: 500; color: $success; .fish-badge--normal & { color: $brand; } .fish-badge--slow & { color: $text-muted; } }
-.fish-trend { font-size: 16px; color: $text-muted; width: 20px; text-align: center; }
-
-/* Fishing Windows (Redesigned) */
-.fishing-windows { display: flex; gap: 8px; margin-bottom: 12px; }
-.fishing-window { flex: 1; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 8px; }
-.fishing-window--best { background: rgba($success, 0.08); border: 1px solid rgba($success, 0.2); }
-.fishing-window--secondary { background: rgba($warning, 0.08); border: 1px solid rgba($warning, 0.2); }
-.fishing-window-dot { font-size: 12px; }
-.fishing-window-info { flex: 1; }
-.fishing-window-label { font-size: 11px; font-weight: 500; color: $text-secondary; display: block; }
-.fishing-window-time { font-size: 15px; font-weight: 700; color: $text-primary; display: block; margin-top: 2px; }
-
-/* Fishing Tags */
-.fishing-tags { display: flex; flex-wrap: wrap; margin-bottom: 10px; }
-
-/* Fishing Advice Paragraph */
-.fishing-advice { background: rgba($brand, 0.03); border-radius: 8px; padding: 10px; margin-bottom: 12px; }
-.fishing-advice-text { font-size: 12px; color: $text-secondary; line-height: 1.6; }
-
-/* Fish Compact List (Redesigned) */
-.fish-compact-list { display: flex; flex-direction: column; }
-.fish-compact-row { display: flex; align-items: center; padding: 8px 0; gap: 10px; }
-.fish-compact-emoji { font-size: 20px; flex-shrink: 0; }
-.fish-compact-info { flex: 1; min-width: 0; }
-.fish-compact-name { font-size: 13px; font-weight: 600; color: $text-primary; display: block; }
-.fish-compact-desc { font-size: 11px; color: $text-muted; display: block; }
-
-/* Tips */
-.tips { display: flex; flex-direction: column; }
-.tip { display: flex !important; align-items: flex-start; gap: 10px; padding: 10px 0 !important; background: transparent !important; }
-.tip :deep(.wd-cell__wrapper) { padding: 0 !important; }
-.tip :deep(.wd-cell__left) { gap: 10px; }
-.tip-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-.tip-icon--b { background: rgba($brand, 0.1); }
-.tip-icon--g { background: rgba($success, 0.1); }
-.tip-icon--o { background: rgba($warning, 0.1); }
-.tip-icon--p { background: rgba($danger, 0.08); }
-.tip-content { flex: 1; }
-.tip-title { font-size: 13px; font-weight: 600; color: $text-primary; display: block; margin-bottom: 2px; }
-.tip-text { font-size: 12px; color: $text-secondary; line-height: 1.5; }
-
-/* Typhoon Card */
-.typhoon-card {}
-
-.typhoon-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.typhoon-header-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.typhoon-level-badge {
-  padding: 2px 8px;
-  border-radius: 3px;
-}
-
-.typhoon-level--super { background: rgba($danger, 0.12); }
-.typhoon-level--strong { background: rgba($warning, 0.12); }
-.typhoon-level--medium { background: rgba($brand, 0.12); }
-.typhoon-level--weak { background: rgba($text-muted, 0.12); }
-
-.typhoon-level-text {
-  font-size: 11px;
-  font-weight: 600;
-  color: $danger;
-  .typhoon-level--strong & { color: $warning; }
-  .typhoon-level--medium & { color: $brand; }
-  .typhoon-level--weak & { color: $text-muted; }
-}
-
-.typhoon-link {
-  font-size: 12px;
-  color: $brand;
-  font-weight: 500;
-}
-
-.typhoon-mini-map {
-  margin-bottom: 12px;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.typhoon-info-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.typhoon-info-item {
-  text-align: center;
-}
-
-.typhoon-info-label {
-  font-size: 10px;
-  color: $text-muted;
-  display: block;
-}
-
-.typhoon-info-value {
-  font-size: 13px;
-  font-weight: 600;
-  color: $text-primary;
-  display: block;
-  margin-top: 2px;
-}
-
-.typhoon-impact {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 10px;
-  background: rgba($danger, 0.04);
-  border-radius: 8px;
-}
-
-.typhoon-impact-icon {
-  font-size: 16px;
-  flex-shrink: 0;
-}
-
-.typhoon-impact-text {
-  font-size: 12px;
-  color: $text-secondary;
-  line-height: 1.5;
-  flex: 1;
-}
-</style>
+.day-comfort { flex-shrink: 0; }
