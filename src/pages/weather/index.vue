@@ -145,22 +145,23 @@
               <text class="card-title-sun">🌇 {{ today.sunset || '--:--' }}</text>
             </view>
           </view>
-          <!-- Day Selector Tabs -->
-          <view class="hourly-day-tabs">
-            <view
-              v-for="(tab, idx) in hourlyDayTabs"
-              :key="tab.date"
-              class="hourly-day-tab"
-              :class="{ 'hourly-day-tab--active': selectedDayIdx === idx }"
-              @tap="selectedDayIdx = idx"
-            >
-              <text class="hourly-day-tab-name">{{ tab.label }}</text>
-              <text class="hourly-day-tab-date">{{ tab.dateShort }}</text>
+          <!-- 横向滑动小时卡片 -->
+          <scroll-view v-if="filteredHourly.length > 0" scroll-x class="hourly-scroll" :show-scrollbar="false">
+            <view class="hourly-row">
+              <view
+                v-for="(h, i) in filteredHourly"
+                :key="i"
+                class="hourly-card"
+                :class="{ 'hourly-card--now': i === 0 && selectedDayIdx === 0 }"
+              >
+                <text class="hourly-time">{{ i === 0 && selectedDayIdx === 0 ? '现在' : h.time.slice(-5, -3) + '点' }}</text>
+                <text class="hourly-icon">{{ getWeatherIcon(h.icon) }}</text>
+                <text class="hourly-temp">{{ h.temp }}°</text>
+                <text class="hourly-wind">{{ h.windDir }} {{ h.windScale }}级</text>
+                <view class="hourly-bar" :class="getHourlyBarClass(h)" />
+              </view>
             </view>
-          </view>
-          <view class="hourly-chart-wrap" v-if="filteredHourly.length > 0">
-            <uni-echarts custom-style="width:100%;height:240px" :option="hourlyChartOption" />
-          </view>
+          </scroll-view>
           <view v-else class="hourly-empty">
             <text class="hourly-empty-text">暂无该日逐时数据</text>
           </view>
@@ -738,6 +739,13 @@ function getVBarClass(score: number) {
   return 'vbar-bar--poor'
 }
 
+function getHourlyBarClass(h: any) {
+  const pop = Number(h.pop || 0)
+  if (pop >= 50) return 'hourly-bar--rain'
+  if (pop >= 20) return 'hourly-bar--cloud'
+  return 'hourly-bar--sun'
+}
+
 // ===== 潮汐 =====
 const tideData = computed(() => weatherStore.tide)
 
@@ -1253,21 +1261,26 @@ $danger: #F23F43;
 .tip-tag--yellow { background: rgba($status-yellow, 0.1); color: $status-yellow; }
 .tip-tag--blue { background: rgba($blurple, 0.1); color: $blurple; }
 
-/* Hourly Chart */
-.hourly-chart-wrap { margin-top: 8px; }
-.hourly-chart-inner { min-height: 200px; }
-.hourly-svg { display: block; }
-
-/* Hourly Day Tabs */
-.hourly-day-tabs { display: flex; gap: 0; margin-bottom: 12px; background: $tag-bg; border-radius: 10px; padding: 3px; }
-.hourly-day-tab { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 6px 4px; border-radius: 8px; cursor: pointer; }
-.hourly-day-tab--active { background: $bg-card; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-.hourly-day-tab-name { font-size: 12px; font-weight: 500; color: $text-primary; }
-.hourly-day-tab--active .hourly-day-tab-name { color: $brand; font-weight: 700; }
-.hourly-day-tab-date { font-size: 10px; color: $text-muted; margin-top: 2px; }
-.hourly-day-tab--active .hourly-day-tab-date { color: $brand; opacity: 0.7; }
-.hourly-empty { padding: 30px 0; text-align: center; }
-.hourly-empty-text { font-size: 13px; color: $text-muted; }
+/* Hourly Scroll Cards */
+.hourly-scroll { white-space: nowrap; }
+.hourly-row { display: inline-flex; gap: 0; }
+.hourly-card {
+  width: 130rpx; min-width: 130rpx; display: flex; flex-direction: column;
+  align-items: center; padding: 16rpx 8rpx; gap: 8rpx;
+}
+.hourly-card--now { background: rgba($blurple, 0.06); border-radius: 16rpx; }
+.hourly-time { font-size: 22rpx; color: $text-muted; font-weight: 500; }
+.hourly-card--now .hourly-time { color: $blurple; font-weight: 700; }
+.hourly-icon { font-size: 36rpx; }
+.hourly-temp { font-size: 30rpx; font-weight: 700; color: $header-primary; }
+.hourly-card--now .hourly-temp { font-size: 34rpx; }
+.hourly-wind { font-size: 18rpx; color: $text-muted; text-align: center; }
+.hourly-bar { width: 32rpx; height: 6rpx; border-radius: 3rpx; margin-top: 2rpx; }
+.hourly-bar--sun { background: $status-green; }
+.hourly-bar--cloud { background: $status-yellow; }
+.hourly-bar--rain { background: $blurple; }
+.hourly-empty { padding: 30rpx 0; text-align: center; }
+.hourly-empty-text { font-size: 26rpx; color: $text-muted; }
 
 /* 7-day comfort tag */
 .day-comfort { margin-left: auto; flex-shrink: 0; }
