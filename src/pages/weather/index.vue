@@ -1087,7 +1087,7 @@ const tidePattern = computed(() => {
 
   // 判断大潮/小潮（基于潮差变化）
   const isSpring = ranges.length >= 2 && ranges[ranges.length - 1] > ranges[0]
-  const cycle = isSpring ? '大潮期 → 活讯' : '小潮期 → 死讯'
+  const cycle = isSpring ? '大潮期 → 活汛' : '小潮期 → 死汛'
   const cycleDesc = isSpring ? '潮差增大，鱼口活跃' : '潮差减小，鱼口较慢'
 
   // 最佳窗口
