@@ -651,7 +651,16 @@ const hourlyChartOption = computed(() => {
 
 function getWeekDayShort(dateStr: string) {
   const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-  return days[new Date(dateStr).getDay()]
+  // 支持 yyyyMMdd 格式
+  let d: Date
+  if (/^\d{8}$/.test(dateStr)) {
+    d = new Date(`${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`)
+  } else {
+    d = new Date(dateStr)
+  }
+  const m = d.getMonth() + 1
+  const day = d.getDate()
+  return `${m}/${day} ${days[d.getDay()]}`
 }
 
 const badgeClass = computed(() => {
@@ -802,7 +811,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 20:30'
+const nowStr = '2026-06-17 20:35'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
