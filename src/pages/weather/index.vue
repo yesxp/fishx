@@ -271,6 +271,7 @@
           </view>
           <!-- 当前实况行 -->
           <view class="tide-now-row">
+            <text class="tide-now-time">{{ tideNowTime }}</text>
             <view class="tide-now-item">
               <text class="tide-now-label">天气</text>
               <text class="tide-now-val">{{ weatherStore.weatherNow?.text || '--' }}</text>
@@ -281,7 +282,7 @@
             </view>
             <view class="tide-now-item">
               <text class="tide-now-label">气压</text>
-              <text class="tide-now-val">{{ weatherStore.weatherNow?.pressure || '--' }}</text>
+              <text class="tide-now-val">{{ weatherStore.weatherNow?.pressure || '--' }}hPa</text>
             </view>
             <view class="tide-now-item">
               <text class="tide-now-label">风</text>
@@ -951,6 +952,10 @@ const tideNowX = computed(() => {
   const now = new Date()
   return tideHour2x(now.getHours() + now.getMinutes() / 60)
 })
+const tideNowTime = computed(() => {
+  const now = new Date()
+  return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+})
 // Y轴刻度标签
 const tideYLabels = computed(() => {
   if (!tideData.value?.tideHourly) return []
@@ -1569,6 +1574,7 @@ $danger: #F23F43;
 .tide-time-label { font-size: 10px; color: $text-muted; }
 /* 当前实况行 */
 .tide-now-row { display: flex; align-items: center; gap: 6px; padding: 8px 0; border-top: 1px solid $divider; border-bottom: 1px solid $divider; margin-bottom: 10px; overflow-x: auto; }
+.tide-now-time { font-size: 14px; font-weight: 700; color: $text-primary; flex-shrink: 0; padding-right: 6px; border-right: 1px solid $divider; }
 .tide-now-item { flex-shrink: 0; text-align: center; min-width: 42px; }
 .tide-now-label { font-size: 9px; color: $text-muted; display: block; }
 .tide-now-val { font-size: 11px; font-weight: 500; color: $text-primary; display: block; white-space: nowrap; }
