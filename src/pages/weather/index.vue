@@ -142,18 +142,22 @@
             <text class="card-title">逐小时预报</text>
             <view class="card-title-right" v-if="today">
               <view class="card-title-sun">
-                <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="#4E5058" stroke-width="1.5" stroke-linecap="round">
-                  <path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.76 3.76l1.41 1.41M10.83 10.83l1.41 1.41M3.76 12.24l1.41-1.41M10.83 5.17l1.41-1.41"/>
-                  <path d="M4 10a4 4 0 0 1 8 0"/>
-                  <line x1="1" y1="14" x2="15" y2="14"/>
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="#4E5058" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                  <!-- 半圆太阳从地平线升起 -->
+                  <path d="M3 11a5 5 0 0 1 10 0"/>
+                  <line x1="1" y1="11" x2="15" y2="11"/>
+                  <!-- 向上箭头 -->
+                  <path d="M8 9V4M6 6l2-2 2 2"/>
                 </svg>
                 <text>{{ today.sunrise || '--:--' }}</text>
               </view>
               <view class="card-title-sun">
-                <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="#4E5058" stroke-width="1.5" stroke-linecap="round">
-                  <path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.76 3.76l1.41 1.41M10.83 10.83l1.41 1.41M3.76 12.24l1.41-1.41M10.83 5.17l1.41-1.41"/>
-                  <path d="M4 10a4 4 0 0 1 8 0"/>
-                  <line x1="1" y1="14" x2="15" y2="14" stroke-dasharray="2 1"/>
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="#4E5058" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                  <!-- 半圆太阳沉入地平线 -->
+                  <path d="M3 11a5 5 0 0 1 10 0"/>
+                  <line x1="1" y1="11" x2="15" y2="11"/>
+                  <!-- 向下箭头 -->
+                  <path d="M8 5v5M6 8l2 2 2-2"/>
                 </svg>
                 <text>{{ today.sunset || '--:--' }}</text>
               </view>
@@ -764,7 +768,7 @@ const hourlyFishingScore = computed(() => {
 
 const nowHour = computed(() => new Date().getHours())
 // 部署时间戳：每次提交时更新
-const nowStr = '2026-06-17 16:50'
+const nowStr = '2026-06-17 16:55'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
