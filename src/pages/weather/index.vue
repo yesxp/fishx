@@ -141,8 +141,22 @@
           <view class="card-title-row">
             <text class="card-title">逐小时预报</text>
             <view class="card-title-right" v-if="today">
-              <text class="card-title-sun">🌅 {{ today.sunrise || '--:--' }}</text>
-              <text class="card-title-sun">🌇 {{ today.sunset || '--:--' }}</text>
+              <view class="card-title-sun">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="#4E5058" stroke-width="1.5" stroke-linecap="round">
+                  <path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.76 3.76l1.41 1.41M10.83 10.83l1.41 1.41M3.76 12.24l1.41-1.41M10.83 5.17l1.41-1.41"/>
+                  <path d="M4 10a4 4 0 0 1 8 0"/>
+                  <line x1="1" y1="14" x2="15" y2="14"/>
+                </svg>
+                <text>{{ today.sunrise || '--:--' }}</text>
+              </view>
+              <view class="card-title-sun">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="#4E5058" stroke-width="1.5" stroke-linecap="round">
+                  <path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.76 3.76l1.41 1.41M10.83 10.83l1.41 1.41M3.76 12.24l1.41-1.41M10.83 5.17l1.41-1.41"/>
+                  <path d="M4 10a4 4 0 0 1 8 0"/>
+                  <line x1="1" y1="14" x2="15" y2="14" stroke-dasharray="2 1"/>
+                </svg>
+                <text>{{ today.sunset || '--:--' }}</text>
+              </view>
             </view>
           </view>
           <!-- 横向滑动小时卡片 -->
@@ -750,7 +764,7 @@ const hourlyFishingScore = computed(() => {
 
 const nowHour = computed(() => new Date().getHours())
 // 部署时间戳：每次提交时更新
-const nowStr = '2026-06-17 16:45'
+const nowStr = '2026-06-17 16:50'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -1258,7 +1272,7 @@ $danger: #F23F43;
 .card-title--sm { font-size: 13px; }
 .card-subtitle { font-size: 11px; color: $text-muted; margin-left: auto; }
 .card-title-right { display: flex; gap: 10px; margin-left: auto; }
-.card-title-sun { font-size: 11px; color: $text-secondary; }
+.card-title-sun { display: flex; align-items: center; gap: 3px; font-size: 11px; color: $text-secondary; }
 .badge { padding: 2px 8px; border-radius: 100px; }
 .badge--ok { background: rgba($success, 0.1); }
 .badge--mid { background: rgba($brand, 0.1); }
