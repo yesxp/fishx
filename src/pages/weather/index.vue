@@ -1303,7 +1303,7 @@ $danger: #F23F43;
 .hourly-scroll { white-space: nowrap; }
 .hourly-row { display: inline-flex; gap: 0; }
 .hourly-card {
-  width: 98rpx; min-width: 98rpx; display: flex; flex-direction: column;
+  width: 107rpx; min-width: 107rpx; display: flex; flex-direction: column;
   align-items: center; padding: 12rpx 6rpx 16rpx; gap: 6rpx;
 }
 .hourly-card--now { background: rgba($blurple, 0.06); border-radius: 16rpx; }
@@ -1312,7 +1312,7 @@ $danger: #F23F43;
 .hourly-icon { font-size: 36rpx; }
 .hourly-temp { font-size: 32rpx; font-weight: 700; color: $header-primary; }
 .hourly-card--now .hourly-temp { font-size: 36rpx; }
-.hourly-line-area { width: 98rpx; height: 53px; display: flex; align-items: flex-end; justify-content: center; }
+.hourly-line-area { width: 107rpx; height: 53px; display: flex; align-items: flex-end; justify-content: center; }
 .hourly-temp-bar { width: 10rpx; border-radius: 5rpx; background: $blurple; }
 .hourly-wind { font-size: 18rpx; color: $text-muted; text-align: center; }
 .hourly-pressure { font-size: 18rpx; color: $text-muted; text-align: center; letter-spacing: 0.5rpx; }
