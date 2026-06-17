@@ -325,7 +325,13 @@
           </view>
           <view v-for="(day, i) in tideCalendar" :key="i" class="tide-cal-row" :class="{ 'tide-cal-row--today': i === 0, 'tide-cal-row--alt': i % 2 === 1 }">
             <view class="tide-cal-col tide-cal-col--day">
-              <text class="tide-cal-date">{{ i === 0 ? '今天' : getWeekDayShort(day.date) }}</text>
+              <template v-if="i === 0">
+                <text class="tide-cal-date">今天</text>
+              </template>
+              <template v-else>
+                <text class="tide-cal-date">{{ getWeekDayShort(day.date).weekday }}</text>
+                <text class="tide-cal-subdate">({{ getWeekDayShort(day.date).date }})</text>
+              </template>
             </view>
             <template v-if="day.data?.tideTable">
               <view v-for="(t, j) in padTideTable(day.data.tideTable, 4)" :key="j" class="tide-cal-col tide-cal-col--hl">
@@ -651,7 +657,6 @@ const hourlyChartOption = computed(() => {
 
 function getWeekDayShort(dateStr: string) {
   const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-  // 支持 yyyyMMdd 格式
   let d: Date
   if (/^\d{8}$/.test(dateStr)) {
     d = new Date(`${dateStr.slice(0,4)}-${dateStr.slice(4,6)}-${dateStr.slice(6,8)}`)
@@ -660,7 +665,7 @@ function getWeekDayShort(dateStr: string) {
   }
   const m = d.getMonth() + 1
   const day = d.getDate()
-  return `${m}/${day} ${days[d.getDay()]}`
+  return { weekday: days[d.getDay()], date: `${m}/${day}` }
 }
 
 const badgeClass = computed(() => {
@@ -1613,6 +1618,7 @@ $danger: #F23F43;
 .tide-cal-col--day { width: 48px; flex-shrink: 0; }
 .tide-cal-col--hl { flex: 1; }
 .tide-cal-date { font-size: 12px; font-weight: 500; color: $text-primary; display: block; }
+.tide-cal-subdate { font-size: 9px; color: $text-muted; display: block; }
 .tide-cal-time { font-size: 11px; color: $text-secondary; display: block; }
 .tide-cal-h { font-size: 11px; font-weight: 600; display: block; }
 .tide-cal-h--hi { color: $warning; }
