@@ -330,7 +330,7 @@
               </template>
               <template v-else>
                 <text class="tide-cal-date">{{ getWeekDayShort(day.date).weekday }}</text>
-                <text class="tide-cal-subdate">({{ getWeekDayShort(day.date).date }})</text>
+                <text class="tide-cal-subdate">{{ getWeekDayShort(day.date).date }}</text>
               </template>
             </view>
             <template v-if="day.data?.tideTable">
@@ -665,7 +665,7 @@ function getWeekDayShort(dateStr: string) {
   }
   const m = d.getMonth() + 1
   const day = d.getDate()
-  return { weekday: days[d.getDay()], date: `${m}/${day}` }
+  return { weekday: days[d.getDay()], date: `${m}-${day}` }
 }
 
 const badgeClass = computed(() => {
