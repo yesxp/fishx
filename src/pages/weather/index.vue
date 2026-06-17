@@ -253,9 +253,9 @@
               <path :d="tidePath" fill="none" stroke="#5865F2" stroke-width="2"/>
               <!-- 满潮/干潮标记 -->
               <g v-for="(pt, i) in tideMarkers" :key="'tm'+i">
-                <circle :cx="pt.x" :cy="pt.y" r="16" :fill="pt.type === 'H' ? '#5865F2' : '#5865F2'" opacity="0.12"/>
-                <circle :cx="pt.x" :cy="pt.y" r="11" :fill="pt.type === 'H' ? '#5865F2' : 'white'" :stroke="pt.type === 'H' ? 'none' : '#5865F2'" stroke-width="2"/>
-                <text :x="pt.x" :y="pt.y + 4" text-anchor="middle" font-size="8" font-weight="700" fill="white">{{ pt.height }}</text>
+                <circle :cx="pt.x" :cy="pt.y" r="20" :fill="pt.type === 'H' ? '#5865F2' : '#5865F2'" opacity="0.1"/>
+                <circle :cx="pt.x" :cy="pt.y" r="14" :fill="pt.type === 'H' ? '#5865F2' : 'white'" :stroke="pt.type === 'H' ? 'none' : '#5865F2'" stroke-width="2"/>
+                <text :x="pt.x" :y="pt.y + 4" text-anchor="middle" font-size="10" font-weight="700" fill="white">{{ pt.height }}</text>
               </g>
               <!-- 当前时间红线 -->
               <line :x1="tideNowX" :y1="TP" :x2="tideNowX" :y2="TP + TCH" stroke="#F23F43" stroke-width="1.5"/>
@@ -799,7 +799,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 19:55'
+const nowStr = '2026-06-17 20:02'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
