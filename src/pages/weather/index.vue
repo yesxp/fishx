@@ -31,10 +31,10 @@
             <view class="hero-left">
               <text class="hero-date">广州 · 6月16日 周二</text>
               <view class="hero-temp-row">
-                <text class="hero-temp-big">{{ weatherStore.weatherNow?.temp || '--' }}°</text>
+                <text class="hero-temp-big" :style="{ fontFamily: '-apple-system, Helvetica, Arial, sans-serif' }">{{ weatherStore.weatherNow?.temp || '--' }}°</text>
                 <text class="hero-icon">{{ getWeatherIcon(weatherStore.weatherNow?.icon || '100') }}</text>
               </view>
-              <text class="hero-weather-desc">{{ weatherStore.weatherNow?.text || '' }}，体感 {{ weatherStore.weatherNow?.feelsLike || '--' }}°</text>
+              <text class="hero-weather-desc" :style="{ fontFamily: '-apple-system, Helvetica, Arial, sans-serif' }">{{ weatherStore.weatherNow?.text || '' }}，体感 {{ weatherStore.weatherNow?.feelsLike || '--' }}°</text>
             </view>
             <!-- Right: Score Ring -->
             <view class="hero-score-ring">
@@ -131,7 +131,7 @@
           <!-- 条件标签 -->
           <view class="tip-bar">
             <view class="tip-tag tip-tag--green"><text>✅ 气压 {{ weatherStore.weatherNow?.pressure || '--' }}hPa</text></view>
-            <view v-if="Number(weatherStore.weatherNow?.temp) >= 30" class="tip-tag tip-tag--yellow"><text>🌡️ 午后闷热 {{ weatherStore.weatherNow?.temp }}°C</text></view>
+            <view v-if="Number(weatherStore.weatherNow?.temp) >= 30" class="tip-tag tip-tag--yellow"><text :style="{ fontFamily: '-apple-system, Helvetica, Arial, sans-serif' }">🌡️ 午后闷热 {{ weatherStore.weatherNow?.temp }}°C</text></view>
             <view class="tip-tag tip-tag--blue"><text>🌊 {{ tideStatus.text }}</text></view>
           </view>
         </view>
@@ -170,7 +170,7 @@
               >
                 <text class="hourly-time">{{ i === 0 && selectedDayIdx === 0 ? '现在' : h.time.slice(-5, -3) + '点' }}</text>
                 <text class="hourly-icon">{{ getWeatherIcon(h.icon) }}</text>
-                <text class="hourly-temp">{{ h.temp }}°</text>
+                <text class="hourly-temp" :style="{ fontFamily: '-apple-system, Helvetica, Arial, sans-serif' }">{{ h.temp }}°</text>
                 <!-- 温度竖条 -->
                 <view class="hourly-line-area">
                   <view class="hourly-temp-bar" :style="{ height: getHourlyBarHeight(h) + 'px' }" />
@@ -204,11 +204,11 @@
                 <text class="day-text">{{ day.textDay }}</text>
               </view>
               <view class="day-temp-bar">
-                <wd-tag size="small" round plain class="temp-tag temp-tag--low" custom-style="font-size:13px;color:#80848E;background:transparent;border:none;padding:0">{{ day.tempNight }}</wd-tag>
+                <text class="temp-num temp-num--low" :style="{ fontFamily: '-apple-system, Helvetica, Arial, sans-serif' }">{{ day.tempNight }}°</text>
                 <view class="day-temp-track">
                   <view class="day-temp-fill" :style="getTempBarStyle(day.tempNight, day.tempDay)" />
                 </view>
-                <wd-tag size="small" round plain class="temp-tag temp-tag--high" custom-style="font-size:13px;font-weight:700;color:#060607;background:transparent;border:none;padding:0">{{ day.tempDay }}</wd-tag>
+                <text class="temp-num temp-num--high" :style="{ fontFamily: '-apple-system, Helvetica, Arial, sans-serif' }">{{ day.tempDay }}°</text>
               </view>
               <view class="day-comfort">
                  <wd-tag :type="getDayComfortType(day)" size="small" round variant="light">{{ getDayComfortText(day) }}</wd-tag>
@@ -757,7 +757,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 18:42'
+const nowStr = '2026-06-17 18:45'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -1418,11 +1418,10 @@ $danger: #F23F43;
 .day-temp-hi { font-size: 13px; font-weight: 700; color: $text-primary; flex-shrink: 0; white-space: nowrap; }
 .day-temp-track { flex: 1; height: 10px; background: #E8EAED; border-radius: 5px; position: relative; overflow: hidden; min-width: 40px; }
 .day-temp-fill { position: absolute; top: 0; height: 100%; background: linear-gradient(90deg, #5865F2, #F23F43); border-radius: 5px; }
-/* 温度数字°符号用CSS伪元素渲染，绕开uni-app文本渲染bug */
-.temp-tag--low::after,
-.temp-tag--high::after { content: '\00B0'; font-size: inherit; }
-.temp-tag--low::after { color: #80848E; }
-.temp-tag--high::after { color: #060607; }
+/* 温度数字样式 */
+.temp-num { font-size: 13px; flex-shrink: 0; white-space: nowrap; display: inline-block; }
+.temp-num--low { color: #80848E; }
+.temp-num--high { color: #060607; font-weight: 700; }
 
 /* Tide */
 .tide-chart-wrap { margin-bottom: 12px; }
