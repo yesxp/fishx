@@ -136,7 +136,7 @@
           </view>
         </view>
 
-        <!-- ===== 逐小时预报（双折线图） ===== -->
+        <!-- ===== 逐小时预报 ===== -->
         <view class="card">
           <view class="card-title-row">
             <text class="card-title">逐小时预报</text>
@@ -144,35 +144,25 @@
               <text class="card-title-sun">🌅 {{ today.sunrise || '--:--' }}</text>
               <text class="card-title-sun">🌇 {{ today.sunset || '--:--' }}</text>
             </view>
-            <wd-tag :type="weatherStore.indexResult.score >= 70 ? 'success' : weatherStore.indexResult.score >= 40 ? 'primary' : 'default'" size="small" round custom-style="margin-left: 8px">
-              {{ weatherStore.indexResult.score >= 70 ? '鱼口活跃' : weatherStore.indexResult.score >= 40 ? '一般' : '鱼口较慢' }}
-            </wd-tag>
           </view>
           <!-- Day Selector Tabs -->
           <view class="hourly-day-tabs">
-            <view class="hourly-day-tab">
-              <text class="hourly-day-tab-name">昨天</text>
-              <text class="hourly-day-tab-date">6/15</text>
-            </view>
-            <view class="hourly-day-tab hourly-day-tab--active">
-              <text class="hourly-day-tab-name">今天</text>
-              <text class="hourly-day-tab-date">6/16</text>
-            </view>
-            <view class="hourly-day-tab">
-              <text class="hourly-day-tab-name">明天</text>
-              <text class="hourly-day-tab-date">6/17</text>
-            </view>
-            <view class="hourly-day-tab">
-              <text class="hourly-day-tab-name">周四</text>
-              <text class="hourly-day-tab-date">6/18</text>
-            </view>
-            <view class="hourly-day-tab">
-              <text class="hourly-day-tab-name">周五</text>
-              <text class="hourly-day-tab-date">6/19</text>
+            <view
+              v-for="(tab, idx) in hourlyDayTabs"
+              :key="tab.date"
+              class="hourly-day-tab"
+              :class="{ 'hourly-day-tab--active': selectedDayIdx === idx }"
+              @tap="selectedDayIdx = idx"
+            >
+              <text class="hourly-day-tab-name">{{ tab.label }}</text>
+              <text class="hourly-day-tab-date">{{ tab.dateShort }}</text>
             </view>
           </view>
-          <view class="hourly-chart-wrap" v-if="weatherStore.hourly.length > 0">
+          <view class="hourly-chart-wrap" v-if="filteredHourly.length > 0">
             <uni-echarts custom-style="width:100%;height:240px" :option="hourlyChartOption" />
+          </view>
+          <view v-else class="hourly-empty">
+            <text class="hourly-empty-text">暂无该日逐时数据</text>
           </view>
         </view>
 
@@ -506,32 +496,14 @@ function getTempBarStyle(lo: number, hi: number) {
 
 // ===== ECharts 逐小时双折线图 =====
 const hourlyChartOption = computed(() => {
-  const hourly = weatherStore.hourly.slice(0, 24)
+  const hourly = filteredHourly.value
   if (hourly.length === 0) return {}
 
   const times = hourly.map((h, i) => i === 0 ? '现在' : h.time.slice(-5))
-  const highTemps = hourly.map(h => Number(h.temp))
-  const lowTemps = hourly.map(h => {
-    const temp = Number(h.temp)
-    const hum = Number(h.humidity || 80)
-    const wind = Number(h.windScale || 1)
-    const feelsOffset = (hum > 80 ? -1 : 0) + (wind >= 4 ? -2 : wind >= 3 ? -1 : 0)
-    return temp + feelsOffset
-  })
+  const temps = hourly.map(h => Number(h.temp))
 
-  const allTemps = [...highTemps, ...lowTemps]
-  const minT = Math.floor(Math.min(...allTemps) - 2)
-  const maxT = Math.ceil(Math.max(...allTemps) + 2)
-
-  // 虚线分隔：在每两个点中间画竖线
-  const separatorLines = []
-  for (let i = 0; i < hourly.length - 1; i++) {
-    separatorLines.push({
-      xAxis: i + 0.5,
-      lineStyle: { color: '#ECEEF1', type: [4, 4], width: 1 },
-      label: { show: false },
-    })
-  }
+  const minT = Math.floor(Math.min(...temps) - 2)
+  const maxT = Math.ceil(Math.max(...temps) + 2)
 
   return {
     dataZoom: [{
@@ -548,16 +520,8 @@ const hourlyChartOption = computed(() => {
       showDetail: false,
       brushSelect: false,
     }],
-    grid: { left: 8, right: 8, top: 45, bottom: 60 },
-    legend: {
-      show: true,
-      top: 0,
-      right: 0,
-      itemWidth: 12,
-      itemHeight: 3,
-      textStyle: { color: '#80848E', fontSize: 10 },
-      data: ['高温', '低温'],
-    },
+    grid: { left: 8, right: 8, top: 30, bottom: 60 },
+    legend: { show: false },
     xAxis: {
       type: 'category',
       data: times,
@@ -597,56 +561,33 @@ const hourlyChartOption = computed(() => {
       textStyle: { color: '#1E2028', fontSize: 12 },
       axisPointer: { type: 'line', lineStyle: { color: '#D0D0D0', type: 'dashed' } },
     },
-    series: [
-      {
-        name: '高温',
-        type: 'line',
-        data: highTemps,
-        smooth: 0.3,
-        symbol: 'circle',
-        symbolSize: 6,
-        lineStyle: { color: '#FF8C42', width: 2 },
-        itemStyle: { color: '#FF8C42', borderColor: '#fff', borderWidth: 1.5 },
-        label: {
-          show: true,
-          position: 'top',
-          color: '#1E2028',
-          fontSize: 11,
-          fontWeight: 600,
-          formatter: '{c}°',
-        },
-        markLine: {
-          silent: true,
-          symbol: 'none',
-          data: [
-            // 当前时间标记（第一列高亮）
-            {
-              xAxis: 0,
-              lineStyle: { color: '#5865F2', type: 'solid', width: 2 },
-              label: { show: false },
-            },
-            ...separatorLines,
+    series: [{
+      name: '温度',
+      type: 'line',
+      data: temps,
+      smooth: 0.3,
+      symbol: 'circle',
+      symbolSize: 6,
+      lineStyle: { color: '#FF8C42', width: 2 },
+      itemStyle: { color: '#FF8C42', borderColor: '#fff', borderWidth: 1.5 },
+      areaStyle: {
+        color: {
+          type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+          colorStops: [
+            { offset: 0, color: 'rgba(255,140,66,0.15)' },
+            { offset: 1, color: 'rgba(255,140,66,0.01)' },
           ],
         },
       },
-      {
-        name: '低温',
-        type: 'line',
-        data: lowTemps,
-        smooth: 0.3,
-        symbol: 'circle',
-        symbolSize: 6,
-        lineStyle: { color: '#5865F2', width: 2 },
-        itemStyle: { color: '#5865F2', borderColor: '#fff', borderWidth: 1.5 },
-        label: {
-          show: true,
-          position: 'bottom',
-          color: '#80848E',
-          fontSize: 10,
-          formatter: '{c}°',
-        },
+      label: {
+        show: true,
+        position: 'top',
+        color: '#1E2028',
+        fontSize: 11,
+        fontWeight: 600,
+        formatter: '{c}°',
       },
-    ],
+    }],
   }
 })
 
@@ -661,6 +602,43 @@ const badgeClass = computed(() => {
 })
 
 const today = computed(() => weatherStore.daily[0] || null)
+
+// ===== 逐小时日期Tab =====
+const selectedDayIdx = ref(0)
+
+const hourlyDayTabs = computed(() => {
+  const daily = weatherStore.daily
+  if (daily.length === 0) return []
+  const now = new Date()
+  return daily.slice(0, 5).map((d, i) => {
+    const date = new Date(d.date)
+    const isToday = date.toDateString() === now.toDateString()
+    const tomorrow = new Date(now)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    const isTomorrow = date.toDateString() === tomorrow.toDateString()
+    const label = isToday ? '今天' : isTomorrow ? '明天' : d.week
+    return {
+      date: d.date,
+      label,
+      dateShort: `${date.getMonth() + 1}/${date.getDate()}`,
+    }
+  })
+})
+
+const filteredHourly = computed(() => {
+  const tabs = hourlyDayTabs.value
+  if (tabs.length === 0) return []
+  const selectedDate = tabs[selectedDayIdx.value]?.date
+  if (!selectedDate) return weatherStore.hourly.slice(0, 24)
+  // 和风天气 hourly 的 time 格式是 HH:MM，需要按日期过滤
+  // hourly data 的 fxTime 包含完整日期，但 store 里只存了 HH:MM
+  // 所以用 index 推断：每天约24条，前24条是今天
+  const allHourly = weatherStore.hourly
+  if (selectedDayIdx.value === 0) return allHourly.slice(0, 24)
+  // 非今天：API 只返回未来24-72小时，按时间偏移截取
+  const start = selectedDayIdx.value * 24
+  return allHourly.slice(start, start + 24)
+})
 
 const moonPhaseIcon = computed(() => {
   const phase = today.value?.moonPhase || ''
@@ -1288,6 +1266,8 @@ $danger: #F23F43;
 .hourly-day-tab--active .hourly-day-tab-name { color: $brand; font-weight: 700; }
 .hourly-day-tab-date { font-size: 10px; color: $text-muted; margin-top: 2px; }
 .hourly-day-tab--active .hourly-day-tab-date { color: $brand; opacity: 0.7; }
+.hourly-empty { padding: 30px 0; text-align: center; }
+.hourly-empty-text { font-size: 13px; color: $text-muted; }
 
 /* 7-day comfort tag */
 .day-comfort { margin-left: auto; flex-shrink: 0; }
