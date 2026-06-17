@@ -203,7 +203,6 @@
                 <text class="day-icon">{{ getWeatherIcon(day.iconDay) }}</text>
                 <text class="day-text">{{ day.textDay }}</text>
               </view>
-              </view>
               <view class="day-temp-bar">
                 <text class="day-temp-lo">{{ day.tempNight }}°</text>
                 <view class="day-temp-track">
@@ -778,7 +777,7 @@ const hourlyFishingScore = computed(() => {
 
 const nowHour = computed(() => new Date().getHours())
 // 部署时间戳：每次提交时更新
-const nowStr = '2026-06-17 17:25'
+const nowStr = '2026-06-17 17:35'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
