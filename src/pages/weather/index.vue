@@ -231,6 +231,7 @@
           </view>
           <!-- 图表 -->
           <view class="tide-chart-wrap">
+            <scroll-view scroll-x enhanced :show-scrollbar="false" class="tide-scroll">
             <svg :viewBox="'0 0 ' + TW + ' ' + TH" :width="TW" :height="TH" class="tide-svg">
               <defs>
                 <linearGradient id="tideFillGrad" x1="0" y1="0" x2="0" y2="1">
@@ -260,6 +261,7 @@
               <line :x1="tideNowX" :y1="TP" :x2="tideNowX" :y2="TP + TCH" stroke="#F23F43" stroke-width="1.5"/>
               <circle :cx="tideNowX" :cy="TP + TCH" r="3" fill="#F23F43" stroke="white" stroke-width="1.5"/>
             </svg>
+            </scroll-view>
             <!-- 时间轴 -->
             <view class="tide-time-axis">
               <text class="tide-time-label">00:00</text>
@@ -797,7 +799,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 19:42'
+const nowStr = '2026-06-17 19:50'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -874,7 +876,7 @@ function getDayComfortText(day: any) {
 
 // ===== 潮汐 =====
 const tideData = computed(() => weatherStore.tide)
-const TW = 360, TP = 10, TCH = 100, TH = 130  // 图表尺寸常量
+const TW = 680, TP = 10, TCH = 100, TH = 130  // 图表尺寸常量
 const tideHour2x = (h: number) => (h / 24) * TW
 
 const tideTable = computed(() => {
@@ -1514,7 +1516,8 @@ $danger: #F23F43;
 .tide-legend-item { display: flex; align-items: center; gap: 4px; }
 .tide-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
 .tide-legend-text { font-size: 11px; color: $text-muted; }
-.tide-chart-wrap { margin-bottom: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.tide-chart-wrap { margin-bottom: 12px; }
+.tide-scroll { white-space: nowrap; }
 .tide-svg { display: block; }
 .tide-time-axis { display: flex; justify-content: space-between; padding: 4px 0; }
 .tide-time-label { font-size: 10px; color: $text-muted; }
