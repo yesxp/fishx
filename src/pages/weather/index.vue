@@ -318,10 +318,7 @@
           </view>
           <view class="tide-cal-header">
             <text class="tide-cal-col tide-cal-col--day">日期</text>
-            <text class="tide-cal-col tide-cal-col--hl">满潮</text>
-            <text class="tide-cal-col tide-cal-col--hl">干潮</text>
-            <text class="tide-cal-col tide-cal-col--hl">满潮</text>
-            <text class="tide-cal-col tide-cal-col--hl">干潮</text>
+            <text v-for="(h, hi) in tideCalHeaders" :key="hi" class="tide-cal-col tide-cal-col--hl">{{ h }}</text>
           </view>
           <view v-for="(day, i) in tideCalendar" :key="i" class="tide-cal-row" :class="{ 'tide-cal-row--today': i === 0, 'tide-cal-row--alt': i % 2 === 1 }">
             <view class="tide-cal-col tide-cal-col--day">
@@ -342,33 +339,6 @@
             <template v-else>
               <text class="tide-cal-empty">--</text>
             </template>
-          </view>
-          <wd-divider hairline custom-style="margin: 12px 0; padding: 0;" />
-          <view class="tide-pattern">
-            <view class="tide-pattern-item">
-              <view class="tide-pattern-icon tide-pattern-icon--spring">🌊</view>
-              <view>
-                <text class="tide-pattern-name">{{ tidePattern.cycle }}</text>
-                <text class="tide-pattern-desc">{{ tidePattern.cycleDesc }}</text>
-              </view>
-            </view>
-            <view class="tide-pattern-item">
-              <view class="tide-pattern-icon tide-pattern-icon--diff">📏</view>
-              <view>
-                <text class="tide-pattern-name">潮差 {{ tidePattern.range }}m</text>
-                <text class="tide-pattern-desc">{{ tidePattern.rangeDesc }}</text>
-              </view>
-            </view>
-            <view class="tide-pattern-item">
-              <view class="tide-pattern-icon tide-pattern-icon--best">🎣</view>
-              <view>
-                <text class="tide-pattern-name">最佳窗口</text>
-                <text class="tide-pattern-desc">{{ tidePattern.bestWindow }}</text>
-              </view>
-            </view>
-          </view>
-          <view class="tide-tip">
-            <text class="tide-tip-text">💡 {{ tidePattern.suggestion }}</text>
           </view>
         </view>
 
@@ -1060,14 +1030,19 @@ const tidePhase = computed(() => {
 // ===== 潮汐日历 =====
 const tideCalendar = computed(() => weatherStore.tideCalendar)
 
+// 动态表头：根据第1天第1个潮汐类型决定列头
+const tideCalHeaders = computed(() => {
+  const cal = tideCalendar.value
+  if (!cal || !cal[0]?.data?.tideTable || cal[0].data.tideTable.length === 0) {
+    return ['满潮', '干潮', '满潮', '干潮']
+  }
+  const firstType = cal[0].data.tideTable[0].type
+  if (firstType === 'L') return ['干潮', '满潮', '干潮', '满潮']
+  return ['满潮', '干潮', '满潮', '干潮']
+})
+
 function padTideTable(table: any[], len: number) {
-  // 按类型排序：H(满潮)在前，L(干潮)在后
-  const sorted = [...table].sort((a, b) => {
-    if (a.type === 'H' && b.type !== 'H') return -1
-    if (a.type !== 'H' && b.type === 'H') return 1
-    return 0
-  })
-  const result = sorted
+  const result = [...table]
   while (result.length < len) result.push(null)
   return result.slice(0, len)
 }
