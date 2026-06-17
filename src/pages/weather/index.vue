@@ -115,33 +115,16 @@
 
           <!-- 按钓法推荐鱼种 -->
           <text class="fish-section-title">🎣 按钓法推荐</text>
-          <scroll-view scroll-x class="method-scroll" :show-scrollbar="false">
-            <view class="method-list">
-              <view v-for="m in fishingMethods" :key="m.name" class="method-card">
-                <view class="method-header">
-                  <text class="method-icon">{{ m.icon }}</text>
-                  <view class="method-header-info">
-                    <text class="method-name">{{ m.name }}</text>
-                    <view class="method-score-row">
-                      <text class="method-score" :class="'method-score--' + m.level">{{ m.score }}分</text>
-                      <text class="method-level">{{ m.levelText }}</text>
-                    </view>
-                  </view>
-                </view>
-                <view class="method-fish-list">
-                  <view v-for="f in m.fish" :key="f.name" class="method-fish-row">
-                    <text class="method-fish-name">{{ f.name }}</text>
-                    <view class="method-fish-bar-wrap">
-                      <view class="method-fish-bar" :style="{ width: f.score + '%' }" :class="'method-fish-bar--' + (f.score >= 70 ? 'good' : f.score >= 50 ? 'ok' : 'low')" />
-                    </view>
-                    <text class="method-fish-score">{{ f.score }}</text>
-                    <text class="method-fish-tag" v-if="f.tag">{{ f.tag }}</text>
-                  </view>
-                </view>
-                <text class="method-tip">{{ m.tip }}</text>
+          <view class="method-grid">
+            <view v-for="m in fishingMethods" :key="m.name" class="method-card-mini">
+              <text class="method-mini-name">{{ m.icon }} {{ m.name }}</text>
+              <view class="method-mini-score-row">
+                <text class="method-mini-score" :class="'method-mini-score--' + m.level">{{ m.score }}分</text>
+                <text class="method-mini-level">{{ m.levelText }}</text>
               </view>
+              <text class="method-mini-fish">推荐{{ m.topFish }}</text>
             </view>
-          </scroll-view>
+          </view>
 
           <view class="divider-simple" />
 
@@ -1050,57 +1033,31 @@ const fishingMethods = computed(() => {
     return ''
   }
 
+  // 生成推荐鱼种文字（取分数最高的2-3种）
+  const getTopFish = (fishObj: Record<string, number>) => {
+    return Object.entries(fishObj)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([name]) => name)
+      .join('、')
+  }
+
   const methods = [
     {
-      name: '台钓',
-      icon: '🎣',
-      score: taiAvg,
-      ...getLevel(taiAvg),
-      fish: [
-        { name: '鲫鱼', score: taiJiyu, tag: taiJiyu >= 70 ? '首选' : '' },
-        { name: '鲤鱼', score: taiLiyu, tag: taiLiyu >= 70 ? '首选' : '' },
-        { name: '草鱼', score: taiCaoyu, tag: taiCaoyu >= 70 ? '首选' : '' },
-        { name: '鲢鳙', score: taiLianyong, tag: taiLianyong >= 70 ? '首选' : '' },
-      ],
-      tip: getTip('台钓'),
+      name: '台钓', icon: '🎣', score: taiAvg, ...getLevel(taiAvg),
+      topFish: getTopFish({ '鲫鱼': taiJiyu, '鲤鱼': taiLiyu, '草鱼': taiCaoyu, '鲢鳙': taiLianyong }),
     },
     {
-      name: '路亚',
-      icon: '🐠',
-      score: luyaAvg,
-      ...getLevel(luyaAvg),
-      fish: [
-        { name: '鲈鱼', score: luyaLuyu, tag: luyaLuyu >= 70 ? '首选' : '' },
-        { name: '鳜鱼', score: luyaGuidiao, tag: luyaGuidiao >= 70 ? '首选' : '' },
-        { name: '翘嘴', score: luyaQiaozui, tag: luyaQiaozui >= 70 ? '首选' : '' },
-        { name: '马口', score: luyaMakou, tag: luyaMakou >= 70 ? '首选' : '' },
-      ],
-      tip: getTip('路亚'),
+      name: '路亚', icon: '🐠', score: luyaAvg, ...getLevel(luyaAvg),
+      topFish: getTopFish({ '鲈鱼': luyaLuyu, '鳜鱼': luyaGuidiao, '翘嘴': luyaQiaozui, '马口': luyaMakou }),
     },
     {
-      name: '伐钓',
-      icon: '🚣',
-      score: faAvg,
-      ...getLevel(faAvg),
-      fish: [
-        { name: '鲤鱼', score: faLiyu, tag: faLiyu >= 70 ? '首选' : '' },
-        { name: '草鱼', score: faCaoyu, tag: faCaoyu >= 70 ? '首选' : '' },
-        { name: '鲫鱼', score: faJiyu, tag: faJiyu >= 70 ? '首选' : '' },
-        { name: '青鱼', score: faQingyu, tag: faQingyu >= 70 ? '首选' : '' },
-      ],
-      tip: getTip('伐钓'),
+      name: '伐钓', icon: '🚣', score: faAvg, ...getLevel(faAvg),
+      topFish: getTopFish({ '鲤鱼': faLiyu, '草鱼': faCaoyu, '鲫鱼': faJiyu, '青鱼': faQingyu }),
     },
     {
-      name: '矶钓',
-      icon: '🪨',
-      score: jiAvg,
-      ...getLevel(jiAvg),
-      fish: [
-        { name: '黑鲷', score: jiHeidiao, tag: jiHeidiao >= 70 ? '首选' : '' },
-        { name: '真鲷', score: jiZhendiao, tag: jiZhendiao >= 70 ? '首选' : '' },
-        { name: '鲈鱼', score: jiLuyu, tag: jiLuyu >= 70 ? '首选' : '' },
-      ],
-      tip: getTip('矶钓'),
+      name: '矶钓', icon: '🪨', score: jiAvg, ...getLevel(jiAvg),
+      topFish: getTopFish({ '黑鲷': jiHeidiao, '真鲷': jiZhendiao, '鲈鱼': jiLuyu }),
     },
   ]
 
@@ -1289,40 +1246,20 @@ $danger: #F23F43;
 
 /* 按钓法推荐 */
 .fish-section-title { font-size: 24rpx; font-weight: 600; color: $header-primary; margin-bottom: 12rpx; display: block; }
-.method-scroll { width: 100%; white-space: nowrap; }
-.method-list { display: inline-flex; gap: 16rpx; padding-right: 24rpx; }
-.method-card {
-  width: 320rpx; min-width: 320rpx; background: $bg-page; border-radius: 16rpx;
-  padding: 20rpx; display: flex; flex-direction: column; gap: 14rpx;
-  flex-shrink: 0; white-space: normal;
+.method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12rpx; }
+.method-card-mini {
+  background: $bg-page; border-radius: 12rpx; padding: 16rpx;
+  display: flex; flex-direction: column; gap: 6rpx;
 }
-.method-header { display: flex; align-items: center; gap: 12rpx; }
-.method-icon { font-size: 36rpx; }
-.method-header-info { flex: 1; }
-.method-name { font-size: 26rpx; font-weight: 700; color: $header-primary; display: block; }
-.method-score-row { display: flex; align-items: center; gap: 8rpx; margin-top: 2rpx; }
-.method-score { font-size: 22rpx; font-weight: 700; }
-.method-score--excellent { color: $status-green; }
-.method-score--good { color: $blurple; }
-.method-score--ok { color: $status-yellow; }
-.method-score--low { color: $text-muted; }
-.method-level { font-size: 18rpx; color: $text-muted; }
-.method-fish-list { display: flex; flex-direction: column; gap: 10rpx; }
-.method-fish-row { display: flex; align-items: center; gap: 8rpx; }
-.method-fish-name { font-size: 22rpx; color: $header-primary; width: 64rpx; flex-shrink: 0; }
-.method-fish-bar-wrap {
-  flex: 1; height: 8rpx; background: rgba($text-muted, 0.1); border-radius: 4rpx; overflow: hidden;
-}
-.method-fish-bar { height: 100%; border-radius: 4rpx; transition: width 0.3s ease; }
-.method-fish-bar--good { background: $status-green; }
-.method-fish-bar--ok { background: $blurple; }
-.method-fish-bar--low { background: rgba($text-muted, 0.3); }
-.method-fish-score { font-size: 20rpx; color: $text-muted; width: 48rpx; text-align: right; flex-shrink: 0; }
-.method-fish-tag {
-  font-size: 16rpx; padding: 2rpx 8rpx; border-radius: 6rpx;
-  background: rgba($status-green, 0.12); color: $status-green; flex-shrink: 0;
-}
-.method-tip { font-size: 18rpx; color: $text-muted; line-height: 1.4; }
+.method-mini-name { font-size: 24rpx; font-weight: 600; color: $header-primary; }
+.method-mini-score-row { display: flex; align-items: center; gap: 8rpx; }
+.method-mini-score { font-size: 22rpx; font-weight: 700; }
+.method-mini-score--excellent { color: $status-green; }
+.method-mini-score--good { color: $blurple; }
+.method-mini-score--ok { color: $status-yellow; }
+.method-mini-score--low { color: $text-muted; }
+.method-mini-level { font-size: 18rpx; color: $text-muted; }
+.method-mini-fish { font-size: 20rpx; color: $text-muted; margin-top: 2rpx; }
 
 /* 条件标签 */
 .divider-simple { height: 1rpx; background: $divider; margin: 16rpx 0; }
