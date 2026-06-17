@@ -142,22 +142,18 @@
             <text class="card-title">逐小时预报</text>
             <view class="card-title-right" v-if="today">
               <view class="card-title-sun">
-                <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="#4E5058" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                  <!-- 半圆太阳从地平线升起 -->
-                  <path d="M3 11a5 5 0 0 1 10 0"/>
-                  <line x1="1" y1="11" x2="15" y2="11"/>
-                  <!-- 向上箭头 -->
-                  <path d="M8 9V4M6 6l2-2 2 2"/>
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#4E5058" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 17h1m16 0h1m-15.4-6.4l.7.7m12.1-.7l-.7.7m-9.7 5.7a4 4 0 0 1 8 0"/>
+                  <path d="M3 21l18 0"/>
+                  <path d="M12 9v-6l3 3m-6 0l3-3"/>
                 </svg>
                 <text>{{ today.sunrise || '--:--' }}</text>
               </view>
               <view class="card-title-sun">
-                <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="#4E5058" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                  <!-- 半圆太阳沉入地平线 -->
-                  <path d="M3 11a5 5 0 0 1 10 0"/>
-                  <line x1="1" y1="11" x2="15" y2="11"/>
-                  <!-- 向下箭头 -->
-                  <path d="M8 5v5M6 8l2 2 2-2"/>
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#4E5058" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 17h1m16 0h1m-15.4-6.4l.7.7m12.1-.7l-.7.7m-9.7 5.7a4 4 0 0 1 8 0"/>
+                  <path d="M3 21l18 0"/>
+                  <path d="M12 3v6l3-3m-6 0l3 3"/>
                 </svg>
                 <text>{{ today.sunset || '--:--' }}</text>
               </view>
@@ -768,7 +764,7 @@ const hourlyFishingScore = computed(() => {
 
 const nowHour = computed(() => new Date().getHours())
 // 部署时间戳：每次提交时更新
-const nowStr = '2026-06-17 16:55'
+const nowStr = '2026-06-17 17:05'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
