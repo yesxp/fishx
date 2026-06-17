@@ -160,26 +160,23 @@
                 <!-- 温度下方：左侧接线 + 圆点 + 右侧接线 -->
                 <view class="hourly-line-area">
                   <view v-if="hourlyDots[i]" class="hourly-line-svg">
-                    <svg viewBox="0 0 65 80" :style="{ width: '100%', height: '100%' }">
+                    <svg viewBox="0 0 65 80" :style="{ width: '100%', height: '100%', overflow: 'visible' }">
+                      <!-- 左侧线：从上一个卡片中心延伸到自己圆点 -->
                       <line
                         v-if="i > 0 && hourlyDots[i - 1]"
-                        :x1="0" :y1="hourlyDots[i].localY"
-                        :x2="32" :y2="hourlyDots[i].localY"
+                        x1="-32" :y1="hourlyDots[i - 1].localY"
+                        x2="32"  :y2="hourlyDots[i].localY"
                         stroke="#FF8C42" stroke-width="1.5" stroke-linecap="round"
                       />
+                      <!-- 右侧线：从自己圆点延伸到下一个卡片中心 -->
                       <line
                         v-if="i < hourlyDots.length - 1"
-                        :x1="32" :y1="hourlyDots[i].localY"
-                        :x2="65" :y2="hourlyDots[i].nextY"
+                        x1="32" :y1="hourlyDots[i].localY"
+                        x2="97" :y2="hourlyDots[i + 1].localY"
                         stroke="#FF8C42" stroke-width="1.5" stroke-linecap="round"
                       />
-                      <line
-                        v-if="i === 0 && hourlyDots.length > 1"
-                        :x1="0" :y1="hourlyDots[i].localY"
-                        :x2="32" :y2="hourlyDots[i].localY"
-                        stroke="#FF8C42" stroke-width="1.5" stroke-linecap="round"
-                      />
-                      <circle cx="32" :cy="hourlyDots[i].localY" r="3" fill="#FF8C42" />
+                      <!-- 圆点 -->
+                      <circle cx="32" :cy="hourlyDots[i].localY" r="3.5" fill="#FF8C42" />
                     </svg>
                   </view>
                 </view>
@@ -683,8 +680,7 @@ const hourlyDots = computed(() => {
 
   return data.map((_, i) => ({
     globalY: globalY[i],
-    localY: globalY[i],       // 在自己卡片内的 Y
-    nextY: globalY[i + 1] ?? globalY[i], // 下一个卡片的 Y（用于右侧连线斜率）
+    localY: globalY[i],
   }))
 })
 
