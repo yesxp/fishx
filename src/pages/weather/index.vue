@@ -926,6 +926,7 @@ const fishingMethods = computed(() => {
   const isFalling = tideNow === '退潮中'
   const temp = Number(weatherStore.weatherNow?.temp || 25)
   const pressure = Number(weatherStore.weatherNow?.pressure || 1013)
+  const wind = Number(weatherStore.weatherNow?.windScale || 0)
   const hour = new Date().getHours()
   const month = new Date().getMonth() + 1
 
