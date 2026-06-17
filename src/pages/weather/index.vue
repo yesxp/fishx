@@ -777,7 +777,7 @@ const hourlyFishingScore = computed(() => {
 
 const nowHour = computed(() => new Date().getHours())
 // 部署时间戳：每次提交时更新
-const nowStr = '2026-06-17 17:35'
+const nowStr = '2026-06-17 17:40'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
