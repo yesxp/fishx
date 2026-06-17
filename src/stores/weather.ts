@@ -107,8 +107,8 @@ export const useWeatherStore = defineStore('weather', () => {
         daily.value = dailyRes.value.daily.map((d: any) => ({
           date: d.fxDate,
           week: getWeekDay(d.fxDate),
-          tempDay: d.tempDay,
-          tempNight: d.tempNight,
+          tempDay: d.tempMax,
+          tempNight: d.tempMin,
           iconDay: d.iconDay,
           iconNight: d.iconNight,
           textDay: d.textDay,
