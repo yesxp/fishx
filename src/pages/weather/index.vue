@@ -231,7 +231,6 @@
           </view>
           <!-- 图表 -->
           <view class="tide-chart-wrap">
-            <scroll-view scroll-x enhanced :show-scrollbar="false" class="tide-scroll">
             <svg :viewBox="'0 0 ' + TW + ' ' + TH" :width="TW" :height="TH" class="tide-svg">
               <defs>
                 <linearGradient id="tideFillGrad" x1="0" y1="0" x2="0" y2="1">
@@ -253,23 +252,22 @@
               <path :d="tidePath" fill="none" stroke="#5865F2" stroke-width="2"/>
               <!-- 满潮/干潮标记 -->
               <g v-for="(pt, i) in tideMarkers" :key="'tm'+i">
-                <circle :cx="pt.x" :cy="pt.y" r="20" :fill="pt.type === 'H' ? '#5865F2' : '#5865F2'" opacity="0.1"/>
-                <circle :cx="pt.x" :cy="pt.y" r="14" :fill="pt.type === 'H' ? '#5865F2' : 'white'" :stroke="pt.type === 'H' ? 'none' : '#5865F2'" stroke-width="2"/>
-                <text :x="pt.x" :y="pt.y + 4" text-anchor="middle" font-size="10" font-weight="700" fill="white">{{ pt.height }}</text>
+                <circle :cx="pt.x" :cy="pt.y" r="16" :fill="pt.type === 'H' ? 'rgba(88,101,242,0.15)' : 'rgba(88,101,242,0.08)'"/>
+                <circle :cx="pt.x" :cy="pt.y" r="12" :fill="pt.type === 'H' ? '#5865F2' : 'white'" :stroke="pt.type === 'H' ? 'none' : '#5865F2'" stroke-width="2"/>
+                <text :x="pt.x" :y="pt.y + 3.5" text-anchor="middle" font-size="9" font-weight="700" :fill="pt.type === 'H' ? 'white' : '#5865F2'">{{ pt.height }}</text>
               </g>
               <!-- 当前时间红线 -->
               <line :x1="tideNowX" :y1="TP" :x2="tideNowX" :y2="TP + TCH" stroke="#F23F43" stroke-width="1.5"/>
               <circle :cx="tideNowX" :cy="TP + TCH" r="3" fill="#F23F43" stroke="white" stroke-width="1.5"/>
             </svg>
             <!-- 时间轴(跟曲线同步滚动) -->
-            <view class="tide-time-axis" :style="{ width: TW + 'px' }">
+            <view class="tide-time-axis">
               <text class="tide-time-label">00:00</text>
               <text class="tide-time-label">06:00</text>
               <text class="tide-time-label">12:00</text>
               <text class="tide-time-label">18:00</text>
               <text class="tide-time-label">24:00</text>
             </view>
-            </scroll-view>
           </view>
           <!-- 当前实况行 -->
           <view class="tide-now-row">
@@ -799,7 +797,7 @@ const hourlyFishingScore = computed(() => {
 })
 
 const nowHour = computed(() => new Date().getHours())
-const nowStr = '2026-06-17 20:02'
+const nowStr = '2026-06-17 20:10'
 
 function getVBarClass(score: number) {
   if (score >= 85) return 'vbar-bar--excellent'
@@ -876,7 +874,7 @@ function getDayComfortText(day: any) {
 
 // ===== 潮汐 =====
 const tideData = computed(() => weatherStore.tide)
-const TW = 680, TP = 10, TCH = 100, TH = 130  // 图表尺寸常量
+const TW = 360, TP = 10, TCH = 100, TH = 130  // 图表尺寸常量
 const tideHour2x = (h: number) => (h / 24) * TW
 
 const tideTable = computed(() => {
