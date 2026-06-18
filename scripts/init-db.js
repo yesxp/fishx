@@ -3,13 +3,15 @@
  * 
  * 功能：
  * 1. 创建集合（spots, catches, reviews）
- * 2. 插入测试数据
+ * 2. 设置权限（READONLY：所有人可读，仅创建者可写）
+ * 3. 插入测试数据
  * 
  * 使用方法：
  *   node scripts/init-db.js
  */
 
 const tcb = require('@cloudbase/node-sdk')
+const CloudBase = require('@cloudbase/manager-node')
 const path = require('path')
 const fs = require('fs')
 
@@ -45,8 +47,9 @@ const config = {
   envId: env.TCB_ENV_ID,
 }
 
-// 初始化
+// 初始化 SDK
 const app = tcb.init(config)
+const manager = CloudBase.init(config)
 const db = app.database()
 
 // 要创建的集合
@@ -167,7 +170,22 @@ async function initDatabase() {
     }
   }
 
-  // 2. 插入测试数据
+  // 2. 设置权限（READONLY：所有人可读，仅创建者可写）
+  console.log('\n🔐 设置集合权限...')
+  for (const collName of collections) {
+    try {
+      await manager.permission.modifyResourcePermission({
+        resourceType: 'collection',
+        resource: collName,
+        permission: 'READONLY',
+      })
+      console.log(`  ✅ ${collName} - 权限设置为 READONLY`)
+    } catch (error) {
+      console.log(`  ⚠️  ${collName} - 权限设置失败: ${error.message}`)
+    }
+  }
+
+  // 3. 插入测试数据
   console.log('\n📝 插入测试钓点数据...')
   try {
     const coll = db.collection('spots')
@@ -190,7 +208,7 @@ async function initDatabase() {
   console.log('\n🎉 初始化完成！')
   console.log('========================')
   console.log('\n下一步：')
-  console.log('1. 访问 https://fishx.lxapp.com 查看钓点页面')
+  console.log('1. 访问 https://fishx.lxapp.com/map 查看钓点页面')
   console.log('2. 在云开发控制台查看数据')
 }
 
