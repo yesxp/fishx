@@ -11,7 +11,7 @@ import cloudbase from '@cloudbase/js-sdk'
 import adapter from '@cloudbase/adapter-uni-app'
 
 // 云开发环境ID - 从腾讯云开发控制台获取
-const ENV_ID = 'YOUR_ENV_ID' // TODO: 替换为实际环境ID
+const ENV_ID = 'fishx-d4gd8ef9uc92d3227'
 
 // 初始化适配器
 const options = {
