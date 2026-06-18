@@ -63,8 +63,12 @@
           :distance="getDistance(spot)"
           :rating="spot.rating"
           :emoji="spot.emoji"
+          :description="spot.description"
+          :address="spot.address"
+          :fish-types="spot.fish_types"
           :is-paid="spot.is_paid"
           :is-pit="spot.is_pit"
+          :catch-count="spot.catch_count"
           @tap="onSpotTap(spot)"
         />
       </view>
