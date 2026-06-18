@@ -2,7 +2,7 @@
  * 钓点 API - 腾讯云开发版
  */
 
-import { db, storage } from '@/lib/cloudbase'
+import { getDB } from '@/lib/cloudbase'
 
 // 钓点类型定义
 export interface Spot {
@@ -41,6 +41,7 @@ export async function getSpotList(params?: {
   pageSize?: number
 }) {
   try {
+    const db = getDB()
     const collection = db.collection('spots')
     let query = collection
 
@@ -85,6 +86,7 @@ export async function getSpotList(params?: {
 // 获取钓点详情
 export async function getSpotDetail(id: string) {
   try {
+    const db = getDB()
     const result = await db.collection('spots').doc(id).get()
     return {
       code: 0,
@@ -99,6 +101,7 @@ export async function getSpotDetail(id: string) {
 // 创建钓点
 export async function createSpot(data: Omit<Spot, '_id' | 'created_at' | 'updated_at'>) {
   try {
+    const db = getDB()
     const now = new Date()
     const result = await db.collection('spots').add({
       ...data,
@@ -122,6 +125,7 @@ export async function createSpot(data: Omit<Spot, '_id' | 'created_at' | 'update
 // 更新钓点
 export async function updateSpot(id: string, data: Partial<Spot>) {
   try {
+    const db = getDB()
     await db.collection('spots').doc(id).update({
       ...data,
       updated_at: new Date(),
@@ -136,6 +140,7 @@ export async function updateSpot(id: string, data: Partial<Spot>) {
 // 删除钓点
 export async function deleteSpot(id: string) {
   try {
+    const db = getDB()
     await db.collection('spots').doc(id).remove()
     return { code: 0, message: '删除成功' }
   } catch (error) {
@@ -147,6 +152,7 @@ export async function deleteSpot(id: string) {
 // 打卡（增加渔获数）
 export async function checkIn(spotId: string) {
   try {
+    const db = getDB()
     await db.collection('spots').doc(spotId).update({
       catch_count: db.command.inc(1),
       updated_at: new Date(),
@@ -161,6 +167,8 @@ export async function checkIn(spotId: string) {
 // 上传钓点图片
 export async function uploadSpotImage(filePath: string, spotId: string) {
   try {
+    const { getStorage } = await import('@/lib/cloudbase')
+    const storage = getStorage()
     const cloudPath = `spots/${spotId}/${Date.now()}.jpg`
     const result = await storage.upload({
       cloudPath,

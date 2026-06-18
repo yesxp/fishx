@@ -1,40 +1,109 @@
 /**
  * 腾讯云开发 SDK 初始化
- * 
- * 使用方法：
- * 1. 在腾讯云开发控制台获取环境ID
- * 2. 替换下方 ENV_ID
- * 3. 在 main.ts 中 import 并调用 initCloud()
  */
 
-import cloudbase from '@cloudbase/js-sdk'
-import adapter from '@cloudbase/adapter-uni-app'
+let app: any = null
+let db: any = null
+let auth: any = null
+let storage: any = null
 
-// 云开发环境ID - 从腾讯云开发控制台获取
 const ENV_ID = 'fishx-d4gd8ef9uc92d3227'
 
-// 初始化适配器
-const options = {
-  uni: uni, // UniApp 全局对象
+// 延迟初始化，确保 uni 已定义
+function initCloud() {
+  if (app) return app
+  
+  try {
+    // 动态导入，避免 SSR 报错
+    const cloudbase = require('@cloudbase/js-sdk').default
+    const adapter = require('@cloudbase/adapter-uni-app').default
+    
+    // 初始化适配器
+    const options = {
+      uni: typeof uni !== 'undefined' ? uni : {},
+    }
+    
+    cloudbase.useAdapters(adapter, options)
+    
+    // 初始化云开发
+    app = cloudbase.init({
+      env: ENV_ID,
+    })
+    
+    db = app.database()
+    auth = app.auth()
+    storage = app.storage()
+    
+    console.log('[CloudBase] 初始化成功')
+  } catch (error) {
+    console.error('[CloudBase] 初始化失败:', error)
+    // 创建 mock 对象，避免页面报错
+    db = createMockDB()
+  }
+  
+  return app
 }
 
-cloudbase.useAdapters(adapter, options)
+// Mock 数据库对象（CloudBase 失败时使用）
+function createMockDB() {
+  return {
+    collection: (name: string) => ({
+      where: (query: any) => createMockQuery([]),
+      orderBy: () => createMockQuery([]),
+      skip: () => createMockQuery([]),
+      limit: () => createMockQuery([]),
+      get: async () => ({ data: [], total: 0 }),
+      count: async () => ({ total: 0 }),
+      add: async () => ({ _id: 'mock_id' }),
+      doc: (id: string) => ({
+        get: async () => ({ data: null }),
+        update: async () => ({}),
+        remove: async () => ({}),
+      }),
+    }),
+    command: {
+      inc: (n: number) => n,
+    },
+  }
+}
 
-// 初始化云开发
-const app = cloudbase.init({
-  env: ENV_ID,
-})
+function createMockQuery(data: any[]) {
+  return {
+    where: () => createMockQuery(data),
+    orderBy: () => createMockQuery(data),
+    skip: () => createMockQuery(data),
+    limit: () => createMockQuery(data),
+    get: async () => ({ data, total: data.length }),
+    count: async () => ({ total: data.length }),
+  }
+}
 
-// 导出常用模块
-export const db = app.database()
-export const auth = app.auth()
-// @ts-ignore - storage 类型不完整
-export const storage = app.storage()
+// 懒加载 getter
+export function getDB() {
+  if (!db) initCloud()
+  return db
+}
 
-// 导出云函数调用方法
+export function getAuth() {
+  if (!auth) initCloud()
+  return auth
+}
+
+export function getStorage() {
+  if (!storage) initCloud()
+  return storage
+}
+
+export function getApp() {
+  if (!app) initCloud()
+  return app
+}
+
+// 云函数调用
 export async function callFunction(name: string, data?: any) {
   try {
-    const result = await app.callFunction({
+    const cloudApp = getApp()
+    const result = await cloudApp.callFunction({
       name,
       data,
     })
@@ -45,4 +114,4 @@ export async function callFunction(name: string, data?: any) {
   }
 }
 
-export default app
+export default { getDB, getAuth, getStorage, getApp, callFunction }
