@@ -312,13 +312,6 @@
             <text class="card-title">📅 潮汐日历</text>
             <text class="card-subtitle">未来7天</text>
           </view>
-          <view class="tide-cal-header">
-            <text class="tide-cal-col tide-cal-col--day">日期</text>
-            <text class="tide-cal-col tide-cal-col--hl">满潮</text>
-            <text class="tide-cal-col tide-cal-col--hl">干潮</text>
-            <text class="tide-cal-col tide-cal-col--hl">满潮</text>
-            <text class="tide-cal-col tide-cal-col--hl">干潮</text>
-          </view>
           <view v-for="(day, i) in tideCalendar" :key="i" class="tide-cal-row" :class="{ 'tide-cal-row--today': i === 0, 'tide-cal-row--alt': i % 2 === 1 }">
             <view class="tide-cal-col tide-cal-col--day">
               <template v-if="i === 0">
@@ -331,8 +324,11 @@
             </view>
             <template v-if="day.data?.tideTable">
               <view v-for="(t, j) in padTideTable(day.data.tideTable, 4)" :key="j" class="tide-cal-col tide-cal-col--hl">
-                <text class="tide-cal-time" v-if="t">{{ t.fxTime.slice(11, 16) }}</text>
-                <text class="tide-cal-h" v-if="t" :class="t.type === 'H' ? 'tide-cal-h--hi' : 'tide-cal-h--lo'">{{ t.height }}m</text>
+                <template v-if="t">
+                  <text class="tide-cal-type" :class="t.type === 'H' ? 'tide-cal-type--hi' : 'tide-cal-type--lo'">{{ t.type === 'H' ? '满潮' : '干潮' }}</text>
+                  <text class="tide-cal-time">{{ t.fxTime.slice(11, 16) }}</text>
+                  <text class="tide-cal-h" :class="t.type === 'H' ? 'tide-cal-h--hi' : 'tide-cal-h--lo'">{{ t.height }}m</text>
+                </template>
               </view>
             </template>
             <template v-else>
@@ -903,46 +899,20 @@ const tideStatus = computed(() => {
 const tidePath = computed(() => {
   if (!tideData.value?.tideHourly) return ''
   const hourly = tideData.value.tideHourly
-  const table = tideData.value.tideTable || []
-
-  // 1. 合并 tideTable(分钟精度) + tideHourly(小时精度)，去重
-  const merged: { h: number; height: number }[] = []
-  hourly.forEach((h: any) => {
-    merged.push({ h: parseInt(h.fxTime.slice(11, 13)) + parseInt(h.fxTime.slice(14, 16)) / 60, height: Number(h.height) })
-  })
-  table.forEach((t: any) => {
-    const th = parseInt(t.fxTime.slice(11, 13)) + parseInt(t.fxTime.slice(14, 16)) / 60
-    const idx = merged.findIndex(m => Math.abs(m.h - th) < 0.25)
-    if (idx >= 0) {
-      merged[idx].height = Number(t.height)
-      merged[idx].h = th
-    } else {
-      merged.push({ h: th, height: Number(t.height) })
-    }
-  })
-  merged.sort((a, b) => a.h - b.h)
-
-  // 2. 固定Y轴刻度（黄埔站典型范围0~4m），不同天的潮差差异可见
   const Y_MAX = 4.0
-  const pts = merged.map(m => ({
-    x: tideHour2x(m.h),
-    y: TP + (1 - m.height / Y_MAX) * TCH
+  const pts = hourly.map((h: any) => ({
+    x: tideHour2x(parseInt(h.fxTime.slice(11, 13)) + parseInt(h.fxTime.slice(14, 16)) / 60),
+    y: TP + (1 - Number(h.height) / Y_MAX) * TCH
   }))
   if (pts.length === 0) return ''
-
-  // 3. Catmull-Rom → Bezier，紧张度调低让峰谷更尖
-  const tension = 4 // 越大越贴合数据点（默认6）
+  const tension = 4
   let d = `M ${pts[0].x} ${pts[0].y}`
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[Math.max(i - 1, 0)]
     const p1 = pts[i]
     const p2 = pts[i + 1]
     const p3 = pts[Math.min(i + 2, pts.length - 1)]
-    const cp1x = p1.x + (p2.x - p0.x) / tension
-    const cp1y = p1.y + (p2.y - p0.y) / tension
-    const cp2x = p2.x - (p3.x - p1.x) / tension
-    const cp2y = p2.y - (p3.y - p1.y) / tension
-    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`
+    d += ` C ${p1.x + (p2.x - p0.x) / tension} ${p1.y + (p2.y - p0.y) / tension}, ${p2.x - (p3.x - p1.x) / tension} ${p2.y - (p3.y - p1.y) / tension}, ${p2.x} ${p2.y}`
   }
   return d
 })
@@ -1613,6 +1583,9 @@ $danger: #F23F43;
 .tide-cal-col { text-align: center; }
 .tide-cal-col--day { width: 48px; flex-shrink: 0; }
 .tide-cal-col--hl { flex: 1; }
+.tide-cal-type { font-size: 9px; font-weight: 600; display: block; }
+.tide-cal-type--hi { color: $brand; }
+.tide-cal-type--lo { color: $warning; }
 .tide-cal-date { font-size: 12px; font-weight: 500; color: $text-primary; display: block; }
 .tide-cal-subdate { font-size: 9px; color: $text-muted; display: block; }
 .tide-cal-time { font-size: 11px; color: $text-secondary; display: block; }
