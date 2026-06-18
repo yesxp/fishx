@@ -24,13 +24,18 @@
     <!-- Content -->
     <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
       <!-- Map -->
-      <view class="map-wrap" @tap="onMapTap">
+      <view class="map-wrap">
         <MapView
           :latitude="userLat"
           :longitude="userLng"
           :markers="mapMarkers"
           @marker-tap="onMarkerTap"
         />
+        <!-- 浮层按钮：进入探索页 -->
+        <view class="map-expand-btn" @tap.stop="onMapTap">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+          <text class="map-expand-text">全屏查看</text>
+        </view>
       </view>
 
       <!-- Tags -->
@@ -269,6 +274,26 @@ $tag-bg: #F2F3F5;
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid $divider;
+  position: relative;
+}
+
+.map-expand-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 16px;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.map-expand-text {
+  font-size: 12px;
+  color: #fff;
 }
 
 /* Tags */
