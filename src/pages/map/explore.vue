@@ -634,7 +634,8 @@ $text-muted: #80848E;
 /* ===== 地图浮层按钮 ===== */
 .map-overlay-top {
   position: absolute;
-  top: 50px; left: 60px; right: 16px;
+  top: 0; left: 60px; right: 16px;
+  padding-top: env(safe-area-inset-top);
   display: flex;
   justify-content: space-between;
   z-index: 10;
@@ -644,7 +645,8 @@ $text-muted: #80848E;
 
 .map-overlay-back {
   position: absolute;
-  top: 50px; left: 16px;
+  top: 0; left: 16px;
+  margin-top: env(safe-area-inset-top);
   width: 40px; height: 40px;
   background: $bg-card;
   border-radius: 50%;
