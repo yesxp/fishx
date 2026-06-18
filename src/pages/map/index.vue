@@ -23,12 +23,14 @@
 
     <!-- Content -->
     <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
-      <!-- Map Placeholder -->
-      <view class="map-placeholder" @tap="onMapTap">
-        <view class="map-inner">
-          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#5865F2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <text class="map-label">{{ userLocation || '点击获取位置' }}</text>
-        </view>
+      <!-- Map -->
+      <view class="map-wrap">
+        <MapView
+          :latitude="userLat"
+          :longitude="userLng"
+          :markers="mapMarkers"
+          @marker-tap="onMarkerTap"
+        />
       </view>
 
       <!-- Tags -->
@@ -87,6 +89,7 @@ import { useSpotStore } from '@/stores/spot'
 import { getLocation, calculateDistance, formatDistance, getDefaultLocation } from '@/lib/amap'
 import SpotCard from '@/components/SpotCard.vue'
 import WotTabBar from '@/components/WotTabBar.vue'
+import MapView from '@/components/MapView.vue'
 
 const spotStore = useSpotStore()
 
@@ -99,6 +102,17 @@ const userLng = ref(120.15)
 
 // 从 store 获取钓点列表
 const spots = computed(() => spotStore.spotList)
+
+// 地图标记点
+const mapMarkers = computed(() => {
+  return spots.value.map(spot => ({
+    id: spot._id || '',
+    name: spot.name,
+    latitude: spot.lat,
+    longitude: spot.lng,
+    emoji: spot.emoji,
+  }))
+})
 
 // 初始化定位
 onMounted(async () => {
@@ -160,6 +174,11 @@ function onSearch() {
 // 添加钓点
 function onAdd() {
   uni.navigateTo({ url: '/pages/map/create' })
+}
+
+// 点击地图标记
+function onMarkerTap(id: string) {
+  uni.navigateTo({ url: `/pages/map/detail?id=${id}` })
 }
 
 // 点击钓点
@@ -243,28 +262,13 @@ $tag-bg: #F2F3F5;
   max-width: 100vw;
 }
 
-/* Map Placeholder */
-.map-placeholder {
-  height: 120px;
-  background: linear-gradient(135deg, #E3F2FD 0%, #B3E5FC 50%, #E8F5E9 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Map */
+.map-wrap {
+  height: 200px;
   margin-bottom: 12px;
   border-radius: 12px;
+  overflow: hidden;
   border: 1px solid $divider;
-}
-
-.map-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.map-label {
-  font-size: 13px;
-  color: $text-muted;
 }
 
 /* Tags */
