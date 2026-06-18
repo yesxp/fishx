@@ -24,10 +24,10 @@
     <!-- Content -->
     <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
       <!-- Map Placeholder -->
-      <view class="map-placeholder">
+      <view class="map-placeholder" @tap="onMapTap">
         <view class="map-inner">
           <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#5865F2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <text class="map-label">地图区域</text>
+          <text class="map-label">{{ userLocation || '点击获取位置' }}</text>
         </view>
       </view>
 
@@ -84,6 +84,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useSpotStore } from '@/stores/spot'
+import { getLocation, calculateDistance, formatDistance, getDefaultLocation } from '@/lib/amap'
 import SpotCard from '@/components/SpotCard.vue'
 import WotTabBar from '@/components/WotTabBar.vue'
 
@@ -92,9 +93,40 @@ const spotStore = useSpotStore()
 const tags = ['全部', '湖泊', '河流', '黑坑', '野钓', '海钓']
 const activeTag = ref(0)
 const loading = ref(false)
+const userLocation = ref('')
+const userLat = ref(30.25)
+const userLng = ref(120.15)
 
 // 从 store 获取钓点列表
 const spots = computed(() => spotStore.spotList)
+
+// 初始化定位
+onMounted(async () => {
+  await initLocation()
+  await loadSpots()
+})
+
+// 获取用户位置
+async function initLocation() {
+  try {
+    const location = await getLocation()
+    userLat.value = location.latitude
+    userLng.value = location.longitude
+    userLocation.value = location.address || `${location.city}${location.district}`
+    console.log('[Map] 用户位置:', location)
+  } catch (error) {
+    console.warn('[Map] 定位失败，使用默认位置:', error)
+    const defaultLoc = getDefaultLocation()
+    userLat.value = defaultLoc.latitude
+    userLng.value = defaultLoc.longitude
+    userLocation.value = '杭州市（默认）'
+  }
+}
+
+// 点击地图
+function onMapTap() {
+  uni.showToast({ title: '地图功能开发中', icon: 'none' })
+}
 
 // 标签切换
 async function onTagChange(index: number) {
@@ -109,10 +141,11 @@ async function loadSpots() {
   loading.value = false
 }
 
-// 计算距离（简化版，实际应使用地理距离计算）
+// 计算距离
 function getDistance(spot: any): string {
-  // TODO: 使用用户位置计算真实距离
-  return '...'
+  if (!spot.lat || !spot.lng) return '...'
+  const meters = calculateDistance(userLat.value, userLng.value, spot.lat, spot.lng)
+  return formatDistance(meters)
 }
 
 // 搜索
@@ -129,11 +162,6 @@ function onAdd() {
 function onSpotTap(spot: any) {
   uni.navigateTo({ url: `/pages/map/detail?id=${spot._id}` })
 }
-
-// 页面加载
-onMounted(() => {
-  loadSpots()
-})
 </script>
 
 <style scoped lang="scss">
@@ -213,7 +241,7 @@ $tag-bg: #F2F3F5;
 
 /* Map Placeholder */
 .map-placeholder {
-  height: 180px;
+  height: 120px;
   background: linear-gradient(135deg, #E3F2FD 0%, #B3E5FC 50%, #E8F5E9 100%);
   display: flex;
   align-items: center;
@@ -231,7 +259,7 @@ $tag-bg: #F2F3F5;
 }
 
 .map-label {
-  font-size: 14px;
+  font-size: 13px;
   color: $text-muted;
 }
 
