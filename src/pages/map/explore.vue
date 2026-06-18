@@ -177,24 +177,24 @@
           :class="{ 'stat-item--active': activeTab === 'catch' }"
           @tap="activeTab = 'catch'"
         >
-          <text class="stat-num">{{ stats.catches }}</text>
           <text class="stat-label">渔获</text>
+          <text class="stat-num">{{ stats.catches }}</text>
         </view>
         <view 
           class="stat-item"
           :class="{ 'stat-item--active': activeTab === 'spot' }"
           @tap="activeTab = 'spot'"
         >
-          <text class="stat-num">{{ stats.spots }}</text>
           <text class="stat-label">钓点</text>
+          <text class="stat-num">{{ stats.spots }}</text>
         </view>
         <view 
           class="stat-item"
           :class="{ 'stat-item--active': activeTab === 'shop' }"
           @tap="activeTab = 'shop'"
         >
-          <text class="stat-num">{{ stats.shops }}</text>
           <text class="stat-label">渔具店</text>
+          <text class="stat-num">{{ stats.shops }}</text>
         </view>
       </view>
 
