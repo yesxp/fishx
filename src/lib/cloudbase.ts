@@ -6,73 +6,76 @@ let app: any = null
 let db: any = null
 let auth: any = null
 let storage: any = null
-let isLoggedIn = false
+let initPromise: Promise<any> | null = null
 
 const ENV_ID = 'fishx-d4gd8ef9uc92d3227'
 
-// 延迟初始化，确保 uni 已定义
+// 初始化（只执行一次）
 async function initCloud() {
   if (app) return app
+  if (initPromise) return initPromise
   
-  try {
-    // 动态导入，避免 SSR 报错
-    const cloudbase = require('@cloudbase/js-sdk').default
-    const adapter = require('@cloudbase/adapter-uni-app').default
-    
-    // 初始化适配器
-    const options = {
-      uni: typeof uni !== 'undefined' ? uni : {},
+  initPromise = (async () => {
+    try {
+      // 动态导入（浏览器兼容）
+      const cloudbaseModule = await import('@cloudbase/js-sdk')
+      const adapterModule = await import('@cloudbase/adapter-uni-app')
+      
+      const cloudbase = cloudbaseModule.default
+      const adapter = adapterModule.default
+      
+      // 初始化适配器
+      const options = {
+        uni: typeof uni !== 'undefined' ? uni : {},
+      }
+      
+      cloudbase.useAdapters(adapter, options)
+      
+      // 初始化云开发
+      app = cloudbase.init({
+        env: ENV_ID,
+      })
+      
+      db = app.database()
+      auth = app.auth()
+      storage = app.storage()
+      
+      console.log('[CloudBase] SDK 初始化成功')
+      
+      // 自动匿名登录
+      await anonymousLogin()
+      
+    } catch (error) {
+      console.error('[CloudBase] 初始化失败:', error)
+      // 创建 mock 对象
+      db = createMockDB()
     }
     
-    cloudbase.useAdapters(adapter, options)
-    
-    // 初始化云开发
-    app = cloudbase.init({
-      env: ENV_ID,
-    })
-    
-    db = app.database()
-    auth = app.auth()
-    storage = app.storage()
-    
-    console.log('[CloudBase] SDK 初始化成功')
-    
-    // 自动匿名登录
-    await anonymousLogin()
-    
-  } catch (error) {
-    console.error('[CloudBase] 初始化失败:', error)
-    // 创建 mock 对象，避免页面报错
-    db = createMockDB()
-  }
+    return app
+  })()
   
-  return app
+  return initPromise
 }
 
 // 匿名登录
 async function anonymousLogin() {
-  if (isLoggedIn || !auth) return
+  if (!auth) return
   
   try {
-    // 检查是否已登录
     const loginState = await auth.getLoginState()
     if (loginState) {
       console.log('[CloudBase] 已登录')
-      isLoggedIn = true
       return
     }
     
-    // 匿名登录
     await auth.signInAnonymously()
     console.log('[CloudBase] 匿名登录成功')
-    isLoggedIn = true
   } catch (error) {
     console.error('[CloudBase] 匿名登录失败:', error)
-    // 登录失败不影响数据读取（如果权限允许）
   }
 }
 
-// Mock 数据库对象（CloudBase 失败时使用）
+// Mock 数据库
 function createMockDB() {
   return {
     collection: (name: string) => ({
@@ -106,31 +109,31 @@ function createMockQuery(data: any[]) {
   }
 }
 
-// 懒加载 getter
-export function getDB() {
-  if (!db) initCloud()
+// 导出（确保初始化完成）
+export async function getDB() {
+  if (!db) await initCloud()
   return db
 }
 
-export function getAuth() {
-  if (!auth) initCloud()
+export async function getAuth() {
+  if (!auth) await initCloud()
   return auth
 }
 
-export function getStorage() {
-  if (!storage) initCloud()
+export async function getStorage() {
+  if (!storage) await initCloud()
   return storage
 }
 
-export function getApp() {
-  if (!app) initCloud()
+export async function getApp() {
+  if (!app) await initCloud()
   return app
 }
 
 // 云函数调用
 export async function callFunction(name: string, data?: any) {
   try {
-    const cloudApp = getApp()
+    const cloudApp = await getApp()
     const result = await cloudApp.callFunction({
       name,
       data,
