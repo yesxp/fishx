@@ -289,7 +289,8 @@ $text-muted: #80848E;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  z-index: 10;
+  z-index: 100;
+  pointer-events: auto;
   cursor: pointer;
 }
 

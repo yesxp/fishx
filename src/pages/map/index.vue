@@ -176,14 +176,14 @@ function onAdd() {
   uni.navigateTo({ url: '/pages/map/create' })
 }
 
-// 点击地图标记 → 进入探索页
+// 点击地图标记 → 进入钓点详情
 function onMarkerTap(id: string) {
-  uni.navigateTo({ url: `/pages/map/explore?id=${id}` })
+  uni.navigateTo({ url: `/pages/map/detail?id=${id}` })
 }
 
-// 点击钓点卡片 → 进入探索页
+// 点击钓点卡片 → 进入钓点详情
 function onSpotTap(spot: any) {
-  uni.navigateTo({ url: `/pages/map/explore?id=${spot._id}` })
+  uni.navigateTo({ url: `/pages/map/detail?id=${spot._id}` })
 }
 </script>
 
