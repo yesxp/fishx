@@ -955,7 +955,7 @@ $text-muted: #80848E;
   display: flex; flex-direction: column; align-items: center; gap: 2px;
   position: relative; cursor: pointer;
   &--active {
-    .stat-num { color: $brand; }
+    .stat-label { color: $brand; }
     &::after {
       content: '';
       position: absolute; bottom: -4px;
@@ -964,8 +964,8 @@ $text-muted: #80848E;
     }
   }
 }
-.stat-num { font-size: 20px; font-weight: 700; color: $text-primary; }
-.stat-label { font-size: 12px; color: $text-muted; }
+.stat-label { font-size: 15px; font-weight: 700; color: $text-primary; }
+.stat-num { font-size: 13px; font-weight: 400; color: $text-muted; }
 
 /* ===== 鱼种标签 ===== */
 .fish-tags-scroll { white-space: nowrap; padding: 0 16px 10px; }
