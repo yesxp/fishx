@@ -909,41 +909,36 @@ const tidePath = computed(() => {
   })
   table.forEach((t: any) => {
     const th = parseInt(t.fxTime.slice(11, 13)) + parseInt(t.fxTime.slice(14, 16)) / 60
-    // 如果已有接近的点(±15min)，替换为更精确的 tideTable 值
     const idx = merged.findIndex(m => Math.abs(m.h - th) < 0.25)
     if (idx >= 0) {
       merged[idx].height = Number(t.height)
-      merged[idx].h = th // 用更精确的时间
+      merged[idx].h = th
     } else {
       merged.push({ h: th, height: Number(t.height) })
     }
   })
   merged.sort((a, b) => a.h - b.h)
 
-  // 2. 计算全局Y范围
-  const allH = merged.map(m => m.height)
-  const maxH = Math.max(...allH)
-  const minH = Math.min(...allH)
-  const range = maxH - minH || 1
-
-  // 3. 转为SVG坐标点
+  // 2. 固定Y轴刻度（黄埔站典型范围0~4m），不同天的潮差差异可见
+  const Y_MAX = 4.0
   const pts = merged.map(m => ({
     x: tideHour2x(m.h),
-    y: TP + (1 - (m.height - minH) / range) * TCH
+    y: TP + (1 - m.height / Y_MAX) * TCH
   }))
   if (pts.length === 0) return ''
 
-  // 4. Catmull-Rom → Bezier 插值，曲线坡度跟随实际数据
+  // 3. Catmull-Rom → Bezier，紧张度调低让峰谷更尖
+  const tension = 4 // 越大越贴合数据点（默认6）
   let d = `M ${pts[0].x} ${pts[0].y}`
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[Math.max(i - 1, 0)]
     const p1 = pts[i]
     const p2 = pts[i + 1]
     const p3 = pts[Math.min(i + 2, pts.length - 1)]
-    const cp1x = p1.x + (p2.x - p0.x) / 6
-    const cp1y = p1.y + (p2.y - p0.y) / 6
-    const cp2x = p2.x - (p3.x - p1.x) / 6
-    const cp2y = p2.y - (p3.y - p1.y) / 6
+    const cp1x = p1.x + (p2.x - p0.x) / tension
+    const cp1y = p1.y + (p2.y - p0.y) / tension
+    const cp2x = p2.x - (p3.x - p1.x) / tension
+    const cp2y = p2.y - (p3.y - p1.y) / tension
     d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`
   }
   return d
@@ -952,17 +947,14 @@ const tidePath = computed(() => {
 const tideAreaPath = computed(() => tidePath.value ? tidePath.value + ` L ${TW} ${TP + TCH} L 0 ${TP + TCH} Z` : '')
 
 const tideMarkers = computed(() => {
-  if (!tideData.value?.tideTable || !tideData.value?.tideHourly) return []
-  const hourly = tideData.value.tideHourly
-  const maxH = Math.max(...hourly.map((h: any) => Number(h.height)))
-  const minH = Math.min(...hourly.map((h: any) => Number(h.height)))
-  const range = maxH - minH || 1
+  if (!tideData.value?.tideTable) return []
+  const Y_MAX = 4.0
   return tideData.value.tideTable.map((t: any) => {
     const h = parseInt(t.fxTime.slice(11, 13))
     const m = parseInt(t.fxTime.slice(14, 16))
     return {
       x: tideHour2x(h + m / 60),
-      y: TP + (1 - (Number(t.height) - minH) / range) * TCH,
+      y: TP + (1 - Number(t.height) / Y_MAX) * TCH,
       height: t.height, type: t.type
     }
   })
@@ -976,16 +968,12 @@ const tideNowTime = computed(() => {
   const now = new Date()
   return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
 })
-// Y轴刻度标签
+// Y轴刻度标签（固定0~4m）
 const tideYLabels = computed(() => {
-  if (!tideData.value?.tideHourly) return []
-  const hourly = tideData.value.tideHourly
-  const maxH = Math.max(...hourly.map((h: any) => Number(h.height)))
-  const minH = Math.min(...hourly.map((h: any) => Number(h.height)))
-  const step = Math.ceil((maxH - minH) / 4 * 10) / 10
+  const Y_MAX = 4.0
   const labels = []
-  for (let v = Math.floor(minH * 10) / 10; v <= maxH + 0.01; v += step) {
-    const y = TP + (1 - (v - minH) / (maxH - minH || 1)) * TCH
+  for (let v = 0; v <= Y_MAX + 0.01; v += 1.0) {
+    const y = TP + (1 - v / Y_MAX) * TCH
     labels.push({ y, label: v.toFixed(1) })
   }
   return labels
