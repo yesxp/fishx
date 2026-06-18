@@ -63,6 +63,20 @@
         @tap="goWeather"
       />
 
+      <!-- 地图找钓点入口 -->
+      <view class="map-entry" @tap="goExplore">
+        <view class="map-entry-left">
+          <view class="map-entry-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </view>
+          <view>
+            <text class="map-entry-title">地图找钓点</text>
+            <text class="map-entry-sub">发现附近好钓点</text>
+          </view>
+        </view>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#80848E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </view>
+
       <!-- Catch Card 1 -->
       <CatchCard
         nickname="李钓友"
@@ -180,6 +194,10 @@ function onCreate() {
 
 function goWeather() {
   uni.switchTab({ url: '/pages/weather/index' })
+}
+
+function goExplore() {
+  uni.navigateTo({ url: '/pages/map/explore' })
 }
 </script>
 
@@ -383,5 +401,49 @@ $warning: #F0B232;
 
 .fish-img-6 {
   background: linear-gradient(135deg, #FBE9E7 0%, #FF8A65 100%);
+}
+
+/* 地图入口卡片 */
+.map-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: $bg-card;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  border: 1px solid $divider;
+  cursor: pointer;
+}
+
+.map-entry-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.map-entry-icon {
+  width: 42px;
+  height: 42px;
+  background: rgba($brand, 0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-entry-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-primary;
+  display: block;
+  line-height: 1.3;
+}
+
+.map-entry-sub {
+  font-size: 12px;
+  color: $text-muted;
+  display: block;
+  margin-top: 2px;
 }
 </style>
