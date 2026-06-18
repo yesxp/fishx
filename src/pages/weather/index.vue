@@ -312,6 +312,13 @@
             <text class="card-title">📅 潮汐日历</text>
             <text class="card-subtitle">未来7天</text>
           </view>
+          <view class="tide-cal-header">
+            <text class="tide-cal-col tide-cal-col--day">日期</text>
+            <text class="tide-cal-col tide-cal-col--hl">满潮</text>
+            <text class="tide-cal-col tide-cal-col--hl">干潮</text>
+            <text class="tide-cal-col tide-cal-col--hl">满潮</text>
+            <text class="tide-cal-col tide-cal-col--hl">干潮</text>
+          </view>
           <view v-for="(day, i) in tideCalendar" :key="i" class="tide-cal-row" :class="{ 'tide-cal-row--today': i === 0, 'tide-cal-row--alt': i % 2 === 1 }">
             <view class="tide-cal-col tide-cal-col--day">
               <template v-if="i === 0">
@@ -323,13 +330,14 @@
               </template>
             </view>
             <template v-if="day.data?.tideTable">
-              <view v-for="(t, j) in padTideTable(day.data.tideTable, 4)" :key="j" class="tide-cal-col tide-cal-col--hl">
-                <template v-if="t">
-                  <text class="tide-cal-type" :class="t.type === 'H' ? 'tide-cal-type--hi' : 'tide-cal-type--lo'">{{ t.type === 'H' ? '满潮' : '干潮' }}</text>
-                  <text class="tide-cal-time">{{ t.fxTime.slice(11, 16) }}</text>
-                  <text class="tide-cal-h" :class="t.type === 'H' ? 'tide-cal-h--hi' : 'tide-cal-h--lo'">{{ t.height }}m</text>
-                </template>
-              </view>
+              <template v-for="(t, j) in alignTideTable(day.data.tideTable, 4)" :key="j">
+                <view class="tide-cal-col tide-cal-col--hl">
+                  <template v-if="t">
+                    <text class="tide-cal-time">{{ t.fxTime.slice(11, 16) }}</text>
+                    <text class="tide-cal-h" :class="t.type === 'H' ? 'tide-cal-h--hi' : 'tide-cal-h--lo'">{{ t.height }}m</text>
+                  </template>
+                </view>
+              </template>
             </template>
             <template v-else>
               <text class="tide-cal-empty">--</text>
@@ -1032,6 +1040,19 @@ function padTideTable(table: any[], len: number) {
   return result.slice(0, len)
 }
 
+// 对齐到表头：第1个是干潮(L)则前面补空位，保证满潮在满潮列
+function alignTideTable(table: any[], len: number) {
+  if (table.length === 0) return Array(len).fill(null)
+  const first = table[0]
+  let aligned = [...table]
+  // 第1个是干潮(L)且前面有满潮列 → 前面补一个空位对齐
+  if (first.type === 'L') {
+    aligned = [null, ...aligned]
+  }
+  while (aligned.length < len) aligned.push(null)
+  return aligned.slice(0, len)
+}
+
 // ===== 潮汐规律 =====
 const tidePattern = computed(() => {
   const calendar = weatherStore.tideCalendar
@@ -1583,9 +1604,6 @@ $danger: #F23F43;
 .tide-cal-col { text-align: center; }
 .tide-cal-col--day { width: 48px; flex-shrink: 0; }
 .tide-cal-col--hl { flex: 1; }
-.tide-cal-type { font-size: 9px; font-weight: 600; display: block; }
-.tide-cal-type--hi { color: $brand; }
-.tide-cal-type--lo { color: $warning; }
 .tide-cal-date { font-size: 12px; font-weight: 500; color: $text-primary; display: block; }
 .tide-cal-subdate { font-size: 9px; color: $text-muted; display: block; }
 .tide-cal-time { font-size: 11px; color: $text-secondary; display: block; }
