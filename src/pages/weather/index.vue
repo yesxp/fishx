@@ -275,11 +275,7 @@
             <text class="tide-now-time">{{ tideNowTime }}</text>
             <view class="tide-now-item">
               <text class="tide-now-label">天气</text>
-              <text class="tide-now-val">{{ weatherStore.weatherNow?.text || '--' }}</text>
-            </view>
-            <view class="tide-now-item">
-              <text class="tide-now-label">温度</text>
-              <text class="tide-now-val">{{ weatherStore.weatherNow?.temp || '--' }}°</text>
+              <text class="tide-now-val">{{ weatherStore.weatherNow?.text || '--' }}({{ weatherStore.weatherNow?.temp || '--' }}°)</text>
             </view>
             <view class="tide-now-item">
               <text class="tide-now-label">气压</text>
