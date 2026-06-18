@@ -29,8 +29,13 @@ function loadAMapSDK(): Promise<void> {
   if (amapLoadPromise) return amapLoadPromise
   
   amapLoadPromise = new Promise((resolve, reject) => {
-    // 设置安全配置
-    initAMap()
+    // 安全配置已在 index.html 中设置
+    if (typeof window !== 'undefined' && (window as any).AMap) {
+      amapLoaded = true
+      console.log('[AMap] SDK 已加载')
+      resolve()
+      return
+    }
     
     // 创建 script 标签
     const script = document.createElement('script')
@@ -68,7 +73,7 @@ export interface LocationResult {
 export async function getLocation(highAccuracy = true): Promise<LocationResult> {
   try {
     // 先尝试 uni.getLocation（小程序/App）
-    const res = await new Promise<UniApp.GetLocationSuccess>((resolve, reject) => {
+    const res = await new Promise<any>((resolve, reject) => {
       uni.getLocation({
         type: 'gcj02',
         highAccuracy,

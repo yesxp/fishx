@@ -6,6 +6,13 @@
       var coverSupport = 'CSS' in window && typeof CSS.supports === 'function' && (CSS.supports('top: env(a)') || CSS.supports('top: constant(a)'))
       document.write('<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0' + (coverSupport ? ', viewport-fit=cover' : '') + '" />')
     </script>
+    <!-- 高德地图安全配置（必须在 SDK 加载前） -->
+    <script>
+      window._AMapSecurityConfig = {
+        securityJsCode: '89153ac2b2781babcecfb82482c4b9fc',
+      }
+    </script>
+    <link rel="preconnect" href="https://webapi.amap.com" />
     <title>鱼渔娱</title>
     <!--preload-links-->
     <!--app-context-->
