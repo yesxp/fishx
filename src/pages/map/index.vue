@@ -11,18 +11,18 @@
           </view>
         </view>
         <view class="header-actions">
-          <view class="header-btn">
+          <view class="header-btn" @tap="onSearch">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </view>
-          <view class="header-btn">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <view class="header-btn" @tap="onAdd">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </view>
         </view>
       </view>
     </view>
 
     <!-- Content -->
-    <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false" :style="{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }">
+    <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
       <!-- Map Placeholder -->
       <view class="map-placeholder">
         <view class="map-inner">
@@ -39,23 +39,32 @@
             :key="i"
             :type="activeTag === i ? 'primary' : 'default'"
             round
-            @click="activeTag = i"
+            @click="onTagChange(i)"
           >{{ tag }}</wd-tag>
         </view>
       </scroll-view>
 
+      <!-- Loading -->
+      <view v-if="loading" class="loading-wrap">
+        <wd-loading />
+      </view>
+
       <!-- Spot Cards -->
-      <view class="spot-list">
+      <view v-else class="spot-list">
+        <view v-if="spots.length === 0" class="empty-wrap">
+          <text class="empty-text">暂无钓点数据</text>
+          <text class="empty-sub">点击右上角 + 添加钓点</text>
+        </view>
         <SpotCard
           v-for="spot in spots"
-          :key="spot.name"
+          :key="spot._id"
           :name="spot.name"
           :type="spot.type"
-          :distance="spot.distance"
+          :distance="getDistance(spot)"
           :rating="spot.rating"
           :emoji="spot.emoji"
-          :is-paid="spot.isPaid"
-          :is-pit="spot.isPit"
+          :is-paid="spot.is_paid"
+          :is-pit="spot.is_pit"
           @tap="onSpotTap(spot)"
         />
       </view>
@@ -64,61 +73,63 @@
     </scroll-view>
   </view>
 
-    <!-- Wot UI TabBar -->
-    <WotTabBar current="map" />
+  <!-- Wot UI TabBar -->
+  <WotTabBar current="map" />
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useSpotStore } from '@/stores/spot'
 import SpotCard from '@/components/SpotCard.vue'
 import WotTabBar from '@/components/WotTabBar.vue'
 
+const spotStore = useSpotStore()
 
 const tags = ['全部', '路亚', '台钓', '海钓']
 const activeTag = ref(0)
+const loading = ref(false)
 
-const spots = [
-  {
-    name: '西湖钓点',
-    type: 'lake',
-    distance: '2.8km',
-    rating: 4.8,
-    emoji: '🏞️',
-    isPaid: false,
-    isPit: false,
-  },
-  {
-    name: '老王钓场',
-    type: 'pond',
-    distance: '5.1km',
-    rating: 4.5,
-    emoji: '🐟',
-    isPaid: true,
-    isPit: true,
-  },
-  {
-    name: '千岛湖大坝',
-    type: 'wild',
-    distance: '12km',
-    rating: 4.9,
-    emoji: '⛰️',
-    isPaid: false,
-    isPit: false,
-  },
-  {
-    name: '龙王塘',
-    type: 'pond',
-    distance: '8.3km',
-    rating: 4.2,
-    emoji: '🎣',
-    isPaid: true,
-    isPit: true,
-  },
-]
+// 从 store 获取钓点列表
+const spots = computed(() => spotStore.spotList)
 
-function onSpotTap(spot: any) {
-  uni.navigateTo({ url: `/pages/map/detail?id=${spot.name}` })
+// 标签切换
+async function onTagChange(index: number) {
+  activeTag.value = index
+  await loadSpots()
 }
+
+// 加载钓点
+async function loadSpots() {
+  loading.value = true
+  await spotStore.loadList()
+  loading.value = false
+}
+
+// 计算距离（简化版，实际应使用地理距离计算）
+function getDistance(spot: any): string {
+  // TODO: 使用用户位置计算真实距离
+  return '...'
+}
+
+// 搜索
+function onSearch() {
+  uni.showToast({ title: '搜索功能开发中', icon: 'none' })
+}
+
+// 添加钓点
+function onAdd() {
+  uni.navigateTo({ url: '/pages/map/create' })
+}
+
+// 点击钓点
+function onSpotTap(spot: any) {
+  uni.navigateTo({ url: `/pages/map/detail?id=${spot._id}` })
+}
+
+// 页面加载
+onMounted(() => {
+  loadSpots()
+})
 </script>
 
 <style scoped lang="scss">
@@ -135,12 +146,10 @@ $tag-bg: #F2F3F5;
   min-height: 100vh;
   background: $bg-page;
 }
+
 /* Header */
 .header { position: sticky; top: 0; z-index: 100; background: $bg-card; border-bottom: 1px solid $divider; padding: 12px 16px; }
 .header-top { display: flex; align-items: center; justify-content: space-between; }
-
-
-
 
 .header-logo {
   display: flex;
@@ -188,10 +197,6 @@ $tag-bg: #F2F3F5;
   justify-content: center;
 }
 
-.icon-text {
-  font-size: 16px;
-}
-
 /* Content */
 .content { overflow-x: hidden;
   padding: 12px;
@@ -217,10 +222,6 @@ $tag-bg: #F2F3F5;
   gap: 8px;
 }
 
-.map-pin {
-  font-size: 40px;
-}
-
 .map-label {
   font-size: 14px;
   color: $text-muted;
@@ -235,6 +236,32 @@ $tag-bg: #F2F3F5;
 .tags-inner {
   display: flex;
   gap: 8px;
+}
+
+/* Loading */
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+/* Empty */
+.empty-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+}
+
+.empty-text {
+  font-size: 14px;
+  color: $text-muted;
+  margin-bottom: 8px;
+}
+
+.empty-sub {
+  font-size: 12px;
+  color: $text-muted;
 }
 
 /* Spot List */
