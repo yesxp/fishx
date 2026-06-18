@@ -892,23 +892,51 @@ const tideStatus = computed(() => {
 const tidePath = computed(() => {
   if (!tideData.value?.tideHourly) return ''
   const hourly = tideData.value.tideHourly
-  const allH = tideData.value.tideHourly
-  const maxH = Math.max(...allH.map((h: any) => Number(h.height)))
-  const minH = Math.min(...allH.map((h: any) => Number(h.height)))
-  const range = maxH - minH || 1
-  const points = hourly.map((h: any) => {
-    const hr = parseInt(h.fxTime.slice(11, 13))
-    const mn = parseInt(h.fxTime.slice(14, 16))
-    return {
-      x: tideHour2x(hr + mn / 60),
-      y: TP + (1 - (Number(h.height) - minH) / range) * TCH
+  const table = tideData.value.tideTable || []
+
+  // 1. 合并 tideTable(分钟精度) + tideHourly(小时精度)，去重
+  const merged: { h: number; height: number }[] = []
+  hourly.forEach((h: any) => {
+    merged.push({ h: parseInt(h.fxTime.slice(11, 13)) + parseInt(h.fxTime.slice(14, 16)) / 60, height: Number(h.height) })
+  })
+  table.forEach((t: any) => {
+    const th = parseInt(t.fxTime.slice(11, 13)) + parseInt(t.fxTime.slice(14, 16)) / 60
+    // 如果已有接近的点(±15min)，替换为更精确的 tideTable 值
+    const idx = merged.findIndex(m => Math.abs(m.h - th) < 0.25)
+    if (idx >= 0) {
+      merged[idx].height = Number(t.height)
+      merged[idx].h = th // 用更精确的时间
+    } else {
+      merged.push({ h: th, height: Number(t.height) })
     }
   })
-  if (points.length === 0) return ''
-  let d = `M ${points[0].x} ${points[0].y}`
-  for (let i = 1; i < points.length; i++) {
-    const p = points[i - 1], c = points[i]
-    d += ` C ${p.x + (c.x - p.x) / 3} ${p.y}, ${p.x + 2 * (c.x - p.x) / 3} ${c.y}, ${c.x} ${c.y}`
+  merged.sort((a, b) => a.h - b.h)
+
+  // 2. 计算全局Y范围
+  const allH = merged.map(m => m.height)
+  const maxH = Math.max(...allH)
+  const minH = Math.min(...allH)
+  const range = maxH - minH || 1
+
+  // 3. 转为SVG坐标点
+  const pts = merged.map(m => ({
+    x: tideHour2x(m.h),
+    y: TP + (1 - (m.height - minH) / range) * TCH
+  }))
+  if (pts.length === 0) return ''
+
+  // 4. Catmull-Rom → Bezier 插值，曲线坡度跟随实际数据
+  let d = `M ${pts[0].x} ${pts[0].y}`
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(i - 1, 0)]
+    const p1 = pts[i]
+    const p2 = pts[i + 1]
+    const p3 = pts[Math.min(i + 2, pts.length - 1)]
+    const cp1x = p1.x + (p2.x - p0.x) / 6
+    const cp1y = p1.y + (p2.y - p0.y) / 6
+    const cp2x = p2.x - (p3.x - p1.x) / 6
+    const cp2y = p2.y - (p3.y - p1.y) / 6
+    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`
   }
   return d
 })
