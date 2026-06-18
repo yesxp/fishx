@@ -85,7 +85,7 @@ import WotTabBar from '@/components/WotTabBar.vue'
 
 const spotStore = useSpotStore()
 
-const tags = ['全部', '路亚', '台钓', '海钓']
+const tags = ['全部', '湖泊', '河流', '黑坑', '野钓', '海钓']
 const activeTag = ref(0)
 const loading = ref(false)
 
