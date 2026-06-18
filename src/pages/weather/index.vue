@@ -314,7 +314,10 @@
           </view>
           <view class="tide-cal-header">
             <text class="tide-cal-col tide-cal-col--day">日期</text>
-            <text v-for="(h, hi) in tideCalHeaders" :key="hi" class="tide-cal-col tide-cal-col--hl">{{ h }}</text>
+            <text class="tide-cal-col tide-cal-col--hl">满潮</text>
+            <text class="tide-cal-col tide-cal-col--hl">干潮</text>
+            <text class="tide-cal-col tide-cal-col--hl">满潮</text>
+            <text class="tide-cal-col tide-cal-col--hl">干潮</text>
           </view>
           <view v-for="(day, i) in tideCalendar" :key="i" class="tide-cal-row" :class="{ 'tide-cal-row--today': i === 0, 'tide-cal-row--alt': i % 2 === 1 }">
             <view class="tide-cal-col tide-cal-col--day">
@@ -1052,17 +1055,6 @@ const tidePhase = computed(() => {
 
 // ===== 潮汐日历 =====
 const tideCalendar = computed(() => weatherStore.tideCalendar)
-
-// 动态表头：根据第1天第1个潮汐类型决定列头
-const tideCalHeaders = computed(() => {
-  const cal = tideCalendar.value
-  if (!cal || !cal[0]?.data?.tideTable || cal[0].data.tideTable.length === 0) {
-    return ['满潮', '干潮', '满潮', '干潮']
-  }
-  const firstType = cal[0].data.tideTable[0].type
-  if (firstType === 'L') return ['干潮', '满潮', '干潮', '满潮']
-  return ['满潮', '干潮', '满潮', '干潮']
-})
 
 function padTideTable(table: any[], len: number) {
   const result = [...table]
