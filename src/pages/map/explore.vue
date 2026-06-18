@@ -244,27 +244,25 @@
           <view class="spot-card-body">
             <view class="spot-card-row1">
               <text class="spot-card-name">{{ spot.name }}</text>
-              <view class="spot-card-row1-right">
+              <view class="spot-card-right">
                 <view class="spot-card-rating" v-if="spot.rating">
                   <svg viewBox="0 0 24 24" width="12" height="12" fill="#F0B232" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                   <text>{{ spot.rating }}</text>
                 </view>
-                <text class="spot-card-dist">
-                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#80848E" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                  {{ getDistance(spot) }}
-                </text>
+                <svg class="spot-card-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#C4C8CE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
               </view>
             </view>
             <view class="spot-card-row2">
-              <view class="spot-card-tags">
-                <text v-for="ft in (spot.fish_types || []).slice(0, 3)" :key="ft" class="spot-card-fishtag">{{ ft }}</text>
-              </view>
+              <text v-for="ft in (spot.fish_types || []).slice(0, 4)" :key="ft" class="spot-card-fishtag">{{ ft }}</text>
+            </view>
+            <view class="spot-card-row3">
+              <text class="spot-card-dist">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#80848E" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ getDistance(spot) }}
+              </text>
               <text v-if="spot.is_paid" class="spot-card-paid">💰收费</text>
               <text v-else class="spot-card-free">🆓免费</text>
             </view>
-          </view>
-          <view class="spot-card-arrow">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#C4C8CE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           </view>
         </view>
       </view>
@@ -278,14 +276,14 @@
           <view class="spot-card-body">
             <view class="spot-card-row1">
               <text class="spot-card-name">{{ shop.name }}</text>
+              <svg class="spot-card-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#C4C8CE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </view>
+            <view class="spot-card-row3">
               <text class="spot-card-dist">
                 <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#80848E" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                 {{ shop.distance }}
               </text>
             </view>
-          </view>
-          <view class="spot-card-arrow">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#C4C8CE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           </view>
         </view>
       </view>
@@ -1070,105 +1068,19 @@ $text-muted: #80848E;
   &--sea { background: rgba(#00BCD4, 0.1); color: #00BCD4; }
 }
 
-.spot-card-body {
-  flex: 1;
-  min-width: 0;
-}
-
-.spot-card-row1 {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-}
-
-.spot-card-row1-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.spot-card-name {
-  font-size: 15px;
-  font-weight: 600;
-  color: $text-primary;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
-  min-width: 0;
-}
-
-.spot-card-rating {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  flex-shrink: 0;
-  font-size: 12px;
-  font-weight: 600;
-  color: #F0B232;
-}
-
-.spot-card-dist {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 12px;
-  color: $text-muted;
-}
-
-.spot-card-row2 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.spot-card-tags {
-  display: flex;
-  gap: 4px;
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.spot-card-fishtag {
-  padding: 2px 8px;
-  border-radius: 10px;
-  background: $bg-page;
-  font-size: 11px;
-  color: $text-secondary;
-}
-
-.spot-card-meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 6px;
-}
-
-.spot-card-free {
-  font-size: 11px;
-  color: #23A559;
-  font-weight: 600;
-}
-
-.spot-card-paid {
-  font-size: 11px;
-  color: #F0B232;
-  font-weight: 600;
-}
-
-.spot-card-arrow {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
-.spot-card-shop-icon {
-  font-size: 36px;
-}
+.spot-card-body { flex: 1; min-width: 0; }
+.spot-card-row1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.spot-card-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.spot-card-name { font-size: 15px; font-weight: 600; color: $text-primary; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+.spot-card-rating { display: flex; align-items: center; gap: 2px; flex-shrink: 0; font-size: 12px; font-weight: 600; color: #F0B232; }
+.spot-card-row2 { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.spot-card-fishtag { padding: 2px 8px; border-radius: 10px; background: $bg-page; font-size: 11px; color: $text-secondary; }
+.spot-card-row3 { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.spot-card-dist { display: flex; align-items: center; gap: 3px; font-size: 12px; color: $text-muted; }
+.spot-card-free { font-size: 11px; color: #23A559; font-weight: 600; }
+.spot-card-paid { font-size: 11px; color: #F0B232; font-weight: 600; }
+.spot-card-arrow { flex-shrink: 0; }
+.spot-card-shop-icon { font-size: 36px; }
 
 /* ===== 渔获照片墙 ===== */
 .catch-grid {
