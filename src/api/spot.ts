@@ -2,7 +2,7 @@
  * 钓点 API - 腾讯云开发版
  */
 
-import { getDB } from '@/lib/cloudbase'
+import { getDB, getAuth } from '@/lib/cloudbase'
 
 // 钓点类型定义
 export interface Spot {
@@ -30,6 +30,20 @@ export interface Spot {
   updated_at?: Date
 }
 
+// 等待登录完成
+async function ensureLogin() {
+  try {
+    const auth = getAuth()
+    const loginState = await auth.getLoginState()
+    if (!loginState) {
+      await auth.signInAnonymously()
+      console.log('[SpotAPI] 匿名登录成功')
+    }
+  } catch (error) {
+    console.warn('[SpotAPI] 登录失败，尝试继续:', error)
+  }
+}
+
 // 获取钓点列表
 export async function getSpotList(params?: {
   lat?: number
@@ -41,6 +55,9 @@ export async function getSpotList(params?: {
   pageSize?: number
 }) {
   try {
+    // 确保已登录
+    await ensureLogin()
+    
     const db = getDB()
     const collection = db.collection('spots')
     let query = collection
@@ -72,13 +89,14 @@ export async function getSpotList(params?: {
       .limit(pageSize)
       .get()
 
+    console.log('[SpotAPI] 获取钓点成功:', result.data?.length, '条')
     return {
       code: 0,
       data: result.data as Spot[],
       total: result.total,
     }
   } catch (error) {
-    console.error('获取钓点列表失败:', error)
+    console.error('[SpotAPI] 获取钓点列表失败:', error)
     return { code: -1, data: [], message: '获取失败' }
   }
 }
@@ -86,6 +104,7 @@ export async function getSpotList(params?: {
 // 获取钓点详情
 export async function getSpotDetail(id: string) {
   try {
+    await ensureLogin()
     const db = getDB()
     const result = await db.collection('spots').doc(id).get()
     return {
@@ -93,7 +112,7 @@ export async function getSpotDetail(id: string) {
       data: result.data as Spot,
     }
   } catch (error) {
-    console.error('获取钓点详情失败:', error)
+    console.error('[SpotAPI] 获取钓点详情失败:', error)
     return { code: -1, data: null, message: '获取失败' }
   }
 }
@@ -101,6 +120,7 @@ export async function getSpotDetail(id: string) {
 // 创建钓点
 export async function createSpot(data: Omit<Spot, '_id' | 'created_at' | 'updated_at'>) {
   try {
+    await ensureLogin()
     const db = getDB()
     const now = new Date()
     const result = await db.collection('spots').add({
@@ -117,7 +137,7 @@ export async function createSpot(data: Omit<Spot, '_id' | 'created_at' | 'update
       message: '创建成功',
     }
   } catch (error) {
-    console.error('创建钓点失败:', error)
+    console.error('[SpotAPI] 创建钓点失败:', error)
     return { code: -1, message: '创建失败' }
   }
 }
@@ -125,6 +145,7 @@ export async function createSpot(data: Omit<Spot, '_id' | 'created_at' | 'update
 // 更新钓点
 export async function updateSpot(id: string, data: Partial<Spot>) {
   try {
+    await ensureLogin()
     const db = getDB()
     await db.collection('spots').doc(id).update({
       ...data,
@@ -132,7 +153,7 @@ export async function updateSpot(id: string, data: Partial<Spot>) {
     })
     return { code: 0, message: '更新成功' }
   } catch (error) {
-    console.error('更新钓点失败:', error)
+    console.error('[SpotAPI] 更新钓点失败:', error)
     return { code: -1, message: '更新失败' }
   }
 }
@@ -140,11 +161,12 @@ export async function updateSpot(id: string, data: Partial<Spot>) {
 // 删除钓点
 export async function deleteSpot(id: string) {
   try {
+    await ensureLogin()
     const db = getDB()
     await db.collection('spots').doc(id).remove()
     return { code: 0, message: '删除成功' }
   } catch (error) {
-    console.error('删除钓点失败:', error)
+    console.error('[SpotAPI] 删除钓点失败:', error)
     return { code: -1, message: '删除失败' }
   }
 }
@@ -152,6 +174,7 @@ export async function deleteSpot(id: string) {
 // 打卡（增加渔获数）
 export async function checkIn(spotId: string) {
   try {
+    await ensureLogin()
     const db = getDB()
     await db.collection('spots').doc(spotId).update({
       catch_count: db.command.inc(1),
@@ -159,7 +182,7 @@ export async function checkIn(spotId: string) {
     })
     return { code: 0, message: '打卡成功' }
   } catch (error) {
-    console.error('打卡失败:', error)
+    console.error('[SpotAPI] 打卡失败:', error)
     return { code: -1, message: '打卡失败' }
   }
 }
@@ -179,7 +202,7 @@ export async function uploadSpotImage(filePath: string, spotId: string) {
       data: { fileID: result.fileID },
     }
   } catch (error) {
-    console.error('上传图片失败:', error)
+    console.error('[SpotAPI] 上传图片失败:', error)
     return { code: -1, message: '上传失败' }
   }
 }

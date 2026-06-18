@@ -6,11 +6,12 @@ let app: any = null
 let db: any = null
 let auth: any = null
 let storage: any = null
+let isLoggedIn = false
 
 const ENV_ID = 'fishx-d4gd8ef9uc92d3227'
 
 // 延迟初始化，确保 uni 已定义
-function initCloud() {
+async function initCloud() {
   if (app) return app
   
   try {
@@ -34,7 +35,11 @@ function initCloud() {
     auth = app.auth()
     storage = app.storage()
     
-    console.log('[CloudBase] 初始化成功')
+    console.log('[CloudBase] SDK 初始化成功')
+    
+    // 自动匿名登录
+    await anonymousLogin()
+    
   } catch (error) {
     console.error('[CloudBase] 初始化失败:', error)
     // 创建 mock 对象，避免页面报错
@@ -42,6 +47,29 @@ function initCloud() {
   }
   
   return app
+}
+
+// 匿名登录
+async function anonymousLogin() {
+  if (isLoggedIn || !auth) return
+  
+  try {
+    // 检查是否已登录
+    const loginState = await auth.getLoginState()
+    if (loginState) {
+      console.log('[CloudBase] 已登录')
+      isLoggedIn = true
+      return
+    }
+    
+    // 匿名登录
+    await auth.signInAnonymously()
+    console.log('[CloudBase] 匿名登录成功')
+    isLoggedIn = true
+  } catch (error) {
+    console.error('[CloudBase] 匿名登录失败:', error)
+    // 登录失败不影响数据读取（如果权限允许）
+  }
 }
 
 // Mock 数据库对象（CloudBase 失败时使用）
