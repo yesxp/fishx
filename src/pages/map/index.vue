@@ -112,7 +112,11 @@ async function initLocation() {
     const location = await getLocation()
     userLat.value = location.latitude
     userLng.value = location.longitude
-    userLocation.value = location.address || `${location.city}${location.district}`
+    
+    // 拼接地址，处理 undefined
+    const parts = [location.city, location.district].filter(Boolean)
+    userLocation.value = location.address || parts.join('') || '定位成功'
+    
     console.log('[Map] 用户位置:', location)
   } catch (error) {
     console.warn('[Map] 定位失败，使用默认位置:', error)

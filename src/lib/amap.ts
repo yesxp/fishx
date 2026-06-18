@@ -112,14 +112,16 @@ async function h5GetLocation(): Promise<LocationResult> {
     geolocation.getCurrentPosition((status: string, result: any) => {
       if (status === 'complete') {
         console.log('[AMap] 定位成功:', result)
+        // 高德定位结果字段
+        const addr = result.addressComponent || {}
         resolve({
-          latitude: result.position.lat,
-          longitude: result.position.lng,
-          address: result.formattedAddress,
-          province: result.addressComponent?.province,
-          city: result.addressComponent?.city,
-          district: result.addressComponent?.district,
-          street: result.addressComponent?.street,
+          latitude: result.position?.lat || 30.25,
+          longitude: result.position?.lng || 120.15,
+          address: result.formattedAddress || [addr.province, addr.city, addr.district, addr.street].filter(Boolean).join(''),
+          province: addr.province || '',
+          city: addr.city || '',
+          district: addr.district || '',
+          street: addr.street || '',
         })
       } else {
         console.error('[AMap] 定位失败:', result)
