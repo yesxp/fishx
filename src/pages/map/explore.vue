@@ -274,21 +274,22 @@
             <view class="spot-card-shop-icon">🏪</view>
           </view>
           <view class="spot-card-body">
-            <view class="spot-card-row1">
+            <view class="spot-card-header">
               <text class="spot-card-name">{{ shop.name }}</text>
-              <svg class="spot-card-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#C4C8CE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
             </view>
-            <view class="spot-card-row3">
+            <text class="spot-card-addr">{{ shop.address }}</text>
+            <view class="spot-card-meta">
               <text class="spot-card-dist">
                 <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#80848E" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                 {{ shop.distance }}
               </text>
             </view>
           </view>
+          <view class="spot-card-phone" @tap.stop="callPhone(shop.phone)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#23A559" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </view>
         </view>
       </view>
-    </view>
-  </view>
 </template>
 
 <script setup lang="ts">
@@ -370,12 +371,12 @@ const mapMarkers = computed(() => {
 
 // ===== 渔具店 Mock =====
 const shopList = ref([
-  { id: 'shop_1', name: '西湖渔具', address: '杭州市西湖区龙井路88号', lat: 30.252, lng: 120.152, distance: '0.8km' },
-  { id: 'shop_2', name: '老李钓具', address: '杭州市西湖区灵隐路56号', lat: 30.260, lng: 120.148, distance: '1.2km' },
-  { id: 'shop_3', name: '千岛湖钓具大全', address: '杭州市淳安县千岛湖镇', lat: 29.602, lng: 119.002, distance: '68km' },
-  { id: 'shop_4', name: '路亚之家', address: '杭州市滨江区江南大道128号', lat: 30.208, lng: 120.205, distance: '3.5km' },
-  { id: 'shop_5', name: '渔乐圈钓具', address: '杭州市萧山区市心路200号', lat: 30.175, lng: 120.265, distance: '8.1km' },
-  { id: 'shop_6', name: '化氏钓具旗舰店', address: '杭州市余杭区临平街道', lat: 30.418, lng: 120.301, distance: '15km' },
+  { id: 'shop_1', name: '西湖渔具', address: '杭州市西湖区龙井路88号', phone: '0571-88881234', lat: 30.252, lng: 120.152, distance: '0.8km' },
+  { id: 'shop_2', name: '老李钓具', address: '杭州市西湖区灵隐路56号', phone: '0571-87654321', lat: 30.260, lng: 120.148, distance: '1.2km' },
+  { id: 'shop_3', name: '千岛湖钓具大全', address: '杭州市淳安县千岛湖镇新安大街12号', phone: '0571-64812345', lat: 29.602, lng: 119.002, distance: '68km' },
+  { id: 'shop_4', name: '路亚之家', address: '杭州市滨江区江南大道128号', phone: '0571-89876543', lat: 30.208, lng: 120.205, distance: '3.5km' },
+  { id: 'shop_5', name: '渔乐圈钓具', address: '杭州市萧山区市心路200号', phone: '0571-22889966', lat: 30.175, lng: 120.265, distance: '8.1km' },
+  { id: 'shop_6', name: '化氏钓具旗舰店', address: '杭州市余杭区临平街道世纪大道200号', phone: '0571-86112233', lat: 30.418, lng: 120.301, distance: '15km' },
 ])
 
 // ===== 渔获照片墙 =====
@@ -603,6 +604,10 @@ function onSpotTap(spot: any) {
 
 function onShopTap(shop: any) {
   uni.showToast({ title: `${shop.name} 详情开发中`, icon: 'none' })
+}
+
+function callPhone(phone: string) {
+  uni.makePhoneCall({ phoneNumber: phone })
 }
 </script>
 
@@ -1082,6 +1087,23 @@ $text-muted: #80848E;
 .spot-card-free { font-size: 11px; color: #23A559; font-weight: 600; }
 .spot-card-paid { font-size: 11px; color: #F0B232; font-weight: 600; }
 .spot-card-arrow { flex-shrink: 0; }
+
+.spot-card-phone {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(#23A559, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:active {
+    background: rgba(#23A559, 0.2);
+  }
+}
+
 .spot-card-shop-icon { font-size: 36px; }
 
 /* ===== 渔获照片墙 ===== */
