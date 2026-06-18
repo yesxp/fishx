@@ -17,14 +17,23 @@ const props = defineProps<{
     longitude: number
     emoji: string
   }>
+  mapStyle?: string
+  showTraffic?: boolean
+  showRoadNet?: boolean
 }>()
 
 const emit = defineEmits<{
   markerTap: [id: string]
+  mapReady: [map: any]
 }>()
 
 const mapId = ref(`map_${Date.now()}`)
 let map: any = null
+
+// 图层实例
+let satelliteLayer: any = null
+let roadNetLayer: any = null
+let trafficLayer: any = null
 
 // 加载高德 SDK
 async function loadSDK(): Promise<void> {
@@ -38,7 +47,7 @@ async function loadSDK(): Promise<void> {
     }
     
     const script = document.createElement('script')
-    script.src = 'https://webapi.amap.com/maps?v=2.0&key=7720afe7008d2bf80f6608d8751f3652&plugin=AMap.Scale,AMap.ToolBar'
+    script.src = 'https://webapi.amap.com/maps?v=2.0&key=7720afe7008d2bf80f6608d8751f3652&plugin=AMap.Scale,AMap.ToolBar,AMap.TileLayer'
     script.onload = () => resolve()
     script.onerror = () => reject(new Error('AMap SDK load failed'))
     document.head.appendChild(script)
@@ -78,6 +87,9 @@ async function initMap() {
   if (props.markers?.length) {
     addMarkers(props.markers)
   }
+
+  // 通知父组件地图已就绪
+  emit('mapReady', map)
 }
 
 // 添加钓点标记
@@ -105,6 +117,55 @@ function addMarkers(markers: any[]) {
   })
 }
 
+// 切换地图样式
+function setMapStyle(style: string) {
+  if (!map) return
+  // @ts-ignore
+  map.setMapStyle(style)
+}
+
+// 切换卫星图层
+function toggleSatellite(show: boolean) {
+  if (!map) return
+  if (show) {
+    if (!satelliteLayer) {
+      // @ts-ignore
+      satelliteLayer = new AMap.TileLayer.Satellite()
+    }
+    map.add(satelliteLayer)
+  } else if (satelliteLayer) {
+    map.remove(satelliteLayer)
+  }
+}
+
+// 切换路网图层
+function toggleRoadNet(show: boolean) {
+  if (!map) return
+  if (show) {
+    if (!roadNetLayer) {
+      // @ts-ignore
+      roadNetLayer = new AMap.TileLayer.RoadNet()
+    }
+    map.add(roadNetLayer)
+  } else if (roadNetLayer) {
+    map.remove(roadNetLayer)
+  }
+}
+
+// 切换路况图层
+function toggleTraffic(show: boolean) {
+  if (!map) return
+  if (show) {
+    if (!trafficLayer) {
+      // @ts-ignore
+      trafficLayer = new AMap.TileLayer.Traffic()
+    }
+    map.add(trafficLayer)
+  } else if (trafficLayer) {
+    map.remove(trafficLayer)
+  }
+}
+
 // 监听 markers 变化
 watch(() => props.markers, (newMarkers) => {
   if (map && newMarkers) {
@@ -117,6 +178,21 @@ watch(() => props.markers, (newMarkers) => {
   }
 }, { deep: true })
 
+// 监听地图样式变化
+watch(() => props.mapStyle, (newStyle) => {
+  if (newStyle) setMapStyle(newStyle)
+})
+
+// 监听路况开关
+watch(() => props.showTraffic, (show) => {
+  toggleTraffic(!!show)
+})
+
+// 监听路网开关
+watch(() => props.showRoadNet, (show) => {
+  toggleRoadNet(!!show)
+})
+
 onMounted(() => {
   initMap()
 })
@@ -127,6 +203,9 @@ onUnmounted(() => {
     map = null
   }
 })
+
+// 暴露方法给父组件
+defineExpose({ getMap: () => map, toggleSatellite, toggleRoadNet, toggleTraffic, setMapStyle })
 </script>
 
 <style scoped>
