@@ -149,6 +149,8 @@ $tag-bg: #F2F3F5;
 .page-map { overflow-x: hidden;
   min-height: 100vh;
   background: $bg-page;
+  max-width: 100vw;
+  box-sizing: border-box;
 }
 
 /* Header */
@@ -205,6 +207,8 @@ $tag-bg: #F2F3F5;
 .content { overflow-x: hidden;
   padding: 12px;
   height: calc(100vh - 60px);
+  box-sizing: border-box;
+  max-width: 100vw;
 }
 
 /* Map Placeholder */
@@ -273,5 +277,6 @@ $tag-bg: #F2F3F5;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overflow: hidden;
 }
 </style>

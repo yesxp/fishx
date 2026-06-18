@@ -98,6 +98,8 @@ const bgStyle = computed(() => {
   cursor: pointer;
   transition: transform 0.15s;
   padding: 14px;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .spot-card-header {
