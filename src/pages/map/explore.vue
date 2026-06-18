@@ -54,8 +54,8 @@
             :class="{ 'layer-thumb--active': activeBaseLayer === item.id }"
             @tap="switchBaseLayer(item.id)"
           >
-            <view class="layer-thumb-img" :style="{ background: item.bg }">
-              <text class="layer-thumb-icon">{{ item.icon }}</text>
+            <view class="layer-thumb-img" :class="`layer-thumb-img--${item.id}`">
+              <view class="layer-thumb-svg" v-html="item.svg" />
             </view>
             <text class="layer-thumb-label">{{ item.label }}</text>
             <view v-if="activeBaseLayer === item.id" class="layer-thumb-check">
@@ -203,10 +203,22 @@ const showNoFish = ref(true)
 
 // 底图选项
 const baseLayers = [
-  { id: 'normal', label: '标准地图', icon: '🗺️', bg: 'linear-gradient(135deg, #E8F0FE 0%, #C6DCF7 100%)' },
-  { id: 'satellite', label: '卫星地图', icon: '🛰️', bg: 'linear-gradient(135deg, #2D3436 0%, #636E72 100%)' },
-  { id: 'satellite-road', label: '卫星路网', icon: '🌐', bg: 'linear-gradient(135deg, #2D3436 0%, #74B9FF 100%)' },
-  { id: 'dark', label: '夜间模式', icon: '🌙', bg: 'linear-gradient(135deg, #0C0C1D 0%, #2D3436 100%)' },
+  { 
+    id: 'normal', label: '标准地图',
+    svg: `<svg viewBox="0 0 48 48" width="32" height="32" fill="none" stroke="#4A90D9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="36" height="36" rx="4" fill="#E8F0FE"/><path d="M6 20h36M6 34h36M20 6v36M34 6v36" stroke="#C6DCF7" stroke-width="1.5"/><circle cx="14" cy="14" r="3" fill="#4A90D9" stroke="none"/><circle cx="30" cy="28" r="2" fill="#4A90D9" stroke="none"/></svg>`,
+  },
+  { 
+    id: 'satellite', label: '卫星地图',
+    svg: `<svg viewBox="0 0 48 48" width="32" height="32" fill="none" stroke="none"><rect x="6" y="6" width="36" height="36" rx="4" fill="#1A2332"/><circle cx="16" cy="16" r="6" fill="#2D5A3D"/><circle cx="30" cy="22" r="5" fill="#3D7A5D"/><circle cx="20" cy="32" r="4" fill="#2D5A3D"/><rect x="28" y="30" width="8" height="6" rx="1" fill="#4A7A6D" opacity="0.7"/></svg>`,
+  },
+  { 
+    id: 'satellite-road', label: '卫星路网',
+    svg: `<svg viewBox="0 0 48 48" width="32" height="32" fill="none" stroke="none"><rect x="6" y="6" width="36" height="36" rx="4" fill="#1A2332"/><circle cx="16" cy="16" r="6" fill="#2D5A3D"/><circle cx="30" cy="22" r="5" fill="#3D7A5D"/><path d="M6 20h36M20 6v36" stroke="#FFD700" stroke-width="1.5" stroke-dasharray="4 2"/></svg>`,
+  },
+  { 
+    id: 'dark', label: '夜间模式',
+    svg: `<svg viewBox="0 0 48 48" width="32" height="32" fill="none" stroke="none"><rect x="6" y="6" width="36" height="36" rx="4" fill="#0C0C1D"/><path d="M6 20h36M6 34h36M20 6v36M34 6v36" stroke="#1E2A3A" stroke-width="1.5"/><circle cx="14" cy="14" r="3" fill="#5865F2"/><circle cx="30" cy="28" r="2" fill="#5865F2"/></svg>`,
+  },
 ]
 
 // 统计数据
@@ -530,10 +542,17 @@ $text-muted: #80848E;
   justify-content: center;
   position: relative;
   transition: all 0.2s;
+
+  &--normal { background: #E8F0FE; }
+  &--satellite { background: #1A2332; }
+  &--satellite-road { background: #1A2332; }
+  &--dark { background: #0C0C1D; }
 }
 
-.layer-thumb-icon {
-  font-size: 28px;
+.layer-thumb-svg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .layer-thumb-label {
