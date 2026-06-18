@@ -4,7 +4,7 @@
     <view class="header">
       <view class="header-top">
         <view class="header-logo">
-          <view class="logo-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></view>
+          <view class="logo-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></view>
           <view>
             <text class="header-title">我的</text>
             <text class="header-subtitle">个人中心</text>
@@ -12,7 +12,7 @@
         </view>
         <view class="header-actions">
           <view class="header-btn" @tap="goSettings">
-            <text class="icon-text">⚙️</text>
+            <wd-icon name="settings" size="18px" color="#80848E" />
           </view>
         </view>
       </view>
@@ -47,7 +47,7 @@
         <wd-cell v-for="item in menuItems1" :key="item.text" :title="item.text" is-link @click="onMenuTap(item)">
           <template #icon>
             <view class="profile-menu-icon" :class="'profile-menu-icon--' + item.color">
-              <view v-html="menuIcons[item.icon]" />
+              <wd-icon :name="item.icon" size="18px" :color="item.iconColor" />
             </view>
           </template>
         </wd-cell>
@@ -58,7 +58,7 @@
         <wd-cell v-for="item in menuItems2" :key="item.text" :title="item.text" is-link @click="onMenuTap(item)">
           <template #icon>
             <view class="profile-menu-icon" :class="'profile-menu-icon--' + item.color">
-              <view v-html="menuIcons[item.icon]" />
+              <wd-icon :name="item.icon" size="18px" :color="item.iconColor" />
             </view>
           </template>
         </wd-cell>
@@ -77,33 +77,22 @@ import { computed } from 'vue'
 import { useUserStore } from '@/stores/user'
 import WotTabBar from '@/components/WotTabBar.vue'
 
-
 const userStore = useUserStore()
 
 const nickname = computed(() => userStore.userInfo?.nickname || '钓鱼达人')
 const userInitial = computed(() => nickname.value?.charAt(0) || 'U')
 
-const menuIcons: Record<string, string> = {
-  camera: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
-  heart: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
-  pin: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
-  chart: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
-  settings: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
-  feedback: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
-  info: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
-}
-
 const menuItems1 = [
-  { icon: 'camera', text: '我的渔获', color: 'blue' },
-  { icon: 'heart', text: '我的收藏', color: 'green' },
-  { icon: 'pin', text: '常去钓点', color: 'orange' },
-  { icon: 'chart', text: '钓鱼统计', color: 'blue' },
+  { icon: 'image', text: '我的渔获', color: 'blue', iconColor: '#5865F2' },
+  { icon: 'heart', text: '我的收藏', color: 'green', iconColor: '#23A559' },
+  { icon: 'location', text: '常去钓点', color: 'orange', iconColor: '#F0B232' },
+  { icon: 'time-line', text: '钓鱼统计', color: 'blue', iconColor: '#5865F2' },
 ]
 
 const menuItems2 = [
-  { icon: 'settings', text: '设置', color: 'blue' },
-  { icon: 'feedback', text: '意见反馈', color: 'orange' },
-  { icon: 'info', text: '关于我们', color: 'green' },
+  { icon: 'settings', text: '设置', color: 'blue', iconColor: '#5865F2' },
+  { icon: 'message', text: '意见反馈', color: 'orange', iconColor: '#F0B232' },
+  { icon: 'info-circle', text: '关于我们', color: 'green', iconColor: '#23A559' },
 ]
 
 function goSettings() {
