@@ -24,7 +24,7 @@
     <!-- Content -->
     <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
       <!-- Map -->
-      <view class="map-wrap">
+      <view class="map-wrap" @tap="onMapTap">
         <MapView
           :latitude="userLat"
           :longitude="userLng"
@@ -141,9 +141,9 @@ async function initLocation() {
   }
 }
 
-// 点击地图
+// 点击地图区域 → 进入探索内页
 function onMapTap() {
-  uni.showToast({ title: '地图功能开发中', icon: 'none' })
+  uni.navigateTo({ url: '/pages/map/explore' })
 }
 
 // 标签切换
