@@ -23,10 +23,10 @@
       </swiper>
       <!-- 浮层按钮 -->
       <view class="detail-back" @tap="goBack">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </view>
       <view class="detail-share-btn" @tap="onShare">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       </view>
       <view class="banner-count">
         <text>{{ currentImgIndex + 1 }}/{{ bannerImages.length }}</text>
@@ -569,21 +569,23 @@ $text-muted: #80848E;
   position: absolute; top: 0; left: 16px;
   margin-top: env(safe-area-inset-top);
   width: 40px; height: 40px;
-  background: rgba(255,255,255,0.92);
+  background: rgba($brand, 0.85);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   z-index: 10; cursor: pointer;
+  margin-top: calc(env(safe-area-inset-top) + 8px);
 }
 .detail-share-btn {
   position: absolute; top: 0; right: 16px;
   margin-top: env(safe-area-inset-top);
   width: 40px; height: 40px;
-  background: rgba(255,255,255,0.92);
+  background: rgba($brand, 0.85);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   z-index: 10; cursor: pointer;
+  margin-top: calc(env(safe-area-inset-top) + 8px);
 }
 
 /* ===== 内容区 ===== */
