@@ -2,7 +2,7 @@
   <view class="page-detail">
     <!-- 轮播图头部 -->
     <view class="detail-banner">
-      <swiper 
+      <swiper
         class="banner-swiper"
         :indicator-dots="true"
         indicator-color="rgba(255,255,255,0.4)"
@@ -36,34 +36,61 @@
     <!-- 内容卡片 -->
     <view class="detail-content">
       <scroll-view scroll-y class="detail-scroll" :enhanced="true" :show-scrollbar="false">
-        
-        <!-- 基本信息 -->
+
+        <!-- 名称 + 标签行 -->
         <view class="info-card">
-          <view class="info-header">
-            <view class="info-title-row">
-              <text class="spot-name">{{ spot?.name || '加载中...' }}</text>
-              <view class="spot-rating" v-if="spot?.rating">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="#F0B232" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <text class="rating-num">{{ spot.rating }}</text>
-                <text class="rating-count">({{ spot.review_count }}条评价)</text>
+          <view class="info-name-row">
+            <text class="spot-name">{{ spot?.name || '加载中...' }}</text>
+            <view class="tag-badges">
+              <view class="type-badge" v-if="spot?.type">
+                <text>{{ typeLabel(spot?.type) }}</text>
               </view>
-            </view>
-            <text class="spot-addr" v-if="spot?.address">📍 {{ spot.address }}</text>
-            <view class="spot-badges">
-              <view class="badge-item">
-                <text class="badge-icon">🗺️</text>
-                <text class="badge-text">{{ typeLabel(spot?.type) }}</text>
+              <view class="tag-badge tag-badge--green" v-if="!spot?.is_paid">
+                <text>免费</text>
               </view>
-              <view class="badge-item">
-                <text class="badge-icon">💰</text>
-                <text class="badge-text">{{ spot?.is_paid ? '收费' : '免费' }}</text>
-              </view>
-              <view class="badge-item" v-if="spot?.is_pit">
-                <text class="badge-icon">🎯</text>
-                <text class="badge-text">黑坑</text>
+              <view class="tag-badge tag-badge--orange" v-if="spot?.is_pit">
+                <text>黑坑</text>
               </view>
             </view>
           </view>
+
+          <!-- 评分行 -->
+          <view class="rating-row" v-if="spot?.rating">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="#F0B232" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <text class="rating-num">{{ spot.rating }}</text>
+            <view class="rating-stars">
+              <svg v-for="i in 5" :key="i" viewBox="0 0 24 24" width="14" height="14" fill="#F0B232" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </view>
+            <text class="rating-count">{{ spot.review_count }}条评价</text>
+          </view>
+
+          <!-- 地址卡片 -->
+          <view class="address-card" @tap="onNavigate">
+            <view class="address-left">
+              <text class="address-pin">📍</text>
+              <view class="address-text-wrap">
+                <text class="address-dist">{{ getDistance() }}</text>
+                <text class="address-text">{{ spot?.address }}</text>
+              </view>
+            </view>
+            <view class="address-link">
+              <text class="address-link-text">查看地图</text>
+            </view>
+          </view>
+
+          <!-- 最近渔获照片 -->
+          <scroll-view scroll-x class="recent-photos-scroll" :show-scrollbar="false">
+            <view class="recent-photos-row">
+              <view v-for="(p, i) in recentPhotos" :key="i" class="recent-photo-item">
+                <view class="recent-photo" :style="{ background: p.bg }">
+                  <text class="recent-photo-emoji">{{ p.emoji }}</text>
+                  <view class="recent-photo-badge" v-if="i < 2">
+                    <text>最新</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </scroll-view>
         </view>
 
         <!-- 数据统计 -->
@@ -84,106 +111,98 @@
           </view>
         </view>
 
-        <!-- 地图预览（静态图，秒加载） -->
-        <view class="section-card" v-if="spot?.lat && spot?.lng">
-          <view class="section-header">
-            <text class="section-title">钓点位置</text>
-            <text class="section-more" @tap="onNavigate">导航 ></text>
-          </view>
-          <view class="map-preview" @tap="onNavigate">
-            <image 
-              :src="staticMapUrl" 
-              mode="aspectFill" 
-              class="map-preview-img"
-              :show-menu-by-longpress="true"
-            />
-            <view class="map-preview-overlay">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-              <text class="map-preview-text">点击导航</text>
-            </view>
+        <!-- 会员黄条 -->
+        <view class="member-banner">
+          <text class="member-banner-text">{{ memberCount }}位钓友常来 · 会员可看</text>
+          <view class="member-banner-btn">
+            <text>了解会员</text>
           </view>
         </view>
 
-        <!-- 常见鱼种 -->
-        <view class="section-card" v-if="spot?.fish_types?.length">
-          <text class="section-title">常见鱼种</text>
-          <view class="fish-tags">
-            <view v-for="f in spot.fish_types" :key="f" class="fish-tag-item">
-              <text>{{ getFishEmoji(f) }} {{ f }}</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 钓点介绍 -->
-        <view class="section-card" v-if="spot?.description">
-          <text class="section-title">钓点介绍</text>
-          <text class="desc-text">{{ spot.description }}</text>
-        </view>
-
-        <!-- 标签 -->
-        <view class="section-card" v-if="spot?.tags?.length">
-          <text class="section-title">特色标签</text>
-          <view class="fish-tags">
-            <view v-for="t in spot.tags" :key="t" class="tag-item">
-              <text>{{ t }}</text>
-            </view>
-          </view>
-        </view>
-
-        <!-- 交通信息 -->
+        <!-- 天气与鱼情 -->
         <view class="section-card">
-          <text class="section-title">交通指南</text>
-          <view class="traffic-item">
-            <view class="traffic-icon traffic-icon--car">🚗</view>
-            <view class="traffic-info">
-              <text class="traffic-label">驾车导航</text>
-              <text class="traffic-desc">距您{{ getDistance() }}，约{{ estimateTime() }}到达</text>
+          <text class="section-title">天气与鱼情</text>
+          <view class="weather-grid">
+            <view class="weather-item">
+              <text class="weather-icon">🌡️</text>
+              <text class="weather-val">{{ weatherData.temp }}</text>
+              <text class="weather-label">{{ weatherData.tempLabel }}</text>
+            </view>
+            <view class="weather-item">
+              <text class="weather-icon">☀️</text>
+              <text class="weather-val">{{ weatherData.condition }}</text>
+              <text class="weather-label">天气</text>
+            </view>
+            <view class="weather-item">
+              <text class="weather-icon">🌬️</text>
+              <text class="weather-val">{{ weatherData.wind }}</text>
+              <text class="weather-label">风力</text>
+            </view>
+            <view class="weather-item">
+              <text class="weather-icon">📊</text>
+              <text class="weather-val">{{ weatherData.pressure }}</text>
+              <text class="weather-label">气压</text>
             </view>
           </view>
-          <view class="traffic-item" v-if="spot?.type !== 'sea'">
-            <view class="traffic-icon traffic-icon--park">🅿️</view>
-            <view class="traffic-info">
-              <text class="traffic-label">停车信息</text>
-              <text class="traffic-desc">{{ spot?.is_pit ? '有停车场（钓场内）' : '路边可停车' }}</text>
-            </view>
+          <view class="weather-forecast-link">
+            <text>查看7天预报 ></text>
           </view>
-          <view class="traffic-item" v-if="spot?.is_pit">
-            <view class="traffic-icon traffic-icon--food">🍜</view>
-            <view class="traffic-info">
-              <text class="traffic-label">配套服务</text>
-              <text class="traffic-desc">提供午饭、装备租赁、夜钓服务</text>
-            </view>
-          </view>
-        </view>
 
-        <!-- 最佳时段 -->
-        <view class="section-card">
-          <text class="section-title">最佳钓鱼时段</text>
-          <view class="time-grid">
-            <view v-for="slot in bestTimeSlots" :key="slot.label" class="time-slot" :class="{ 'time-slot--active': slot.active }">
-              <text class="time-icon">{{ slot.icon }}</text>
-              <text class="time-label">{{ slot.label }}</text>
-              <text class="time-desc">{{ slot.desc }}</text>
-            </view>
+          <!-- 今日鱼口指数 -->
+          <view class="fish-index-header">
+            <text class="fish-index-title">今日鱼口指数</text>
           </view>
-        </view>
-
-        <!-- 最近渔获 -->
-        <view class="section-card">
-          <view class="section-header">
-            <text class="section-title">最近渔获</text>
-            <text class="section-more">查看全部 ></text>
-          </view>
-          <view class="catch-list">
-            <view v-for="c in recentCatches" :key="c.id" class="catch-item" @tap="onCatchTap(c)">
-              <view class="catch-avatar" :style="{ background: c.bg }">
-                <text>{{ c.emoji }}</text>
+          <view class="fish-index-bars">
+            <view v-for="(val, idx) in fishIndexData" :key="idx" class="fish-bar-col">
+              <view class="fish-bar-track">
+                <view class="fish-bar-fill" :style="{ height: val + '%', background: getBarColor(val) }" />
               </view>
-              <view class="catch-info">
-                <text class="catch-fish">{{ c.fish }}</text>
-                <text class="catch-user">{{ c.user }} · {{ c.time }}</text>
+              <text class="fish-bar-label" v-if="idx % 3 === 0">{{ idx }}时</text>
+              <text class="fish-bar-label" v-else></text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 最近这水域钓什么 -->
+        <view class="section-card">
+          <text class="section-title">最近这水域钓什么</text>
+          <scroll-view scroll-x class="filter-tabs-scroll" :show-scrollbar="false">
+            <view class="filter-tabs">
+              <view v-for="(tab, i) in filterTabs" :key="i" class="filter-tab" :class="{ 'filter-tab--active': activeFilter === i }" @tap="activeFilter = i">
+                <text :class="activeFilter === i ? 'filter-tab-text--active' : 'filter-tab-text'">{{ tab }}</text>
               </view>
-              <view class="catch-weight">{{ c.weight }}</view>
+            </view>
+          </scroll-view>
+        </view>
+
+        <!-- 渔获动态 Feed -->
+        <view class="feed-section">
+          <view v-for="feed in feedData" :key="feed.id" class="feed-item">
+            <!-- 头部：头像+用户名+等级 -->
+            <view class="feed-header">
+              <view class="feed-avatar" :style="{ background: feed.avatarBg }">
+                <text class="feed-avatar-emoji">{{ feed.avatarEmoji }}</text>
+              </view>
+              <view class="feed-user-info">
+                <text class="feed-username">{{ feed.username }}</text>
+                <text class="feed-meta">Lv.{{ feed.level }} · {{ feed.city }} · {{ feed.daysAgo }}天前</text>
+              </view>
+            </view>
+            <!-- 文字内容 -->
+            <text class="feed-text">{{ feed.text }}</text>
+            <!-- 大图 -->
+            <view class="feed-image" :style="{ background: feed.imageBg }">
+              <text class="feed-image-emoji">{{ feed.imageEmoji }}</text>
+            </view>
+            <!-- 底部互动栏 -->
+            <view class="feed-bottom">
+              <view class="feed-actions">
+                <text class="feed-action">👍 {{ feed.likes }}</text>
+                <text class="feed-action">💬 {{ feed.comments }}</text>
+              </view>
+              <view class="feed-fish-tag">
+                <text class="feed-fish-tag-text">{{ feed.fishTag }}</text>
+              </view>
             </view>
           </view>
         </view>
@@ -194,7 +213,13 @@
             <text class="section-title">钓友评价</text>
             <text class="section-more">全部 {{ spot?.review_count || 0 }}条 ></text>
           </view>
-          <view class="comment-list">
+          <view v-if="comments.length === 0" class="empty-reviews">
+            <text class="empty-text">还没人留下评价</text>
+            <view class="write-review-btn" @tap="onWriteReview">
+              <text class="write-review-text">写评价</text>
+            </view>
+          </view>
+          <view class="comment-list" v-else>
             <view v-for="c in comments" :key="c.id" class="comment-item">
               <view class="comment-header">
                 <view class="comment-avatar" :style="{ background: c.bg }">
@@ -202,7 +227,7 @@
                 </view>
                 <view class="comment-meta">
                   <text class="comment-name">{{ c.name }}</text>
-                  <text class="comment-time">{{ c.time }}</text>
+                  <text class="comment-time">Lv.{{ c.level }} · {{ c.city }} · {{ c.time }}</text>
                 </view>
                 <view class="comment-stars">
                   <svg v-for="i in c.stars" :key="i" viewBox="0 0 24 24" width="12" height="12" fill="#F0B232" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -240,17 +265,21 @@
 
       <!-- 底部操作栏 -->
       <view class="detail-bottom-bar">
-        <view class="bar-btn bar-btn--icon" @tap="onCheckIn">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#5865F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          <text class="bar-btn-text">打卡</text>
+        <view class="bar-icon-btn" @tap="onCollect">
+          <text class="bar-icon-emoji">⭐</text>
+          <text class="bar-icon-label" :class="{ 'bar-icon-label--active': collected }">收藏</text>
         </view>
-        <view class="bar-btn bar-btn--icon" @tap="onCollect">
-          <svg viewBox="0 0 24 24" width="20" height="20" :fill="collected ? '#ED4245' : 'none'" :stroke="collected ? '#ED4245' : '#5865F2'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          <text class="bar-btn-text" :class="{ 'bar-btn-text--red': collected }">收藏</text>
+        <view class="bar-icon-btn" @tap="onWriteReview">
+          <text class="bar-icon-emoji">💬</text>
+          <text class="bar-icon-label">评价</text>
         </view>
-        <view class="bar-btn bar-btn--nav" @tap="onNavigate">
+        <view class="bar-icon-btn" @tap="onCheckIn">
+          <text class="bar-icon-emoji">📷</text>
+          <text class="bar-icon-label">晒渔获</text>
+        </view>
+        <view class="bar-nav-btn" @tap="onNavigate">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-          <text class="bar-btn-nav-text">导航到这里</text>
+          <text class="bar-nav-text">导航前往</text>
         </view>
       </view>
     </view>
@@ -277,46 +306,107 @@ const bannerImages = ref([
   { emoji: '⛰️', bg: 'linear-gradient(135deg, #E0F7FA 0%, #4DD0E1 50%, #B2EBF2 100%)', tag: '' },
 ])
 
-// 静态地图（秒加载，不需要JS SDK）
+// 静态地图
 const staticMapUrl = computed(() => {
   if (!spot.value?.lat || !spot.value?.lng) return ''
   const lng = spot.value.lng
   const lat = spot.value.lat
-  // 高德静态图API：marker + size 320x180
   return `https://restapi.amap.com/v3/staticmap?location=${lng},${lat}&zoom=15&size=600*300&markers=mid,0xFF0000,A:${lng},${lat}&key=7720afe7008d2bf80f6608d8751f3652`
 })
 
-// 最佳时段
-const bestTimeSlots = ref([
-  { icon: '🌅', label: '清晨', desc: '6:00-9:00', active: true },
-  { icon: '☀️', label: '上午', desc: '9:00-12:00', active: false },
-  { icon: '🌇', label: '傍晚', desc: '16:00-19:00', active: true },
-  { icon: '🌙', label: '夜间', desc: '20:00-23:00', active: false },
+// 会员人数
+const memberCount = ref(128)
+
+// 天气数据
+const weatherData = ref({
+  temp: '33.5°C',
+  tempLabel: '温度',
+  condition: '晴',
+  wind: '西南风3级',
+  pressure: '1003.6',
+})
+
+// 鱼口指数 24小时数据
+const fishIndexData = ref([
+  15, 10, 8, 5, 3, 12, 35, 65, 82, 90, 78, 55,
+  45, 40, 50, 62, 85, 92, 88, 72, 55, 38, 25, 18
 ])
 
-// Mock 渔获数据
-const recentCatches = ref([
-  { id: '1', fish: '3.2斤 鲫鱼', weight: '3.2斤', user: '李钓友', time: '2小时前', emoji: '🐟', bg: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)' },
-  { id: '2', fish: '5.6斤 草鱼', weight: '5.6斤', user: '张大师', time: '5小时前', emoji: '🐠', bg: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)' },
-  { id: '3', fish: '2.1斤 鲤鱼', weight: '2.1斤', user: '老王', time: '昨天', emoji: '🐟', bg: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)' },
-  { id: '4', fish: '8.3斤 青鱼', weight: '8.3斤', user: '钓鱼郎', time: '2天前', emoji: '🎣', bg: 'linear-gradient(135deg, #FCE4EC 0%, #F8BBD0 100%)' },
-  { id: '5', fish: '1.8斤 鳊鱼', weight: '1.8斤', user: '新手小白', time: '3天前', emoji: '🐟', bg: 'linear-gradient(135deg, #E0F7FA 0%, #B2EBF2 100%)' },
+// 滤筛 tabs
+const filterTabs = ref(['最新发布', '最多点赞', '只看大物', '全部鱼种 ▼'])
+const activeFilter = ref(0)
+
+// 最近渔获照片
+const recentPhotos = ref([
+  { emoji: '🐟', bg: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)' },
+  { emoji: '🐠', bg: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)' },
+  { emoji: '🎣', bg: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)' },
+  { emoji: '🐟', bg: 'linear-gradient(135deg, #FCE4EC 0%, #F8BBD0 100%)' },
+])
+
+// 渔获动态 Feed
+const feedData = ref([
+  {
+    id: 'f1',
+    avatarEmoji: '🎣',
+    avatarBg: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
+    username: '钓鱼郎',
+    level: 3,
+    city: '杭州',
+    daysAgo: 1,
+    text: '今天大丰收！连杆了好几条鲫鱼，最大的有3斤多，用蚯蚓+蓝鲫打窝，效果绝佳 🎉',
+    imageBg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    imageEmoji: '🐟',
+    likes: 42,
+    comments: 8,
+    fishTag: '鲫鱼 3尾 2.5公斤',
+  },
+  {
+    id: 'f2',
+    avatarEmoji: '🐟',
+    avatarBg: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)',
+    username: '新手小白',
+    level: 1,
+    city: '宁波',
+    daysAgo: 2,
+    text: '第一次来这个钓点，环境真不错，虽然只钓了一条但很开心 😄',
+    imageBg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    imageEmoji: '🐠',
+    likes: 15,
+    comments: 3,
+    fishTag: '鲫鱼 1尾 0.5公斤',
+  },
+  {
+    id: 'f3',
+    avatarEmoji: '🐠',
+    avatarBg: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)',
+    username: '张大师',
+    level: 5,
+    city: '温州',
+    daysAgo: 3,
+    text: '今天来试试新买的鱼竿，手感不错。收获一般般，但胜在风景好 🌅',
+    imageBg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    imageEmoji: '🎣',
+    likes: 28,
+    comments: 5,
+    fishTag: '鲤鱼 2尾 1.8公斤',
+  },
 ])
 
 // Mock 评论数据
 const comments = ref([
-  { 
-    id: '1', avatar: '🎣', name: '钓鱼郎', time: '3天前', stars: 5, bg: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
+  {
+    id: '1', avatar: '🎣', name: '钓鱼郎', level: 3, city: '杭州', time: '3天前', stars: 5, bg: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
     text: '鱼口很好，连杆了好几条鲫鱼！水质清澈，环境不错。周末人会多一些，建议工作日去。用蚯蚓钓效果最佳，蓝鲫打窝。',
     images: ['linear-gradient(135deg, #E8F5E9 0%, #81C784 100%)', 'linear-gradient(135deg, #E3F2FD 0%, #64B5F6 100%)'],
   },
-  { 
-    id: '2', avatar: '🐟', name: '新手小白', time: '1周前', stars: 4, bg: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)',
+  {
+    id: '2', avatar: '🐟', name: '新手小白', level: 1, city: '宁波', time: '1周前', stars: 4, bg: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)',
     text: '第一次来，钓到了2条鲫鱼，很开心。老板很热情，还教了我调漂。停车方便，就是蚊子有点多，记得带驱蚊水。',
     images: [],
   },
-  { 
-    id: '3', avatar: '🐠', name: '老王', time: '2周前', stars: 5, bg: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)',
+  {
+    id: '3', avatar: '🐠', name: '老王', level: 4, city: '嘉兴', time: '2周前', stars: 5, bg: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)',
     text: '钓了十年的老钓位了，每次来都有收获。大物池有10斤以上的青鱼，不过需要碰运气。推荐用玉米打窝，蚯蚓挂钩。',
     images: ['linear-gradient(135deg, #FFF3E0 0%, #FFB74D 100%)'],
   },
@@ -372,6 +462,13 @@ function onSwiperChange(e: any) {
   currentImgIndex.value = e.detail.current
 }
 
+function getBarColor(val: number): string {
+  if (val >= 80) return 'linear-gradient(to top, #FFB300, #FF8F00)'
+  if (val >= 60) return 'linear-gradient(to top, #FFC107, #FFB300)'
+  if (val >= 40) return 'linear-gradient(to top, #FFD54F, #FFC107)'
+  return 'linear-gradient(to top, #FFE082, #FFD54F)'
+}
+
 function goBack() { uni.navigateBack() }
 
 function onNavigate() {
@@ -413,6 +510,10 @@ function onCatchTap(c: any) {
 function onNearbyTap(n: any) {
   uni.redirectTo({ url: `/pages/map/detail?id=${n.id}` })
 }
+
+function onWriteReview() {
+  uni.showToast({ title: '评价功能开发中', icon: 'none' })
+}
 </script>
 
 <style scoped lang="scss">
@@ -435,8 +536,10 @@ $text-muted: #80848E;
 /* ===== Banner ===== */
 .detail-banner {
   width: 100%;
-  height: 300px;
+  height: 280px;
   position: relative;
+  border-radius: 0 0 20px 20px;
+  overflow: hidden;
 }
 .banner-swiper { width: 100%; height: 100%; }
 .banner-item {
@@ -486,12 +589,12 @@ $text-muted: #80848E;
 /* ===== 内容区 ===== */
 .detail-content {
   position: absolute;
-  top: 270px; left: 0; right: 0; bottom: 0;
+  top: 250px; left: 0; right: 0; bottom: 0;
   background: $bg-page;
   border-radius: 16px 16px 0 0;
   z-index: 20;
 }
-.detail-scroll { height: 100%; padding: 16px 12px; }
+.detail-scroll { height: 100%; padding: 12px 12px 0; }
 
 /* ===== 信息卡 ===== */
 .info-card {
@@ -500,31 +603,108 @@ $text-muted: #80848E;
   padding: 16px;
   margin-bottom: 10px;
 }
-.info-title-row {
-  display: flex; align-items: center; gap: 8px;
+.info-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 .spot-name {
-  font-size: 20px; font-weight: 700; color: $text-primary;
+  font-size: 18px; font-weight: 700; color: $text-primary;
 }
-.spot-rating {
-  display: flex; align-items: center; gap: 3px;
+.tag-badges {
+  display: flex; gap: 6px;
+}
+.type-badge {
+  padding: 2px 8px;
+  background: rgba($brand, 0.1);
+  border-radius: 6px;
+  font-size: 11px; color: $brand; font-weight: 600;
+}
+.tag-badge {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px; font-weight: 600;
+  &--green {
+    background: rgba(#23A559, 0.1);
+    color: #23A559;
+  }
+  &--orange {
+    background: rgba(#F0B232, 0.1);
+    color: #E67E22;
+  }
+}
+
+/* ===== 评分行 ===== */
+.rating-row {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 8px;
+}
+.rating-num {
+  font-size: 16px; font-weight: 700; color: #F0B232;
+}
+.rating-stars {
+  display: flex; gap: 1px;
+}
+.rating-count {
+  font-size: 12px; color: $text-muted; margin-left: 4px;
+}
+
+/* ===== 地址卡片 ===== */
+.address-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: $bg-page;
+  border-radius: 10px;
+}
+.address-left {
+  display: flex; align-items: center; gap: 8px; flex: 1;
+  min-width: 0;
+}
+.address-pin { font-size: 16px; flex-shrink: 0; }
+.address-text-wrap { min-width: 0; }
+.address-dist {
+  font-size: 12px; color: $brand; font-weight: 600;
+  display: block;
+}
+.address-text {
+  font-size: 13px; color: $text-secondary;
+  display: block; margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.address-link { flex-shrink: 0; margin-left: 8px; }
+.address-link-text {
+  font-size: 13px; color: $brand; font-weight: 500;
+}
+
+/* ===== 最近渔获照片 ===== */
+.recent-photos-scroll {
+  margin-top: 12px;
+}
+.recent-photos-row {
+  display: flex; gap: 8px;
+}
+.recent-photo-item {
   flex-shrink: 0;
 }
-.rating-num { font-size: 14px; font-weight: 700; color: #F0B232; }
-.rating-count { font-size: 12px; color: $text-muted; }
-.spot-addr {
-  font-size: 13px; color: $text-secondary;
-  margin-top: 6px; display: block;
+.recent-photo {
+  width: 80px; height: 80px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
-.spot-badges { display: flex; gap: 8px; margin-top: 10px; }
-.badge-item {
-  display: flex; align-items: center; gap: 4px;
-  padding: 4px 10px;
-  background: $bg-page;
-  border-radius: 8px;
+.recent-photo-emoji { font-size: 36px; }
+.recent-photo-badge {
+  position: absolute; top: 4px; left: 4px;
+  padding: 2px 6px;
+  background: rgba($brand, 0.85);
+  border-radius: 4px;
+  font-size: 10px; color: #fff; font-weight: 600;
 }
-.badge-icon { font-size: 14px; }
-.badge-text { font-size: 12px; color: $text-secondary; font-weight: 500; }
 
 /* ===== 统计卡 ===== */
 .stat-card {
@@ -547,25 +727,24 @@ $text-muted: #80848E;
   width: 1px; height: 30px; background: $divider;
 }
 
-/* ===== 地图预览（静态图） ===== */
-.map-preview {
-  margin-top: 10px;
-  border-radius: 10px;
-  overflow: hidden;
-  position: relative;
+/* ===== 会员黄条 ===== */
+.member-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%);
+  border-radius: 12px;
 }
-.map-preview-img {
-  width: 100%; height: 150px; display: block;
+.member-banner-text {
+  font-size: 13px; font-weight: 600; color: #E65100;
 }
-.map-preview-overlay {
-  position: absolute; bottom: 8px; right: 8px;
-  display: flex; align-items: center; gap: 4px;
-  padding: 5px 12px;
-  background: rgba(0,0,0,0.55);
+.member-banner-btn {
+  padding: 4px 12px;
+  background: rgba(230, 81, 0, 0.1);
   border-radius: 14px;
-}
-.map-preview-text {
-  font-size: 12px; color: #fff;
+  font-size: 12px; color: #E65100; font-weight: 600;
 }
 
 /* ===== 通用 Section ===== */
@@ -587,77 +766,154 @@ $text-muted: #80848E;
   font-size: 13px; color: $brand; font-weight: 500; cursor: pointer;
 }
 
-/* ===== 鱼种标签 ===== */
-.fish-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-.fish-tag-item {
-  padding: 6px 14px;
-  background: $bg-page;
-  border-radius: 20px;
-  font-size: 13px; color: $text-secondary;
+/* ===== 天气与鱼情 ===== */
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
 }
-.tag-item {
-  padding: 4px 12px;
-  background: rgba($brand, 0.08);
-  border-radius: 12px;
-  font-size: 12px; color: $brand; font-weight: 500;
-}
-
-/* ===== 描述 ===== */
-.desc-text {
-  font-size: 14px; line-height: 1.7;
-  color: $text-secondary;
-}
-
-/* ===== 交通 ===== */
-.traffic-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid $bg-page;
-  &:last-child { border-bottom: none; }
-}
-.traffic-icon {
-  width: 36px; height: 36px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  &--car { background: rgba($brand, 0.1); }
-  &--park { background: rgba(#23A559, 0.1); }
-  &--food { background: rgba(#F0B232, 0.1); }
-}
-.traffic-label { font-size: 14px; font-weight: 600; color: $text-primary; display: block; }
-.traffic-desc { font-size: 12px; color: $text-muted; display: block; margin-top: 2px; }
-
-/* ===== 最佳时段 ===== */
-.time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.time-slot {
+.weather-item {
   display: flex; flex-direction: column; align-items: center;
   padding: 10px 4px;
-  border-radius: 10px;
   background: $bg-page;
-  &--active { background: rgba($brand, 0.08); }
+  border-radius: 10px;
 }
-.time-icon { font-size: 20px; margin-bottom: 4px; }
-.time-label { font-size: 13px; font-weight: 600; color: $text-primary; }
-.time-desc { font-size: 11px; color: $text-muted; margin-top: 2px; }
+.weather-icon { font-size: 20px; margin-bottom: 4px; }
+.weather-val {
+  font-size: 14px; font-weight: 700; color: $text-primary;
+}
+.weather-label {
+  font-size: 11px; color: $text-muted; margin-top: 2px;
+}
+.weather-forecast-link {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 13px; color: $brand; font-weight: 500;
+}
 
-/* ===== 渔获列表 ===== */
-.catch-list { margin-top: 8px; }
-.catch-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid $bg-page;
-  &:last-child { border-bottom: none; }
-  cursor: pointer;
+/* ===== 鱼口指数 ===== */
+.fish-index-header {
+  margin-top: 16px;
 }
-.catch-avatar {
-  width: 44px; height: 44px; border-radius: 10px;
+.fish-index-title {
+  font-size: 14px; font-weight: 600; color: $text-primary;
+}
+.fish-index-bars {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 80px;
+  margin-top: 10px;
+}
+.fish-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+.fish-bar-track {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  border-radius: 2px;
+}
+.fish-bar-fill {
+  width: 100%;
+  border-radius: 2px;
+  min-height: 2px;
+}
+.fish-bar-label {
+  font-size: 9px;
+  color: $text-muted;
+  margin-top: 3px;
+  text-align: center;
+}
+
+/* ===== 滤筛 Tabs ===== */
+.filter-tabs-scroll {
+  margin-top: 4px;
+}
+.filter-tabs {
+  display: flex; gap: 8px;
+}
+.filter-tab {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: $bg-page;
+  &--active {
+    background: $brand;
+  }
+}
+.filter-tab-text {
+  font-size: 13px; color: $text-secondary; font-weight: 500;
+}
+.filter-tab-text--active {
+  font-size: 13px; color: #fff; font-weight: 600;
+}
+
+/* ===== 渔获动态 Feed ===== */
+.feed-section {
+  margin-bottom: 10px;
+}
+.feed-item {
+  background: $bg-card;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 10px;
+}
+.feed-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+}
+.feed-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
+  flex-shrink: 0;
 }
-.catch-info { flex: 1; min-width: 0; }
-.catch-fish { font-size: 14px; font-weight: 600; color: $text-primary; display: block; }
-.catch-user { font-size: 12px; color: $text-muted; display: block; margin-top: 2px; }
-.catch-weight {
-  font-size: 14px; font-weight: 700; color: $brand; flex-shrink: 0;
+.feed-avatar-emoji { font-size: 20px; }
+.feed-user-info { flex: 1; min-width: 0; }
+.feed-username {
+  font-size: 14px; font-weight: 600; color: $text-primary;
+  display: block;
+}
+.feed-meta {
+  font-size: 12px; color: $text-muted;
+  display: block; margin-top: 2px;
+}
+.feed-text {
+  font-size: 14px; line-height: 1.6;
+  color: $text-secondary;
+  margin-bottom: 10px;
+  display: block;
+}
+.feed-image {
+  width: 100%; height: 180px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px;
+}
+.feed-image-emoji { font-size: 48px; }
+.feed-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.feed-actions {
+  display: flex; gap: 16px;
+}
+.feed-action {
+  font-size: 13px; color: $text-muted;
+}
+.feed-fish-tag {
+  padding: 4px 10px;
+  background: rgba($brand, 0.08);
+  border-radius: 8px;
+}
+.feed-fish-tag-text {
+  font-size: 12px; color: $brand; font-weight: 600;
 }
 
 /* ===== 评论 ===== */
@@ -691,6 +947,25 @@ $text-muted: #80848E;
 }
 .comment-img-emoji { font-size: 28px; }
 
+/* ===== 空评价 ===== */
+.empty-reviews {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 0;
+}
+.empty-text {
+  font-size: 14px; color: $text-muted; margin-bottom: 12px;
+}
+.write-review-btn {
+  padding: 8px 24px;
+  background: $brand;
+  border-radius: 20px;
+}
+.write-review-text {
+  font-size: 14px; color: #fff; font-weight: 600;
+}
+
 /* ===== 周边推荐 ===== */
 .nearby-scroll { margin-top: 8px; }
 .nearby-list { display: flex; gap: 10px; }
@@ -720,31 +995,36 @@ $text-muted: #80848E;
   background: $bg-card;
   border-top: 1px solid $divider;
   display: flex; align-items: center;
-  padding: 0 16px;
-  gap: 10px;
+  padding: 0 12px;
+  gap: 8px;
   padding-bottom: env(safe-area-inset-bottom);
   z-index: 30;
 }
-.bar-btn {
-  display: flex; align-items: center; gap: 4px;
-  padding: 10px 16px;
-  border-radius: 12px;
+.bar-icon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
   cursor: pointer;
 }
-.bar-btn--icon {
-  background: $bg-page;
+.bar-icon-emoji { font-size: 20px; }
+.bar-icon-label {
+  font-size: 10px; color: $text-muted; margin-top: 2px;
+  &--active { color: $brand; }
 }
-.bar-btn--nav {
+.bar-nav-btn {
   flex: 1;
-  background: $brand;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  padding: 12px 16px;
+  gap: 6px;
+  height: 44px;
+  background: $brand;
+  border-radius: 22px;
+  cursor: pointer;
 }
-.bar-btn-text {
-  font-size: 14px; font-weight: 500; color: $text-primary;
-  &--red { color: #ED4245; }
-}
-.bar-btn-nav-text {
+.bar-nav-text {
   font-size: 15px; font-weight: 600; color: #fff;
 }
 </style>
