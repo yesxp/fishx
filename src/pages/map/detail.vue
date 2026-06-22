@@ -3,12 +3,12 @@
     <!-- 轮播图头部 -->
     <view class="detail-banner">
       <swiper 
-        class="banner-swiper" 
-        :indicator-dots="true" 
-        indicator-color="rgba(255,255,255,0.4)" 
+        class="banner-swiper"
+        :indicator-dots="true"
+        indicator-color="rgba(255,255,255,0.4)"
         indicator-active-color="#FFFFFF"
-        :autoplay="true" 
-        :interval="4000" 
+        :autoplay="true"
+        :interval="4000"
         :circular="true"
         @change="onSwiperChange"
       >
@@ -28,7 +28,6 @@
       <view class="detail-share-btn" @tap="onShare">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       </view>
-      <!-- 图片计数 -->
       <view class="banner-count">
         <text>{{ currentImgIndex + 1 }}/{{ bannerImages.length }}</text>
       </view>
@@ -50,7 +49,6 @@
               </view>
             </view>
             <text class="spot-addr" v-if="spot?.address">📍 {{ spot.address }}</text>
-            <!-- 标签行 -->
             <view class="spot-badges">
               <view class="badge-item">
                 <text class="badge-icon">🗺️</text>
@@ -83,6 +81,26 @@
           <view class="stat-item">
             <text class="stat-num">{{ spot?.fish_types?.length || 0 }}</text>
             <text class="stat-label">鱼种</text>
+          </view>
+        </view>
+
+        <!-- 地图预览（静态图，秒加载） -->
+        <view class="section-card" v-if="spot?.lat && spot?.lng">
+          <view class="section-header">
+            <text class="section-title">钓点位置</text>
+            <text class="section-more" @tap="onNavigate">导航 ></text>
+          </view>
+          <view class="map-preview" @tap="onNavigate">
+            <image 
+              :src="staticMapUrl" 
+              mode="aspectFill" 
+              class="map-preview-img"
+              :show-menu-by-longpress="true"
+            />
+            <view class="map-preview-overlay">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              <text class="map-preview-text">点击导航</text>
+            </view>
           </view>
         </view>
 
@@ -192,7 +210,6 @@
                 </view>
               </view>
               <text class="comment-text">{{ c.text }}</text>
-              <!-- 评价图片 -->
               <view v-if="c.images?.length" class="comment-images">
                 <view v-for="(img, idx) in c.images" :key="idx" class="comment-img-item" :style="{ background: img }">
                   <text class="comment-img-emoji">🐟</text>
@@ -241,7 +258,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useSpotStore } from '@/stores/spot'
 import { calculateDistance, formatDistance } from '@/lib/amap'
@@ -259,6 +276,15 @@ const bannerImages = ref([
   { emoji: '🌅', bg: 'linear-gradient(135deg, #FCE4EC 0%, #F48FB1 50%, #F8BBD0 100%)', tag: '日落' },
   { emoji: '⛰️', bg: 'linear-gradient(135deg, #E0F7FA 0%, #4DD0E1 50%, #B2EBF2 100%)', tag: '' },
 ])
+
+// 静态地图（秒加载，不需要JS SDK）
+const staticMapUrl = computed(() => {
+  if (!spot.value?.lat || !spot.value?.lng) return ''
+  const lng = spot.value.lng
+  const lat = spot.value.lat
+  // 高德静态图API：marker + size 320x180
+  return `https://restapi.amap.com/v3/staticmap?location=${lng},${lat}&zoom=15&size=600*300&markers=mid,0xFF0000,A:${lng},${lat}&key=7720afe7008d2bf80f6608d8751f3652`
+})
 
 // 最佳时段
 const bestTimeSlots = ref([
@@ -298,13 +324,13 @@ const comments = ref([
 
 // 周边推荐 Mock
 const nearbySpots = ref([
-  { id: 'near_1', name: '老王钓场', emoji: '🐟', distance: '5.1km', bg: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)' },
-  { id: 'near_2', name: '千岛湖大坝', emoji: '⛰️', distance: '12km', bg: 'linear-gradient(135deg, #E0F7FA 0%, #B2EBF2 100%)' },
-  { id: 'near_3', name: '龙王塘路亚', emoji: '🎣', distance: '8.3km', bg: 'linear-gradient(135deg, #FCE4EC 0%, #F8BBD0 100%)' },
-  { id: 'near_4', name: '富春江钓场', emoji: '🏞️', distance: '15km', bg: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)' },
+  { id: 'mock_2', name: '老王钓场', emoji: '🐟', distance: '5.1km', bg: 'linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%)' },
+  { id: 'mock_3', name: '千岛湖大坝', emoji: '⛰️', distance: '12km', bg: 'linear-gradient(135deg, #E0F7FA 0%, #B2EBF2 100%)' },
+  { id: 'mock_4', name: '龙王塘路亚', emoji: '🎣', distance: '8.3km', bg: 'linear-gradient(135deg, #FCE4EC 0%, #F8BBD0 100%)' },
+  { id: 'mock_6', name: '富春江钓场', emoji: '🏞️', distance: '15km', bg: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)' },
 ])
 
-// 用户位置（用于距离计算）
+// 用户位置
 const userLat = ref(30.25)
 const userLng = ref(120.15)
 
@@ -385,7 +411,6 @@ function onCatchTap(c: any) {
 }
 
 function onNearbyTap(n: any) {
-  // 跳转到其他钓点详情
   uni.redirectTo({ url: `/pages/map/detail?id=${n.id}` })
 }
 </script>
@@ -407,95 +432,66 @@ $text-muted: #80848E;
   background: $bg-page;
 }
 
-/* ===== Banner 轮播图 ===== */
+/* ===== Banner ===== */
 .detail-banner {
   width: 100%;
   height: 300px;
   position: relative;
 }
-
-.banner-swiper {
-  width: 100%;
-  height: 100%;
-}
-
+.banner-swiper { width: 100%; height: 100%; }
 .banner-item {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
   position: relative;
 }
-
-.banner-emoji {
-  font-size: 80px;
-}
-
+.banner-emoji { font-size: 80px; }
 .banner-tag {
   position: absolute;
-  top: env(safe-area-inset-top);
-  right: 16px;
+  top: env(safe-area-inset-top); right: 16px;
   margin-top: 12px;
   padding: 4px 10px;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0,0,0,0.4);
   border-radius: 8px;
-  font-size: 11px;
-  color: #fff;
+  font-size: 11px; color: #fff;
 }
-
 .banner-count {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
+  position: absolute; bottom: 20px; left: 50%;
   transform: translateX(-50%);
   padding: 3px 12px;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0,0,0,0.35);
   border-radius: 12px;
-  font-size: 12px;
-  color: #fff;
+  font-size: 12px; color: #fff;
 }
-
 .detail-back {
-  position: absolute;
-  top: 0; left: 16px;
+  position: absolute; top: 0; left: 16px;
   margin-top: env(safe-area-inset-top);
   width: 40px; height: 40px;
   background: rgba(255,255,255,0.92);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  z-index: 10;
-  cursor: pointer;
+  z-index: 10; cursor: pointer;
 }
-
 .detail-share-btn {
-  position: absolute;
-  top: 0; right: 16px;
+  position: absolute; top: 0; right: 16px;
   margin-top: env(safe-area-inset-top);
   width: 40px; height: 40px;
   background: rgba(255,255,255,0.92);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  z-index: 10;
-  cursor: pointer;
+  z-index: 10; cursor: pointer;
 }
 
 /* ===== 内容区 ===== */
 .detail-content {
   position: absolute;
-  top: 270px;
-  left: 0; right: 0; bottom: 0;
+  top: 270px; left: 0; right: 0; bottom: 0;
   background: $bg-page;
   border-radius: 16px 16px 0 0;
   z-index: 20;
 }
-
-.detail-scroll {
-  height: 100%;
-  padding: 16px 12px;
-}
+.detail-scroll { height: 100%; padding: 16px 12px; }
 
 /* ===== 信息卡 ===== */
 .info-card {
@@ -504,367 +500,251 @@ $text-muted: #80848E;
   padding: 16px;
   margin-bottom: 10px;
 }
-
-.info-header { }
-
 .info-title-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 4px;
+  display: flex; align-items: center; gap: 8px;
 }
-
 .spot-name {
-  font-size: 20px;
-  font-weight: 700;
-  color: $text-primary;
-  flex: 1;
+  font-size: 20px; font-weight: 700; color: $text-primary;
 }
-
 .spot-rating {
-  display: flex;
-  align-items: center;
-  gap: 3px;
+  display: flex; align-items: center; gap: 3px;
   flex-shrink: 0;
 }
-
-.rating-num {
-  font-size: 14px;
-  font-weight: 700;
-  color: #F0B232;
-}
-
-.rating-count {
-  font-size: 12px;
-  color: $text-muted;
-}
-
+.rating-num { font-size: 14px; font-weight: 700; color: #F0B232; }
+.rating-count { font-size: 12px; color: $text-muted; }
 .spot-addr {
-  font-size: 13px;
-  color: $text-muted;
-  display: block;
-  margin-bottom: 12px;
+  font-size: 13px; color: $text-secondary;
+  margin-top: 6px; display: block;
 }
-
-.spot-badges {
-  display: flex;
-  gap: 16px;
-}
-
+.spot-badges { display: flex; gap: 8px; margin-top: 10px; }
 .badge-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px 10px;
+  background: $bg-page;
+  border-radius: 8px;
 }
-
 .badge-icon { font-size: 14px; }
-
-.badge-text {
-  font-size: 13px;
-  color: $text-secondary;
-  font-weight: 500;
-}
+.badge-text { font-size: 12px; color: $text-secondary; font-weight: 500; }
 
 /* ===== 统计卡 ===== */
 .stat-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
+  display: flex; align-items: center;
   background: $bg-card;
   border-radius: 12px;
-  padding: 16px;
+  padding: 16px 0;
   margin-bottom: 10px;
 }
-
 .stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
+  flex: 1; text-align: center; cursor: pointer;
 }
-
 .stat-num {
-  font-size: 22px;
-  font-weight: 700;
-  color: $brand;
+  font-size: 22px; font-weight: 700; color: $text-primary; display: block;
 }
-
 .stat-label {
-  font-size: 12px;
-  color: $text-muted;
+  font-size: 12px; color: $text-muted; display: block; margin-top: 2px;
 }
-
 .stat-divider {
-  width: 1px;
-  height: 28px;
-  background: $divider;
+  width: 1px; height: 30px; background: $divider;
 }
 
-/* ===== 通用区块 ===== */
+/* ===== 地图预览（静态图） ===== */
+.map-preview {
+  margin-top: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.map-preview-img {
+  width: 100%; height: 150px; display: block;
+}
+.map-preview-overlay {
+  position: absolute; bottom: 8px; right: 8px;
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px 12px;
+  background: rgba(0,0,0,0.55);
+  border-radius: 14px;
+}
+.map-preview-text {
+  font-size: 12px; color: #fff;
+}
+
+/* ===== 通用 Section ===== */
 .section-card {
   background: $bg-card;
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 10px;
 }
-
 .section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+  display: flex; justify-content: space-between; align-items: center;
 }
-
 .section-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: $text-primary;
-  display: block;
-  margin-bottom: 12px;
+  font-size: 16px; font-weight: 700; color: $text-primary;
+  display: block; margin-bottom: 12px;
 }
-
-.section-header .section-title {
-  margin-bottom: 0;
-}
-
+.section-header .section-title { margin-bottom: 0; }
 .section-more {
-  font-size: 13px;
-  color: $brand;
+  font-size: 13px; color: $brand; font-weight: 500; cursor: pointer;
 }
 
 /* ===== 鱼种标签 ===== */
-.fish-tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
+.fish-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .fish-tag-item {
   padding: 6px 14px;
-  background: rgba($brand, 0.08);
-  border-radius: 16px;
-  font-size: 13px;
-  color: $brand;
-  font-weight: 500;
-}
-
-.tag-item {
-  padding: 6px 14px;
   background: $bg-page;
-  border-radius: 16px;
-  font-size: 13px;
-  color: $text-secondary;
+  border-radius: 20px;
+  font-size: 13px; color: $text-secondary;
+}
+.tag-item {
+  padding: 4px 12px;
+  background: rgba($brand, 0.08);
+  border-radius: 12px;
+  font-size: 12px; color: $brand; font-weight: 500;
 }
 
-/* ===== 介绍 ===== */
+/* ===== 描述 ===== */
 .desc-text {
-  font-size: 14px;
+  font-size: 14px; line-height: 1.7;
   color: $text-secondary;
-  line-height: 1.6;
 }
 
-/* ===== 交通信息 ===== */
+/* ===== 交通 ===== */
 .traffic-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
   border-bottom: 1px solid $bg-page;
   &:last-child { border-bottom: none; }
 }
-
 .traffic-icon {
-  width: 40px; height: 40px;
-  border-radius: 10px;
+  width: 36px; height: 36px; border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 20px;
+  font-size: 18px;
   &--car { background: rgba($brand, 0.1); }
   &--park { background: rgba(#23A559, 0.1); }
   &--food { background: rgba(#F0B232, 0.1); }
 }
-
-.traffic-info { flex: 1; }
 .traffic-label { font-size: 14px; font-weight: 600; color: $text-primary; display: block; }
 .traffic-desc { font-size: 12px; color: $text-muted; display: block; margin-top: 2px; }
 
 /* ===== 最佳时段 ===== */
-.time-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-
+.time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .time-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 10px 0;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 10px 4px;
   border-radius: 10px;
   background: $bg-page;
-  transition: all 0.2s;
-
-  &--active {
-    background: rgba($brand, 0.1);
-    .time-label { color: $brand; font-weight: 600; }
-  }
+  &--active { background: rgba($brand, 0.08); }
 }
-
-.time-icon { font-size: 20px; }
-.time-label { font-size: 12px; color: $text-primary; }
-.time-desc { font-size: 10px; color: $text-muted; }
+.time-icon { font-size: 20px; margin-bottom: 4px; }
+.time-label { font-size: 13px; font-weight: 600; color: $text-primary; }
+.time-desc { font-size: 11px; color: $text-muted; margin-top: 2px; }
 
 /* ===== 渔获列表 ===== */
-.catch-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
+.catch-list { margin-top: 8px; }
 .catch-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  &:active { opacity: 0.7; }
-}
-
-.catch-avatar {
-  width: 44px; height: 44px;
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
-  flex-shrink: 0;
-}
-
-.catch-info { flex: 1; }
-.catch-fish { font-size: 14px; font-weight: 600; color: $text-primary; display: block; }
-.catch-user { font-size: 12px; color: $text-muted; display: block; }
-.catch-weight { font-size: 14px; font-weight: 600; color: $brand; flex-shrink: 0; }
-
-/* ===== 评论区 ===== */
-.comment-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.comment-item {
-  padding-bottom: 16px;
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
   border-bottom: 1px solid $bg-page;
-  &:last-child { border-bottom: none; padding-bottom: 0; }
+  &:last-child { border-bottom: none; }
+  cursor: pointer;
 }
-
-.comment-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.comment-avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
+.catch-avatar {
+  width: 44px; height: 44px; border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
+  font-size: 22px; flex-shrink: 0;
+}
+.catch-info { flex: 1; min-width: 0; }
+.catch-fish { font-size: 14px; font-weight: 600; color: $text-primary; display: block; }
+.catch-user { font-size: 12px; color: $text-muted; display: block; margin-top: 2px; }
+.catch-weight {
+  font-size: 14px; font-weight: 700; color: $brand; flex-shrink: 0;
 }
 
+/* ===== 评论 ===== */
+.comment-list { margin-top: 8px; }
+.comment-item {
+  padding: 12px 0;
+  border-bottom: 1px solid $bg-page;
+  &:last-child { border-bottom: none; }
+}
+.comment-header { display: flex; align-items: center; gap: 10px; }
+.comment-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
 .comment-meta { flex: 1; }
 .comment-name { font-size: 14px; font-weight: 600; color: $text-primary; display: block; }
 .comment-time { font-size: 11px; color: $text-muted; display: block; }
 .comment-stars { display: flex; gap: 1px; }
-.comment-text { font-size: 13px; color: $text-secondary; line-height: 1.5; }
-
-.comment-images {
-  display: flex;
-  gap: 6px;
+.comment-text {
+  font-size: 13px; line-height: 1.6;
+  color: $text-secondary;
   margin-top: 8px;
 }
-
+.comment-images {
+  display: flex; gap: 6px; margin-top: 8px;
+}
 .comment-img-item {
-  width: 72px; height: 72px;
-  border-radius: 8px;
+  width: 80px; height: 80px; border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
 }
-
-.comment-img-emoji { font-size: 24px; }
+.comment-img-emoji { font-size: 28px; }
 
 /* ===== 周边推荐 ===== */
-.nearby-scroll { white-space: nowrap; }
-
-.nearby-list {
-  display: flex;
-  gap: 10px;
-}
-
+.nearby-scroll { margin-top: 8px; }
+.nearby-list { display: flex; gap: 10px; }
 .nearby-item {
   flex-shrink: 0;
-  width: 100px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  &:active { opacity: 0.7; }
-}
-
-.nearby-avatar {
-  width: 60px; height: 60px;
+  width: 110px;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 12px 8px;
+  background: $bg-page;
   border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
 }
-
+.nearby-avatar {
+  width: 60px; height: 60px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 8px;
+}
 .nearby-emoji { font-size: 28px; }
-.nearby-name { font-size: 12px; font-weight: 600; color: $text-primary; }
-.nearby-dist { font-size: 11px; color: $text-muted; }
+.nearby-name { font-size: 13px; font-weight: 600; color: $text-primary; text-align: center; }
+.nearby-dist { font-size: 11px; color: $text-muted; margin-top: 2px; }
 
 /* ===== 底部操作栏 ===== */
 .detail-bottom-bar {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  display: flex;
-  gap: 10px;
-  padding: 12px 16px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  height: 64px;
   background: $bg-card;
   border-top: 1px solid $divider;
+  display: flex; align-items: center;
+  padding: 0 16px;
+  gap: 10px;
+  padding-bottom: env(safe-area-inset-bottom);
   z-index: 30;
 }
-
 .bar-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  height: 44px;
+  display: flex; align-items: center; gap: 4px;
+  padding: 10px 16px;
   border-radius: 12px;
   cursor: pointer;
-
-  &--icon {
-    flex: 0 0 auto;
-    padding: 0 16px;
-    border: 1.5px solid $divider;
-    background: $bg-card;
-  }
-
-  &--nav {
-    flex: 1;
-    background: $brand;
-  }
 }
-
+.bar-btn--icon {
+  background: $bg-page;
+}
+.bar-btn--nav {
+  flex: 1;
+  background: $brand;
+  justify-content: center;
+  padding: 12px 16px;
+}
 .bar-btn-text {
-  font-size: 13px;
-  font-weight: 600;
-  color: $text-secondary;
-
+  font-size: 14px; font-weight: 500; color: $text-primary;
   &--red { color: #ED4245; }
 }
-
 .bar-btn-nav-text {
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
+  font-size: 15px; font-weight: 600; color: #fff;
 }
 </style>
