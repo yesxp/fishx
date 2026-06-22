@@ -335,6 +335,8 @@ $text-muted: #80848E;
   height: 100vh;
   overflow: hidden;
   background: $bg-page;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ===== 顶部导航栏 ===== */
@@ -346,6 +348,8 @@ $text-muted: #80848E;
   padding-top: calc(env(safe-area-inset-top) + 12px);
   background: $bg-card;
   border-bottom: 1px solid $divider;
+  flex-shrink: 0;
+  z-index: 10;
 }
 .nav-back, .nav-share {
   width: 36px; height: 36px;
@@ -361,6 +365,11 @@ $text-muted: #80848E;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.detail-scroll {
+  flex: 1;
+  overflow: hidden;
 }
 
 /* ===== 地图区域 ===== */
@@ -773,8 +782,6 @@ $text-muted: #80848E;
 
 /* ===== 底部操作栏 ===== */
 .bottom-bar {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -782,7 +789,8 @@ $text-muted: #80848E;
   padding-bottom: calc(env(safe-area-inset-bottom) + 10px);
   background: $bg-card;
   border-top: 1px solid $divider;
-  z-index: 100;
+  flex-shrink: 0;
+  z-index: 10;
 }
 .bar-icons {
   display: flex;
