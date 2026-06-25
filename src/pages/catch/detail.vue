@@ -1,203 +1,766 @@
 <template>
-  <view class="page-detail">
-    <!-- Header -->
-    <wd-navbar title="渔获详情" left-arrow bordered @click-left="goBack" custom-style="position: sticky; top: 0; z-index: 100;" />
+  <view class="page">
+    <!-- 顶栏 -->
+    <view class="topbar">
+      <view class="topbar-left" @tap="goBack">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4">
+          <path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </view>
+      <text class="topbar-title">鱼获详情</text>
+      <view class="topbar-right">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="5" r="1.5" />
+          <circle cx="19" cy="5" r="1.5" />
+          <circle cx="5" cy="5" r="1.5" />
+        </svg>
+      </view>
+    </view>
 
-    <!-- Content -->
-    <scroll-view scroll-y class="content" :enhanced="true" :show-scrollbar="false">
-      <!-- Catch Card (full width) -->
-      <CatchCard
-        :nickname="detail.nickname"
-        :time="detail.time"
-        :fish-name="detail.fishName"
-        fish-emoji="🐟"
-        :liked="detail.liked"
-        :like-count="detail.likeCount"
-        :comment-count="detail.commentCount"
-        :content="detail.content"
-        :tags="detail.tags"
-      />
+    <!-- 可滚动内容 -->
+    <scroll-view scroll-y class="scroll-content" :enhanced="true" :show-scrollbar="false">
 
-      <!-- Comments Section -->
-      <view class="comments-section">
-        <view class="comments-header">
-          <text class="comments-title">评论 ({{ comments.length }})</text>
-        </view>
-
-        <wd-empty v-if="comments.length === 0" description="暂无评论，快来抢沙发！" />
-
-        <view v-else class="comment-list">
-          <wd-cell v-for="comment in comments" :key="comment.id" :title="comment.nickname" :label="comment.content" :value="comment.time" clickable>
-            <template #icon>
-              <view class="comment-avatar">
-                <text class="comment-avatar-text">{{ comment.nickname.charAt(0) }}</text>
+      <!-- 轮播图 -->
+      <view class="carousel">
+        <swiper
+          class="carousel-swiper"
+          :indicator-dots="false"
+          :autoplay="false"
+          :circular="false"
+          @change="onSwiperChange"
+        >
+          <swiper-item v-for="(photo, idx) in photos" :key="idx">
+            <view class="carousel-item">
+              <view class="carousel-placeholder" :style="{ background: photo.bg }">
+                <text class="carousel-emoji">{{ photo.emoji }}</text>
               </view>
-            </template>
-          </wd-cell>
+            </view>
+          </swiper-item>
+        </swiper>
+        <view class="carousel-overlay" />
+        <view class="carousel-info">
+          <text class="carousel-species">{{ detail.fishName }}</text>
+          <text class="carousel-latin">{{ detail.latin }}</text>
+        </view>
+        <view class="carousel-dots">
+          <view
+            v-for="(photo, idx) in photos"
+            :key="idx"
+            class="carousel-dot"
+            :class="{ 'carousel-dot--active': currentSlide === idx }"
+          />
         </view>
       </view>
 
-      <view style="height: 120rpx;" />
-    </scroll-view>
+      <!-- 鱼种百科摘要卡 -->
+      <view class="species-card">
+        <view class="sp-head">
+          <view class="sp-emoji">
+            <text>{{ detail.fishEmoji }}</text>
+          </view>
+          <view class="sp-info">
+            <text class="sp-name">{{ detail.fishName }}</text>
+            <text class="sp-latin">{{ detail.latin }}</text>
+          </view>
+        </view>
+        <view class="sp-chips">
+          <view
+            v-for="(chip, idx) in detail.chips"
+            :key="idx"
+            class="sp-chip"
+            :class="{ 'sp-chip--green': idx === 0 }"
+          >
+            <text>{{ chip }}</text>
+          </view>
+        </view>
+        <view class="sp-bio">
+          <text class="sp-bio-title">为什么叫"{{ detail.fishName }}"？</text>
+          <text class="sp-bio-text">{{ detail.bio }}</text>
+          <view class="sp-link">
+            <text class="sp-link-text">查看完整图鉴 →</text>
+          </view>
+        </view>
+      </view>
 
-    <!-- Comment Input -->
-    <view class="comment-bar">
-      <wd-input v-model="commentText" placeholder="写评论..." @confirm="onSendComment" />
-      <wd-button type="primary" size="small" round :disabled="!commentText.trim()" @click="onSendComment">发送</wd-button>
-    </view>
+      <!-- 基础信息卡 -->
+      <view class="sec-h">
+        <text class="sec-title">记录详情</text>
+      </view>
+      <view class="info-card">
+        <view class="info-grid">
+          <view class="info-cell" v-for="(item, idx) in infoGrid" :key="idx">
+            <text class="info-emoji">{{ item.emoji }}</text>
+            <text class="info-label">{{ item.label }}</text>
+            <text class="info-value">{{ item.value }}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 3 个 CTA 按钮 -->
+      <view class="cta-grid">
+        <view class="btn btn--primary" @tap="copyText()">
+          <text class="btn-text btn-text--white">✨ 复制文案</text>
+        </view>
+        <view class="btn btn--secondary" @tap="onEdit">
+          <text class="btn-text">📝 编辑</text>
+        </view>
+        <view class="btn btn--danger" @tap="onDelete">
+          <text class="btn-text btn-text--red">🗑 删除</text>
+        </view>
+      </view>
+
+      <!-- AI 文案打磨 · 5 种风格 -->
+      <view class="sec-h">
+        <text class="sec-title">AI 文案打磨 · 5 种风格</text>
+      </view>
+      <view class="ai-subtitle">
+        <text>基于这条鱼获，AI 为你生成不同风格的分享文案</text>
+      </view>
+
+      <view
+        v-for="(style, idx) in styles"
+        :key="idx"
+        class="copy-card"
+        :class="'copy-card--' + style.key"
+      >
+        <view class="copy-card-head">
+          <view class="copy-tag" :class="'copy-tag--' + style.key">
+            <text>{{ style.emoji }} {{ style.name }}</text>
+          </view>
+        </view>
+        <text class="copy-style">CATCH REPORT</text>
+        <text class="copy-text">{{ style.text }}</text>
+        <view class="copy-actions">
+          <view class="copy-btn" @tap="copyStyleText(style)">
+            <text class="copy-btn-text">📋 复制</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 重新生成按钮 -->
+      <view class="regen-btn" @tap="onRegenerate">
+        <text class="regen-btn-text">🔄 重新生成</text>
+      </view>
+
+      <!-- 底部安全区 -->
+      <view class="safe-bottom" />
+    </scroll-view>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import CatchCard from '@/components/CatchCard.vue'
-import { getComments, addComment } from '@/api/interact'
 
+// ---- 类型 ----
+interface Photo {
+  bg: string
+  emoji: string
+}
+
+interface StyleItem {
+  key: string
+  emoji: string
+  name: string
+  text: string
+}
+
+interface InfoItem {
+  emoji: string
+  label: string
+  value: string
+}
+
+// ---- 路由参数 ----
+const detailId = ref('1')
+const pages = getCurrentPages()
+const currentPage = pages[pages.length - 1] as any
+if (currentPage?.options?.id) {
+  detailId.value = currentPage.options.id
+}
+
+// ---- 当前轮播索引 ----
+const currentSlide = ref(0)
+
+function onSwiperChange(e: any) {
+  currentSlide.value = e.detail.current ?? 0
+}
+
+// ---- 轮播图 ----
+const photos: Photo[] = [
+  { bg: 'linear-gradient(135deg, #3D5A4A, #1A2A22)', emoji: '🐟' },
+  { bg: 'linear-gradient(135deg, #2A4A6A, #0F2A4A)', emoji: '🐠' },
+  { bg: 'linear-gradient(135deg, #5A3D4A, #2A1A22)', emoji: '🎣' },
+]
+
+// ---- 鱼种详情 ----
 const detail = reactive({
-  nickname: '李钓友',
-  time: '2小时前 · 千岛湖',
-  fishName: '3.2斤 鲫鱼',
-  liked: true,
-  likeCount: 128,
-  commentCount: 32,
-  content: '今天手感不错，连杆了好几条！这款蓝鲫饵料真的好用。',
-  tags: [
-    { text: '鲫鱼' },
-    { text: '野钓', type: 'green' as const },
-    { text: '战报', type: 'orange' as const },
-  ],
+  fishName: '鲫鱼',
+  fishEmoji: '🐟',
+  latin: 'Carassius auratus · 鲤科',
+  chips: ['底层', '杂食', '易', '0.2-1.0kg', '春夏秋'],
+  bio: '鲫鱼，中国最常见的淡水鱼之一，广布于江河湖库。因其肉质细嫩、适应性强，是钓友入门的首选鱼种。',
 })
 
-interface Comment {
-  id: string
-  nickname: string
-  content: string
-  time: string
-}
+// ---- 基础信息网格 ----
+const infoGrid: InfoItem[] = [
+  { emoji: '🐟', label: '重量', value: '320g（AI 估算）' },
+  { emoji: '🎯', label: '钓点', value: '老王钓位' },
+  { emoji: '⏱', label: '时间', value: '今天 14:30' },
+  { emoji: '🎣', label: '钓法', value: '台钓' },
+  { emoji: '🪱', label: '饵料', value: '商品饵 + 蚯蚓' },
+  { emoji: '💬', label: '心情', value: '得意' },
+]
 
-const comments = ref<Comment[]>([])
-const commentText = ref('')
+// ---- 5 风格文案 ----
+const styles: StyleItem[] = [
+  {
+    key: 'proud',
+    emoji: '🏆',
+    name: '得意',
+    text: '今天老王钓位爆护了！320g 鲫鱼一尾，下午 2-5 点气压稳，鲫鱼咬钩勤。一竿一尾，爽！',
+  },
+  {
+    key: 'modest',
+    emoji: '🙏',
+    name: '谦虚',
+    text: '运气不错，下午在老王钓位碰到一条 320g 鲫鱼。新手第一次单独上这么大的，开心。',
+  },
+  {
+    key: 'artistic',
+    emoji: '🎨',
+    name: '文艺',
+    text: '下午的光线打在水面，鲫鱼跃出的一瞬，时间仿佛静止。320g，是自然的礼物。',
+  },
+  {
+    key: 'funny',
+    emoji: '😂',
+    name: '搞笑',
+    text: '鲫鱼：我只是想透个气。钓者：我只是想吃你。320g 上岸，钓鱼人的日常迷惑行为。',
+  },
+  {
+    key: 'minimal',
+    emoji: '⚡',
+    name: '简约',
+    text: '鲫鱼 · 320g · 老王钓位 · 台钓 · 今天 14:30。',
+  },
+]
 
-async function loadComments() {
-  const res = await getComments('1')
-  if (res.code === 0) {
-    comments.value = res.data.map((c: any) => ({
-      id: c.id,
-      nickname: c.nickname,
-      content: c.content,
-      time: formatTime(c.time),
-    }))
-  }
-}
-
-function formatTime(iso: string) {
-  const diff = Date.now() - new Date(iso).getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 60) return `${mins}分钟前`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours}小时前`
-  return `${Math.floor(hours / 24)}天前`
-}
-
-async function onSendComment() {
-  const text = commentText.value.trim()
-  if (!text) return
-
-  const res = await addComment('1', text, 'dev_user')
-  if (res.code === 0) {
-    comments.value.push({
-      id: res.data.id,
-      nickname: res.data.nickname,
-      content: res.data.content,
-      time: '刚刚',
-    })
-    commentText.value = ''
-    detail.commentCount++
-  }
-}
-
+// ---- 操作 ----
 function goBack() {
   uni.navigateBack()
 }
 
-// Load on mount
-loadComments()
+function copyText() {
+  const defaultText = styles[0]?.text ?? ''
+  uni.setClipboardData({
+    data: defaultText,
+    success() {
+      uni.showToast({ title: '已复制', icon: 'success' })
+    },
+  })
+}
+
+function copyStyleText(style: StyleItem) {
+  uni.setClipboardData({
+    data: style.text,
+    success() {
+      uni.showToast({ title: '已复制', icon: 'success' })
+    },
+  })
+}
+
+function onEdit() {
+  uni.showToast({ title: '编辑功能开发中', icon: 'none' })
+}
+
+function onDelete() {
+  uni.showModal({
+    title: '确认删除',
+    content: '确定要删除这条鱼获记录吗？此操作不可撤销。',
+    confirmText: '删除',
+    confirmColor: '#FF3B30',
+    success(res) {
+      if (res.confirm) {
+        uni.showToast({ title: '已删除', icon: 'success' })
+        setTimeout(() => {
+          uni.navigateBack()
+        }, 1200)
+      }
+    },
+  })
+}
+
+function onRegenerate() {
+  uni.showToast({ title: 'AI 重新生成中...', icon: 'none', duration: 2000 })
+}
 </script>
 
 <style scoped lang="scss">
-$bg-page: #F2F3F5;
-$bg-card: #FFFFFF;
-$brand: #5865F2;
-$divider: #E3E5E8;
-$text-primary: #060607;
-$text-secondary: #4E5058;
-$text-muted: #80848E;
+/* ====== Design Tokens ====== */
+// Note: --b/--b2 etc. not used directly in <style>, using raw values for uni-app compat
 
-.page-detail {
+/* ====== Page ====== */
+.page {
   min-height: 100vh;
-  background: $bg-page;
-  display: flex;
-  flex-direction: column;
-}
-
-
-/* Content */
-.content {
-  flex: 1;
-  padding: 12px;
-}
-
-/* Comments */
-.comments-section {
-  background: $bg-card;
-  border-radius: 12px;
-  border: 1px solid $divider;
+  background: #F2F3F7;
+  font-family: -apple-system, "PingFang SC", sans-serif;
+  color: #1C1C1E;
+  position: relative;
   overflow: hidden;
-  margin-top: 12px;
 }
 
-.comments-header {
-  padding: 12px 14px;
-  border-bottom: 1px solid $divider;
-}
-
-.comments-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: $text-primary;
-}
-
-.comment-list {
+/* ====== Top Bar ====== */
+.topbar {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 54px 20px 12px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(60, 60, 67, 0.06);
 }
 
-.comment-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: $divider;
+.topbar-left {
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #1C1C1E;
+}
+
+.topbar-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.topbar-right {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(60, 60, 67, 0.08);
+  color: #1C1C1E;
+}
+
+/* ====== Scroll ====== */
+.scroll-content {
+  height: calc(100vh - 96px);
+  padding: 0 0;
+}
+
+/* ====== Carousel ====== */
+.carousel {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  background: #000;
+}
+
+.carousel-swiper {
+  width: 100%;
+  height: 340px;
+}
+
+.carousel-item {
+  width: 100%;
+  height: 340px;
+}
+
+.carousel-placeholder {
+  width: 100%;
+  height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-emoji {
+  font-size: 64px;
+  opacity: 0.5;
+}
+
+.carousel-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+  pointer-events: none;
+}
+
+.carousel-info {
+  position: absolute;
+  bottom: 32px;
+  left: 16px;
+  right: 16px;
+}
+
+.carousel-species {
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+  display: block;
+}
+
+.carousel-latin {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 2px;
+  display: block;
+  font-style: italic;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.carousel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.carousel-dot--active {
+  background: #fff;
+  width: 18px;
+  border-radius: 3px;
+}
+
+/* ====== Species Card ====== */
+.species-card {
+  background: linear-gradient(140deg, #fff 0%, #F4F2FF 100%);
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.1);
+  margin: -30px 16px 0;
+  position: relative;
+  z-index: 3;
+}
+
+.sp-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.sp-emoji {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #5865F2, #8B5CF6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 4px 10px rgba(88, 101, 242, 0.2);
   flex-shrink: 0;
 }
 
-.comment-avatar-text {
-  font-size: 12px;
-  font-weight: 600;
-  color: $text-muted;
+.sp-info {
+  flex: 1;
+  min-width: 0;
 }
 
-/* Comment Bar */
-.comment-bar {
-  position: sticky;
-  bottom: 0;
-  background: $bg-card;
-  border-top: 1px solid $divider;
-  padding: 8px 12px;
+.sp-name {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  display: block;
+}
+
+.sp-latin {
+  font-size: 11px;
+  color: #8E8E93;
+  font-style: italic;
+  margin-top: 2px;
+  display: block;
+}
+
+.sp-chips {
   display: flex;
-  gap: 8px;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.sp-chip {
+  padding: 3px 8px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(88, 101, 242, 0.1);
+  color: #5865F2;
+}
+
+.sp-chip--green {
+  background: rgba(52, 199, 89, 0.12);
+  color: #1B7F3A;
+}
+
+/* ====== Bio Section ====== */
+.sp-bio {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(60, 60, 67, 0.06);
+}
+
+.sp-bio-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #8B5CF6;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.sp-bio-text {
+  font-size: 13px;
+  color: #3C3C43;
+  line-height: 1.6;
+  display: block;
+}
+
+.sp-link {
+  margin-top: 10px;
+}
+
+.sp-link-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #5865F2;
+}
+
+/* ====== Section Header ====== */
+.sec-h {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 10px;
+}
+
+.sec-title {
+  font-size: 13px;
+  color: #8E8E93;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* ====== Info Card ====== */
+.info-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid rgba(60, 60, 67, 0.08);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.03);
+  margin: 0 16px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.info-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.info-emoji {
+  font-size: 22px;
+}
+
+.info-label {
+  font-size: 11px;
+  color: #8E8E93;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.info-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1C1C1E;
+  text-align: center;
+}
+
+/* ====== CTA Grid ====== */
+.cta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1.4fr;
+  gap: 8px;
+  margin: 18px 16px 0;
+}
+
+.btn {
+  padding: 12px 14px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+}
+
+.btn--primary {
+  background: linear-gradient(135deg, #5865F2, #8B5CF6);
+  box-shadow: 0 4px 14px rgba(88, 101, 242, 0.3);
+}
+
+.btn--secondary {
+  background: #fff;
+  border: 1px solid rgba(60, 60, 67, 0.08);
+}
+
+.btn--danger {
+  background: #fff;
+  border: 1px solid rgba(255, 59, 48, 0.25);
+}
+
+.btn-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3C3C43;
+}
+
+.btn-text--white {
+  color: #fff;
+}
+
+.btn-text--red {
+  color: #FF3B30;
+}
+
+/* ====== AI Copy Styles Section ====== */
+.ai-subtitle {
+  padding: 0 20px 10px;
+  font-size: 12px;
+  color: #8E8E93;
+  line-height: 1.5;
+}
+
+.copy-card {
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid rgba(60, 60, 67, 0.08);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.03);
+  padding: 14px;
+  margin: 0 16px 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.copy-card-head {
+  margin-bottom: 8px;
+}
+
+.copy-tag {
+  display: inline-flex;
+  padding: 3px 8px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.copy-tag--proud {
+  background: rgba(255, 215, 0, 0.15);
+  color: #9A7B00;
+}
+
+.copy-tag--modest {
+  background: rgba(52, 199, 89, 0.12);
+  color: #1B7F3A;
+}
+
+.copy-tag--artistic {
+  background: rgba(139, 92, 246, 0.12);
+  color: #8B5CF6;
+}
+
+.copy-tag--funny {
+  background: rgba(255, 149, 0, 0.14);
+  color: #9A5500;
+}
+
+.copy-tag--minimal {
+  background: rgba(60, 60, 67, 0.08);
+  color: #3C3C43;
+}
+
+.copy-style {
+  font-size: 10px;
+  color: #8E8E93;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.copy-text {
+  font-size: 14px;
+  color: #1C1C1E;
+  line-height: 1.5;
+}
+
+.copy-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}
+
+.copy-btn {
+  padding: 6px 12px;
+  border-radius: 100px;
+  background: rgba(88, 101, 242, 0.08);
+  display: inline-flex;
+  align-items: center;
+}
+
+.copy-btn-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: #5865F2;
+}
+
+/* ====== Regenerate Button ====== */
+.regen-btn {
+  margin: 4px 16px 0;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(88, 101, 242, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.regen-btn-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #5865F2;
+}
+
+/* ====== Safe Bottom ====== */
+.safe-bottom {
+  height: 34px;
 }
 </style>
