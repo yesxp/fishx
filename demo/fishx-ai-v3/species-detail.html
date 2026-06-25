@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>鲫鱼 · 鱼种图鉴 · FishX 3.0</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:-apple-system,"PingFang SC",sans-serif;letter-spacing:-.01em;color:#1C1C1E;background:#F2F3F7}
+:root{--b:#5865F2;--b2:#8B5CF6;--ink:#1C1C1E;--ink2:#3C3C43;--muted:#8E8E93;--good:#34C759;--gs:rgba(52,199,89,.12);--warn:#FF9500;--ws:rgba(255,149,0,.12);--border:rgba(60,60,67,.08);--divider:rgba(60,60,67,.06);--rc:24px;--rb:14px;--sm:0 2px 6px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06)}
+.device{width:393px;height:852px;margin:0 auto;background:#F2F3F7;position:relative;overflow:hidden;border-radius:48px;box-shadow:0 0 0 12px #1C1C1E,0 30px 80px rgba(0,0,0,.18)}
+@media (max-width:480px){.device{width:100vw;height:100vh;border-radius:0;box-shadow:none}}
+.statusbar{height:54px;display:flex;align-items:center;justify-content:space-between;padding:18px 28px 0;font-weight:600;font-size:15px;color:#fff}
+.topbar{padding:8px 20px 14px;display:flex;align-items:center;justify-content:space-between}
+.topbar .left{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:grid;place-items:center;border:1px solid rgba(255,255,255,.3)}
+.topbar .left svg{width:20px;height:20px;color:#fff}
+.topbar .right{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:grid;place-items:center;border:1px solid rgba(255,255,255,.3)}
+.topbar .right svg{width:18px;height:18px;color:#fff}
+.scroll{height:calc(100% - 54px - 96px);overflow-y:auto;padding:0 0 120px;scrollbar-width:none;background:#F2F3F7}
+.scroll::-webkit-scrollbar{display:none}
+.hero-img{position:relative;width:100%;height:380px;background:linear-gradient(140deg,#3a5a8c 0%,#1e3a5f 100%);overflow:hidden;display:grid;place-items:center}
+.hero-img::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(255,220,160,.15) 0%,transparent 60%)}
+.hero-img .fish-emoji{font-size:160px;position:relative;z-index:1;filter:drop-shadow(0 8px 24px rgba(0,0,0,.3))}
+.hero-img .unlock-badge{position:absolute;top:80px;left:20px;background:rgba(52,199,89,.95);color:#fff;padding:5px 12px;border-radius:100px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;backdrop-filter:blur(20px)}
+.body{padding:18px 18px 0}
+.season-row{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.season-row .fish-icon{font-size:14px}
+.species-name{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-top:6px}
+.species-sub{font-size:14px;color:var(--b);font-weight:600;margin-top:4px;line-height:1.4}
+.meta-chips{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.m-chip{padding:6px 12px;border-radius:100px;font-size:11px;font-weight:600;background:rgba(88,101,242,.1);color:var(--b);display:flex;align-items:center;gap:4px}
+.m-chip.g{background:var(--gs);color:#1B7F3A}
+.m-chip.o{background:var(--ws);color:#9A5500}
+.m-chip.n{background:rgba(60,60,67,.06);color:var(--ink2)}
+.sec{margin-top:24px}
+.sec-h{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.sec-emoji{font-size:18px}
+.sec-title{font-size:14px;font-weight:800;letter-spacing:-.01em}
+.sec-body{font-size:13.5px;line-height:1.7;color:var(--ink2)}
+.fun-fact{background:linear-gradient(135deg,rgba(255,149,0,.06) 0%,rgba(255,107,107,.04) 100%);border-left:3px solid var(--warn);padding:12px 14px;border-radius:0 12px 12px 0;margin-top:6px;font-size:13px;line-height:1.6}
+.tactics-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.tactic-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px}
+.tactic-card .l{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.tactic-card .v{font-size:13px;font-weight:700;color:var(--ink)}
+.recent-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;margin-top:10px}
+.recent-thumb{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#A8C0E0,#5865F2);display:grid;place-items:center;color:#fff;font-size:18px;flex-shrink:0}
+.recent-info{flex:1;font-size:12px}
+.recent-info .t{font-weight:700}
+.recent-info .s{color:var(--muted);font-size:11px;margin-top:1px}
+.related-row{display:flex;gap:8px;margin:0 -18px;padding:0 18px;overflow-x:auto;scrollbar-width:none}
+.related-row::-webkit-scrollbar{display:none}
+.related-card{flex:0 0 130px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:10px;text-align:center;cursor:pointer}
+.related-card .e{font-size:32px;margin-bottom:6px}
+.related-card .n{font-size:13px;font-weight:700}
+.related-card .m{font-size:10px;color:var(--muted);margin-top:2px}
+.cta-bar{position:absolute;bottom:0;left:0;right:0;padding:12px 16px 28px;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;gap:8px}
+.btn{padding:13px 16px;border-radius:var(--rb);font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-p{flex:1;color:#fff;background:linear-gradient(135deg,var(--b),var(--b2));box-shadow:0 4px 14px rgba(88,101,242,.3)}
+.btn-g{padding:13px 16px;background:rgba(60,60,67,.06);color:var(--ink2);display:flex;align-items:center;gap:4px}
+.tabbar{position:absolute;bottom:0;left:0;right:0;height:96px;background:var(--glass);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-around;padding:10px 0 28px;display:none}
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="hero-img">
+    <!-- 沉浸式顶栏（覆盖在 hero 上）-->
+    <div class="statusbar" style="position:absolute;top:0;left:0;right:0;z-index:5">
+      <span>9:41</span>
+      <span style="display:flex;align-items:center;gap:6px">
+        <svg viewBox="0 0 26 12" fill="none" style="width:26px;height:12px"><rect x=".5" y=".5" width="22" height="11" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="19" height="8" rx="1.5" fill="currentColor"/></svg>
+      </span>
+    </div>
+    <div class="topbar" style="position:absolute;top:54px;left:0;right:0;z-index:5">
+      <div class="left" onclick="location.href='today.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="right">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+      </div>
+    </div>
+    <span class="fish-emoji">🐟</span>
+    <div class="unlock-badge">✅ 已解锁</div>
+  </div>
+
+  <div class="scroll">
+    <div class="body">
+      <div class="season-row"><span class="fish-icon">🐟</span> 夏季 · 旺季</div>
+      <div class="species-name">鲫鱼</div>
+      <div class="species-sub">为什么北方钓友管它叫"鲫瓜子"？</div>
+      <div class="meta-chips">
+        <span class="m-chip g">容易</span>
+        <span class="m-chip">底层</span>
+        <span class="m-chip o">杂食</span>
+        <span class="m-chip n">0.2-1.0kg</span>
+        <span class="m-chip n">春夏秋冬</span>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h"><span class="sec-emoji">🐟</span><span class="sec-title">鱼种简介</span></div>
+        <div class="sec-body">我国最常见、分布最广的淡水鱼之一。适应力极强，号称"淡水小强"。群居、杂食偏植物，从南到北四季可钓。</div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h"><span class="sec-emoji">💬</span><span class="sec-title">一鱼一名</span></div>
+        <div class="sec-body">因体侧扁、背隆起、形似瓜子而得名"鲫瓜子"。古书写作"鲒鱼"（鳞大而少）。南方俗称"河鲫"、"月鲫"。</div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h"><span class="sec-emoji">💡</span><span class="sec-title">钓鱼趣闻</span></div>
+        <div class="fun-fact">耐低氧极强，新手第一条鱼多是它。冬季其他鱼不咬钩时它仍咬。"鲫鱼"是钓鱼的入门老师。</div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h"><span class="sec-emoji">🎣</span><span class="sec-title">钓法技巧</span></div>
+        <div class="tactics-grid">
+          <div class="tactic-card"><div class="l">饵料</div><div class="v">商品饵+蚯蚓</div></div>
+          <div class="tactic-card"><div class="l">钓法</div><div class="v">台钓万能</div></div>
+          <div class="tactic-card"><div class="l">时间</div><div class="v">夏秋早晚</div></div>
+          <div class="tactic-card"><div class="l">冬钓</div><div class="v">红虫深水</div></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h"><span class="sec-emoji">🍲</span><span class="sec-title">食用价值</span></div>
+        <div class="sec-body">"春吃鲫夏吃鲤"。春季最肥美，炖汤奶白鲜甜，传统食疗圣品。刺多但肉嫩。</div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h"><span class="sec-emoji">📖</span><span class="sec-title">鱼种小百科</span></div>
+        <div class="sec-body" style="font-style:italic;color:var(--muted);font-size:12px">
+          拉丁名：Carassius auratus<br>
+          鲤科 Cyprinidae · 鲫属 Carassius<br>
+          分布：全国淡水水域
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h"><span class="sec-emoji">📊</span><span class="sec-title">最近钓获动态</span><span style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:500">公共聚合</span></div>
+        <div class="recent-card">
+          <div class="recent-thumb">🐟</div>
+          <div class="recent-info">
+            <div class="t">今天 3 人钓到鲫鱼</div>
+            <div class="s">最大 0.5kg · 命中率 78%</div>
+          </div>
+        </div>
+        <div class="recent-card">
+          <div class="recent-thumb">📈</div>
+          <div class="recent-info">
+            <div class="t">本周 12 人解锁鲫鱼图鉴</div>
+            <div class="s">活跃度 ↑ 同比 +18%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h"><span class="sec-emoji">🐠</span><span class="sec-title">同科鱼推荐</span></div>
+        <div class="related-row">
+          <div class="related-card"><div class="e">🐠</div><div class="n">鲤鱼</div><div class="m">鲤科</div></div>
+          <div class="related-card"><div class="e">🐡</div><div class="n">草鱼</div><div class="m">鲤科</div></div>
+          <div class="related-card"><div class="e">🐟</div><div class="n">鳊鱼</div><div class="m">鲤科</div></div>
+          <div class="related-card"><div class="e">🎏</div><div class="n">翘嘴</div><div class="m">鲤科</div></div>
+        </div>
+      </div>
+
+      <div style="height:80px"></div>
+    </div>
+  </div>
+
+  <!-- 底部 CTA 固定栏 -->
+  <div class="cta-bar">
+    <button class="btn btn-g" onclick="location.href='catch-list.html?species=sp-001'">📋 我的战绩</button>
+    <button class="btn btn-p">✨ 用此鱼种生成文案</button>
+  </div>
+</div>
+</body>
+</html>

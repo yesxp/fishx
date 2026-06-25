@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>拍照 · FishX 3.0</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:-apple-system,"PingFang SC",sans-serif;letter-spacing:-.01em;color:#fff;background:#000}
+:root{--b:#5865F2;--b2:#8B5CF6;--good:#34C759;--ink:#1C1C1E;--ink2:#3C3C43;--muted:#8E8E93;--border:rgba(60,60,67,.08);--glass:rgba(20,20,30,.4);--glass2:rgba(20,20,30,.65);--rb:14px;--rc:24px;--rs:rgba(255,255,255,.12)}
+.device{width:393px;height:852px;margin:0 auto;background:#000;position:relative;overflow:hidden;border-radius:48px;box-shadow:0 0 0 12px #1C1C1E,0 30px 80px rgba(0,0,0,.4)}
+@media (max-width:480px){.device{width:100vw;height:100vh;border-radius:0;box-shadow:none}}
+.statusbar{position:relative;height:54px;display:flex;align-items:center;justify-content:space-between;padding:18px 28px 0;font-weight:600;font-size:15px;z-index:5}
+.topbar{position:relative;z-index:5;padding:10px 20px 14px;display:flex;align-items:center;justify-content:space-between}
+.iconbtn{width:40px;height:40px;border-radius:50%;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:grid;place-items:center;border:1px solid var(--rs);color:#fff}
+.iconbtn svg{width:18px;height:18px}
+.topbar-title{font-size:14px;font-weight:600;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:8px 14px;border-radius:100px;border:1px solid var(--rs);display:inline-flex;align-items:center;gap:6px}
+.topbar-title .dot{width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px rgba(52,199,89,.3);animation:pl 2s infinite}
+@keyframes pl{0%,100%{opacity:1}50%{opacity:.5}}
+.camera-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,#3D5A4A 0%,#1A2A22 50%,#0A1410 100%),#0A1410;background-blend-mode:multiply}
+.camera-bg::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 70%,rgba(255,200,100,.1) 0%,transparent 40%),radial-gradient(circle at 80% 30%,rgba(100,180,220,.08) 0%,transparent 40%)}
+.camera-bg::after{content:"";position:absolute;top:38%;left:30%;width:160px;height:80px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,220,160,.18) 0%,transparent 70%);filter:blur(8px);animation:fl 6s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-10px)}}
+.viewfinder{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;z-index:2}
+.vf-box{position:relative;width:280px;height:280px}
+.vf-box::before,.vf-box::after,.vf-box>span{content:"";position:absolute;width:36px;height:36px}
+.vf-box::before{top:0;left:0;border-top:3px solid #fff;border-left:3px solid #fff;border-top-left-radius:16px}
+.vf-box::after{top:0;right:0;border-top:3px solid #fff;border-right:3px solid #fff;border-top-right-radius:16px}
+.vf-box>span:nth-child(1){bottom:0;left:0;border-bottom:3px solid #fff;border-left:3px solid #fff;border-bottom-left-radius:16px}
+.vf-box>span:nth-child(2){bottom:0;right:0;border-bottom:3px solid #fff;border-right:3px solid #fff;border-bottom-right-radius:16px}
+.vf-box>span{display:block;position:absolute}
+.vf-box>span:nth-child(1),.vf-box>span:nth-child(2){display:block}
+.vf-box>span:nth-child(3),.vf-box>span:nth-child(4){display:none}
+.scan{position:absolute;left:8px;right:8px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--b),transparent);box-shadow:0 0 18px rgba(88,101,242,.8);top:0;animation:scan 2.4s ease-in-out infinite}
+@keyframes scan{0%,100%{top:8px;opacity:0}10%,90%{opacity:1}50%{top:calc(100% - 10px)}}
+.vf-hint{position:absolute;left:0;right:0;text-align:center;bottom:-44px;font-size:13px;color:rgba(255,255,255,.85);font-weight:500;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.cat-switch{position:absolute;left:0;right:0;top:170px;display:flex;justify-content:center;gap:6px;z-index:4}
+.cat-pill{padding:8px 14px;border-radius:100px;font-size:12px;font-weight:600;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--rs);color:rgba(255,255,255,.85);cursor:pointer}
+.cat-pill.active{background:rgba(255,255,255,.95);color:#1C1C1E;border-color:transparent}
+.bottom{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.7) 30%,rgba(0,0,0,.92));padding:60px 20px 0;z-index:5}
+.shutter-row{display:flex;align-items:center;justify-content:space-between;padding:0 24px 36px}
+.album-btn{width:48px;height:48px;border-radius:14px;border:1.5px solid rgba(255,255,255,.4);background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:grid;place-items:center;color:#fff}
+.album-btn svg{width:20px;height:20px}
+.shutter{width:78px;height:78px;border-radius:50%;border:none;cursor:pointer;background:#fff;position:relative;display:grid;place-items:center;box-shadow:0 0 0 4px rgba(255,255,255,.2),0 0 0 8px rgba(255,255,255,.06)}
+.shutter::before{content:"";width:64px;height:64px;border-radius:50%;border:2px solid #1C1C1E}
+.flip-btn{width:48px;height:48px;border-radius:50%;background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--rs);color:#fff;display:grid;place-items:center}
+.flip-btn svg{width:22px;height:22px}
+
+/* 弹层 1: loading */
+.modal-mask{position:absolute;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:120px;gap:30px}
+.modal-mask .user-photo{width:280px;height:200px;border-radius:18px;background:linear-gradient(135deg,#3D5A4A,#1A2A22);display:grid;place-items:center;color:rgba(255,255,255,.4);font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.4);overflow:hidden;position:relative}
+.modal-mask .user-photo::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(255,220,160,.2) 0%,transparent 50%)}
+.loading-block{text-align:center;max-width:280px}
+.loading-pct{font-size:38px;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1}
+.loading-pct small{font-size:18px;color:rgba(255,255,255,.6);font-weight:600;margin-left:4px}
+.loading-bar{height:6px;background:rgba(255,255,255,.15);border-radius:100px;margin-top:14px;overflow:hidden;position:relative}
+.loading-bar::after{content:"";position:absolute;left:0;top:0;bottom:0;width:38%;background:linear-gradient(90deg,var(--b),var(--b2));border-radius:100px;box-shadow:0 0 12px rgba(88,101,242,.6);animation:slide 1.6s ease-in-out infinite}
+@keyframes slide{0%{width:0%}50%{width:62%}100%{width:100%}}
+.loading-quote{margin-top:24px;font-size:15px;color:rgba(255,255,255,.85);font-weight:500;line-height:1.5}
+.loading-quote::before,.loading-quote::after{content:"";display:block;width:24px;height:2px;background:rgba(255,255,255,.2);margin:10px auto;border-radius:2px}
+
+/* 弹层 2: 结果 */
+.result-mask{position:absolute;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:10;display:flex;align-items:flex-end}
+.result-sheet{width:100%;background:#fff;border-radius:24px 24px 0 0;padding:14px 18px 36px;max-height:80%;overflow-y:auto;color:var(--ink);box-shadow:0 -8px 32px rgba(0,0,0,.2)}
+.sheet-handle{width:36px;height:4px;background:rgba(60,60,67,.2);border-radius:2px;margin:0 auto 14px}
+.user-photo-circle{width:140px;height:140px;border-radius:50%;margin:8px auto 16px;background:linear-gradient(135deg,#3D5A4A,#1A2A22);display:grid;place-items:center;position:relative;box-shadow:0 8px 24px rgba(0,0,0,.15);overflow:hidden}
+.user-photo-circle::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,rgba(255,220,160,.3) 0%,transparent 50%)}
+.user-photo-circle svg{width:60px;height:60px;color:rgba(255,255,255,.5);position:relative;z-index:1}
+.collect-tag{text-align:center;margin-bottom:14px}
+.collect-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:100px;background:rgba(52,199,89,.12);color:#1B7F3A;font-size:12px;font-weight:700}
+.species-name{text-align:center;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.species-subtitle{text-align:center;font-size:13px;color:var(--muted);margin-top:4px;line-height:1.4;padding:0 12px}
+.species-chips{display:flex;justify-content:center;gap:6px;margin:12px 0 16px;flex-wrap:wrap}
+.s-chip{padding:5px 10px;border-radius:100px;font-size:11px;font-weight:600;background:rgba(60,60,67,.05);color:var(--ink2)}
+.s-chip.b{background:rgba(88,101,242,.1);color:var(--b)}
+.s-chip.g{background:rgba(52,199,89,.12);color:#1B7F3A}
+.cta-row{display:flex;gap:8px;padding:0 4px}
+.cta-row .btn{padding:13px 14px;font-size:13px}
+.cta-row .btn-p{flex:1;background:linear-gradient(135deg,var(--b),var(--b2));color:#fff;box-shadow:0 4px 14px rgba(88,101,242,.3)}
+.cta-row .btn-g{flex:1;background:#fff;color:var(--ink2);border:1px solid var(--border)}
+.modify-link{text-align:center;margin-top:12px;font-size:12px;color:var(--b);font-weight:600}
+
+/* 弹层 3: 补字段 */
+.field-mask{position:absolute;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:10;display:flex;align-items:flex-end}
+.field-sheet{width:100%;background:#fff;border-radius:24px 24px 0 0;padding:14px 18px 28px;max-height:90%;overflow-y:auto;color:var(--ink);box-shadow:0 -8px 32px rgba(0,0,0,.2)}
+.field-h{font-size:18px;font-weight:800;letter-spacing:-.02em;margin:6px 0 4px}
+.field-sub{font-size:12px;color:var(--muted);margin-bottom:18px}
+.field-grp{margin-bottom:16px}
+.field-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.field-lbl .req{color:var(--b);font-size:10px}
+.field-lbl .opt{color:#C7C7CC;font-size:10px;font-weight:500}
+.weight-input{background:rgba(60,60,67,.04);border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.weight-input .v{font-size:24px;font-weight:800;letter-spacing:-.02em;flex:1}
+.weight-input .v small{font-size:14px;color:var(--muted);font-weight:500;margin-left:4px}
+.weight-input .ai-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;background:rgba(88,101,242,.1);color:var(--b)}
+.chips-row{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:8px 12px;border-radius:100px;font-size:12px;font-weight:600;background:rgba(60,60,67,.05);color:var(--ink2);border:1px solid transparent;cursor:pointer}
+.chip.active{background:rgba(88,101,242,.12);color:var(--b);border-color:rgba(88,101,242,.25)}
+.chip.g.active{background:rgba(52,199,89,.14);color:#1B7F3A;border-color:rgba(52,199,89,.3)}
+.chip.o.active{background:rgba(255,149,0,.14);color:#9A5500;border-color:rgba(255,149,0,.3)}
+.field-btn{display:flex;gap:8px;padding-top:8px}
+.field-btn .btn-p{flex:1}
+.field-btn .btn-g{padding:12px 18px;background:rgba(60,60,67,.06);color:var(--ink);border:none}
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="camera-bg"></div>
+
+  <div class="statusbar">
+    <span>9:41</span>
+    <span style="display:flex;align-items:center;gap:6px">
+      <svg viewBox="0 0 26 12" fill="none" style="width:26px;height:12px"><rect x=".5" y=".5" width="22" height="11" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="19" height="8" rx="1.5" fill="currentColor"/></svg>
+    </span>
+  </div>
+
+  <div class="topbar">
+    <div class="iconbtn" onclick="location.href='today.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="topbar-title">
+      <span class="dot"></span>
+      GPS · 西湖支流
+    </div>
+    <div class="iconbtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v3M12 19v3M5 12H2M22 12h-3M6.3 6.3l-2.1-2.1M19.8 19.8l-2.1-2.1M6.3 17.7l-2.1 2.1M19.8 4.2l-2.1 2.1" stroke-linecap="round"/><circle cx="12" cy="12" r="4"/></svg>
+    </div>
+  </div>
+
+  <div class="cat-switch">
+    <div class="cat-pill active">🐟 鱼</div>
+    <div class="cat-pill">🦐 虾蟹</div>
+    <div class="cat-pill">🎣 装备</div>
+    <div class="cat-pill">📍 钓点</div>
+  </div>
+
+  <div class="viewfinder">
+    <div class="vf-box">
+      <span class="scan"></span>
+      <span></span><span></span>
+      <div class="vf-hint">将鱼放入取景框 · 自动识别</div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="shutter-row">
+      <button class="album-btn" title="相册">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2"/><path d="M21 17l-5-5-9 9" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="shutter" title="拍照"></button>
+      <button class="flip-btn" title="翻转">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke-linejoin="round"/><path d="M9 14a3 3 0 1 0 6 0 3 3 0 0 0-6 0z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- 弹层 1: 识别 loading -->
+  <div class="modal-mask">
+    <div class="user-photo">📷 用户拍的照片</div>
+    <div class="loading-block">
+      <div class="loading-pct">38<small>%</small></div>
+      <div class="loading-bar"></div>
+      <div class="loading-quote">别急，鱼也有自己的节奏 🐟</div>
+    </div>
+  </div>
+</div>
+
+<!-- 弹层 2: 识别结果（截图外，作为参考） -->
+<div class="device" style="margin-top:20px;display:none">
+  <div class="result-mask">
+    <div class="result-sheet">
+      <div class="sheet-handle"></div>
+      <div class="user-photo-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 8h3l1.5-2h5L16 8h3v12H5z" stroke-linejoin="round"/><circle cx="12" cy="14" r="3.5"/></svg>
+      </div>
+      <div class="collect-tag">
+        <span class="collect-badge">✅ 收集完成</span>
+      </div>
+      <div class="species-name">🐟 鲫鱼</div>
+      <div class="species-subtitle">为什么北方钓友管它叫"鲫瓜子"？</div>
+      <div class="species-chips">
+        <span class="s-chip">鲤科</span>
+        <span class="s-chip g">底层</span>
+        <span class="s-chip">杂食</span>
+        <span class="s-chip b">易</span>
+      </div>
+      <div class="cta-row">
+        <button class="btn btn-g">📖 查看鱼种百科</button>
+        <button class="btn btn-p">💾 保存这条鱼获</button>
+      </div>
+      <div class="modify-link">识别有误？修改</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

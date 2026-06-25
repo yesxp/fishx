@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>鱼获详情 · FishX 3.0</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:-apple-system,"PingFang SC",sans-serif;letter-spacing:-.01em;color:#1C1C1E;background:#F2F3F7}
+:root{--b:#5865F2;--b2:#8B5CF6;--ink:#1C1C1E;--ink2:#3C3C43;--muted:#8E8E93;--good:#34C759;--gs:rgba(52,199,89,.12);--warn:#FF9500;--ws:rgba(255,149,0,.12);--border:rgba(60,60,67,.08);--divider:rgba(60,60,67,.06);--glass:rgba(255,255,255,.72);--rc:24px;--rb:14px;--sm:0 2px 6px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06)}
+.device{width:393px;height:852px;margin:0 auto;background:#F2F3F7;position:relative;overflow:hidden;border-radius:48px;box-shadow:0 0 0 12px #1C1C1E,0 30px 80px rgba(0,0,0,.18)}
+@media (max-width:480px){.device{width:100vw;height:100vh;border-radius:0;box-shadow:none}}
+.statusbar{height:54px;display:flex;align-items:center;justify-content:space-between;padding:18px 28px 0;font-weight:600;font-size:15px}
+.topbar{padding:8px 20px 14px;display:flex;align-items:center;justify-content:space-between}
+.topbar .left{width:36px;height:36px;display:grid;place-items:center;cursor:pointer}
+.topbar .left svg{width:20px;height:20px;color:var(--ink)}
+.topbar .right{width:36px;height:36px;border-radius:50%;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:grid;place-items:center;border:1px solid var(--border)}
+.topbar .right svg{width:18px;height:18px;color:var(--ink)}
+.topbar .title{font-size:16px;font-weight:700;letter-spacing:-.01em}
+.scroll{height:calc(100% - 54px - 96px);overflow-y:auto;padding:0 16px 120px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.carousel{position:relative;width:calc(100% + 32px);margin:0 -16px;height:340px;background:#000;display:grid;place-items:center;color:rgba(255,255,255,.5);font-size:14px;background-image:linear-gradient(135deg,#3D5A4A,#1A2A22)}
+.carousel::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(255,220,160,.15) 0%,transparent 60%)}
+.carousel .dots{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:2}
+.carousel .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.4)}
+.carousel .dot.active{background:#fff;width:18px;border-radius:3px}
+.species-card{background:linear-gradient(140deg,#fff 0%,#F4F2FF 100%);border-radius:var(--rc);padding:16px;border:1px solid rgba(139,92,246,.2);box-shadow:0 4px 16px rgba(139,92,246,.1);margin-top:-30px;position:relative;z-index:3}
+.sp-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sp-emoji{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--b),var(--b2));display:grid;place-items:center;font-size:22px;box-shadow:0 4px 10px rgba(88,101,242,.2)}
+.sp-info{flex:1;min-width:0}
+.sp-name{font-size:16px;font-weight:800;letter-spacing:-.01em}
+.sp-latin{font-size:11px;color:var(--muted);font-style:italic;margin-top:2px}
+.sp-chips{display:flex;gap:5px;flex-wrap:wrap}
+.sp-chip{padding:3px 8px;border-radius:100px;font-size:10px;font-weight:600;background:rgba(88,101,242,.1);color:var(--b)}
+.sp-chip.g{background:var(--gs);color:#1B7F3A}
+.sp-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--divider);font-size:13px}
+.sp-row:last-child{border-bottom:none}
+.sp-row .l{color:var(--muted)}
+.sp-row .v{color:var(--ink);font-weight:600}
+.weight-row .v{font-size:18px;font-weight:800;color:var(--b);letter-spacing:-.02em}
+.weight-row .ai-est{font-size:10px;color:var(--muted);font-weight:500;margin-left:4px}
+.sec-h{display:flex;align-items:center;justify-content:space-between;padding:18px 4px 10px}
+.sec-title{font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.btn{padding:12px 14px;border-radius:var(--rb);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-p{flex:1;color:#fff;background:linear-gradient(135deg,var(--b),var(--b2));box-shadow:0 4px 14px rgba(88,101,242,.3)}
+.btn-g{flex:1;background:#fff;color:var(--ink2);border:1px solid var(--border)}
+.cta-grid{display:grid;grid-template-columns:1fr 1.4fr 1.4fr;gap:8px;margin-top:18px}
+.copy-card{background:#fff;border-radius:18px;border:1px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.03);padding:14px;margin-top:10px;position:relative;overflow:hidden}
+.copy-card .tag{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px}
+.copy-card .style{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.copy-card .text{font-size:14px;color:var(--ink);line-height:1.5;margin-top:6px;padding-right:48px}
+.copy-card .text b{color:var(--b)}
+.copy-card .actions{display:flex;gap:6px;margin-top:10px}
+.copy-card .actions .mini{padding:6px 10px;font-size:11px;font-weight:600;border-radius:100px;background:rgba(88,101,242,.08);color:var(--b);cursor:pointer}
+.copy-card .actions .mini.b{background:rgba(60,60,67,.06);color:var(--ink2)}
+.c-得意 .tag{background:rgba(255,215,0,.15);color:#9A7B00}
+.c-谦虚 .tag{background:rgba(52,199,89,.12);color:#1B7F3A}
+.c-搞笑 .tag{background:rgba(255,149,0,.14);color:#9A5500}
+.c-专业 .tag{background:rgba(88,101,242,.12);color:var(--b)}
+.c-极简 .tag{background:rgba(60,60,67,.08);color:var(--ink2)}
+.share-fab{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);pointer-events:none;display:none}
+.tabbar{position:absolute;bottom:0;left:0;right:0;height:96px;background:var(--glass);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-around;padding:10px 0 28px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:8px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer}
+.tab.active{color:var(--b)}
+.tab svg{width:24px;height:24px}
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span style="display:flex;align-items:center;gap:6px">
+      <svg viewBox="0 0 26 12" fill="none" style="width:26px;height:12px"><rect x=".5" y=".5" width="22" height="11" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="19" height="8" rx="1.5" fill="currentColor"/></svg>
+    </span>
+  </div>
+
+  <div class="topbar">
+    <div class="left" onclick="location.href='today.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="title">鱼获详情</div>
+    <div class="right">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <!-- 轮播图 -->
+    <div class="carousel">
+      🐟 鱼获照片
+      <div class="dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <!-- 鱼种百科摘要 -->
+    <div class="species-card">
+      <div class="sp-head">
+        <div class="sp-emoji">🐟</div>
+        <div class="sp-info">
+          <div class="sp-name">鲫鱼</div>
+          <div class="sp-latin">Carassius auratus · 鲤科</div>
+        </div>
+      </div>
+      <div class="sp-chips">
+        <span class="sp-chip g">底层</span>
+        <span class="sp-chip">杂食</span>
+        <span class="sp-chip">易</span>
+        <span class="sp-chip">0.2-1.0kg</span>
+        <span class="sp-chip">春夏秋</span>
+      </div>
+    </div>
+
+    <!-- 字段列表 -->
+    <div class="sec-h"><span class="sec-title">记录详情</span></div>
+    <div class="species-card" style="margin-top:0">
+      <div class="sp-row weight-row">
+        <div class="l">重量</div>
+        <div class="v">320<small style="font-size:11px;color:var(--muted);font-weight:500;margin-left:2px">g</small><span class="ai-est">（AI 估算）</span></div>
+      </div>
+      <div class="sp-row">
+        <div class="l">时间</div>
+        <div class="v">今天 14:30</div>
+      </div>
+      <div class="sp-row">
+        <div class="l">钓点</div>
+        <div class="v">📍 老王钓位</div>
+      </div>
+      <div class="sp-row">
+        <div class="l">钓法</div>
+        <div class="v">台钓</div>
+      </div>
+      <div class="sp-row">
+        <div class="l">饵料</div>
+        <div class="v">商品饵 + 蚯蚓</div>
+      </div>
+      <div class="sp-row">
+        <div class="l">天气</div>
+        <div class="v">26°C 晴 · 1012hPa</div>
+      </div>
+    </div>
+
+    <!-- 3 个 CTA -->
+    <div class="cta-grid">
+      <button class="btn btn-g">📝 编辑</button>
+      <button class="btn btn-p">✨ 生成文案</button>
+      <button class="btn btn-p" style="background:linear-gradient(135deg,#FF9500,#FF6B6B);box-shadow:0 4px 14px rgba(255,149,0,.3)">📤 分享图</button>
+    </div>
+
+    <!-- 文案工具 -->
+    <div class="sec-h">
+      <span class="sec-title">5 风格文案</span>
+      <span class="sec-title" style="color:var(--b)">编辑</span>
+    </div>
+
+    <div class="copy-card c-得意">
+      <span class="tag">🎉 得意</span>
+      <div class="style">CATCH REPORT</div>
+      <div class="text">斤头十足！🎣 <b>320g</b> 鲫鱼上岸！</div>
+      <div class="actions">
+        <span class="mini">📋 复制</span>
+        <span class="mini b">✏️ 编辑</span>
+      </div>
+    </div>
+
+    <div class="copy-card c-谦虚">
+      <span class="tag">😌 谦虚</span>
+      <div class="style">CATCH REPORT</div>
+      <div class="text">今日份小幸运，<b>鲫鱼</b>报到🐟<br><span style="color:var(--muted);font-size:12px">📍 老王钓位 · 14:30</span></div>
+      <div class="actions">
+        <span class="mini">📋 复制</span>
+        <span class="mini b">✏️ 编辑</span>
+      </div>
+    </div>
+
+    <div class="copy-card c-搞笑">
+      <span class="tag">🤡 搞笑</span>
+      <div class="style">CATCH REPORT</div>
+      <div class="text">鱼：<b>你礼貌吗？</b><br>我：不太礼貌</div>
+      <div class="actions">
+        <span class="mini">📋 复制</span>
+        <span class="mini b">✏️ 编辑</span>
+      </div>
+    </div>
+
+    <div class="copy-card c-专业">
+      <span class="tag">📊 专业</span>
+      <div class="style">CATCH REPORT</div>
+      <div class="text"><b>26°C</b> / <b>1012hPa</b> / 鲫鱼活性窗口<br><span style="color:var(--muted);font-size:12px">气压稳定,底栖杂食活性↑</span></div>
+      <div class="actions">
+        <span class="mini">📋 复制</span>
+        <span class="mini b">✏️ 编辑</span>
+      </div>
+    </div>
+
+    <div class="copy-card c-极简">
+      <span class="tag">📝 极简</span>
+      <div class="style">CATCH REPORT</div>
+      <div class="text">🎣 <b>320g</b> · 鲫鱼 · 老王钓位</div>
+      <div class="actions">
+        <span class="mini">📋 复制</span>
+        <span class="mini b">✏️ 编辑</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <div class="tab" onclick="location.href='today.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18" stroke-linecap="round"/></svg>
+      今日
+    </div>
+    <div style="flex:1"></div>
+    <div class="tab" onclick="location.href='mine.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7" stroke-linecap="round"/></svg>
+      我的
+    </div>
+  </div>
+</div>
+</body>
+</html>

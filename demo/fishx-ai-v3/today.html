@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>今日 · FishX 3.0</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:-apple-system,"PingFang SC",sans-serif;letter-spacing:-.01em;color:#1C1C1E;background:#F2F3F7}
+:root{--b:#5865F2;--b2:#8B5CF6;--ink:#1C1C1E;--ink2:#3C3C43;--muted:#8E8E93;--good:#34C759;--gs:rgba(52,199,89,.12);--warn:#FF9500;--ws:rgba(255,149,0,.12);--gold:#FFD700;--border:rgba(60,60,67,.08);--divider:rgba(60,60,67,.06);--glass:rgba(255,255,255,.72);--rc:24px;--rb:14px;--sm:0 2px 6px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);--sf:0 8px 24px rgba(88,101,242,.35)}
+.device{width:393px;height:852px;margin:0 auto;background:#F2F3F7;position:relative;overflow:hidden;border-radius:48px;box-shadow:0 0 0 12px #1C1C1E,0 30px 80px rgba(0,0,0,.18)}
+@media (max-width:480px){.device{width:100vw;height:100vh;border-radius:0;box-shadow:none}}
+.statusbar{height:54px;display:flex;align-items:center;justify-content:space-between;padding:18px 28px 0;font-weight:600;font-size:15px}
+.topnav{padding:8px 20px 14px;display:flex;align-items:center;justify-content:space-between}
+.location{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--ink2);font-weight:600}
+.location .dot{width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 0 4px rgba(52,199,89,.18)}
+.topnav .icons{display:flex;gap:8px}
+.iconbtn{width:36px;height:36px;border-radius:50%;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:grid;place-items:center;border:1px solid var(--border)}
+.iconbtn svg{width:18px;height:18px;color:var(--ink)}
+.scroll{height:calc(100% - 54px - 96px);overflow-y:auto;padding:0 16px 120px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.sec-h{display:flex;align-items:center;justify-content:space-between;padding:18px 4px 10px}
+.sec-title{font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.sec-action{font-size:12px;color:var(--b);font-weight:600;display:flex;align-items:center;gap:2px}
+.sec-action svg{width:12px;height:12px}
+.hero{background:linear-gradient(140deg,#fff 0%,#F8F9FF 100%);border-radius:var(--rc);padding:20px 22px 18px;box-shadow:var(--sm);border:1px solid var(--border);position:relative;overflow:hidden;margin-top:8px}
+.hero::before{content:"";position:absolute;top:-40%;right:-30%;width:240px;height:240px;border-radius:50%;background:radial-gradient(closest-side,rgba(139,92,246,.18),transparent 70%);pointer-events:none}
+.hero-top{display:flex;align-items:center;justify-content:space-between;position:relative}
+.hero-chip{padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700;background:var(--gs);color:#1B7F3A;display:inline-flex;align-items:center;gap:4px}
+.hero-chip .pulse{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pl 2s infinite}
+@keyframes pl{0%{box-shadow:0 0 0 0 rgba(52,199,89,.6)}70%,100%{box-shadow:0 0 0 8px rgba(52,199,89,0)}}
+.hero-headline{font-size:22px;font-weight:800;line-height:1.3;letter-spacing:-.02em;position:relative;margin:14px 0 6px}
+.hero-headline .hl{background:linear-gradient(135deg,var(--b),var(--b2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-sub{font-size:13px;color:var(--muted);line-height:1.5;position:relative}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:16px;padding-top:14px;border-top:1px solid var(--divider);position:relative}
+.stat .v{font-size:14px;font-weight:700;display:flex;align-items:baseline;gap:2px}
+.stat .v small{font-size:10px;color:var(--muted);font-weight:500}
+.stat .l{font-size:10px;color:var(--muted);margin-top:2px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.tactic-row{display:flex;gap:5px;margin-top:14px;flex-wrap:nowrap;position:relative;padding:8px 10px;background:rgba(88,101,242,.05);border-radius:12px;align-items:center}
+.tactic-label{font-size:10px;color:var(--b);font-weight:700;display:flex;align-items:center;gap:3px;flex-shrink:0}
+.tactic-label svg{width:11px;height:11px}
+.tactic-chip{padding:4px 8px;border-radius:100px;font-size:10.5px;font-weight:600;background:#fff;color:var(--ink2);border:1px solid var(--border);white-space:nowrap;flex-shrink:0}
+.tactic-chip.b{background:var(--ws);color:#9A5500;border-color:rgba(255,149,0,.2)}
+.btn{padding:12px 16px;border-radius:var(--rb);font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-p{flex:1;color:#fff;background:linear-gradient(135deg,var(--b),var(--b2));box-shadow:0 4px 14px rgba(88,101,242,.3)}
+.btn-s{padding:12px 16px;color:var(--ink);background:rgba(60,60,67,.06)}
+.hero-cta{display:flex;gap:8px;margin-top:14px;position:relative}
+.btn-p .dist{background:rgba(255,255,255,.18);padding:2px 8px;border-radius:100px;font-size:11px;margin-left:4px}
+.ai-ask{background:linear-gradient(135deg,rgba(88,101,242,.1) 0%,rgba(139,92,246,.12) 100%);border:1.5px dashed rgba(88,101,242,.5);border-radius:var(--rc);padding:16px;box-shadow:0 4px 16px rgba(139,92,246,.1);position:relative;overflow:hidden}
+.ai-ask::before{content:"";position:absolute;top:-50px;right:-50px;width:160px;height:160px;border-radius:50%;background:radial-gradient(closest-side,rgba(139,92,246,.25),transparent 70%);pointer-events:none}
+.ai-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;position:relative}
+.ai-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:100px;border:1px dashed rgba(88,101,242,.45);background:linear-gradient(135deg,rgba(88,101,242,.06),rgba(139,92,246,.06));color:var(--b);font-size:11px;font-weight:700}
+.ai-tag svg{width:12px;height:12px}
+.ai-ctx{font-size:11px;color:var(--muted);font-weight:500;background:rgba(255,255,255,.5);padding:3px 8px;border-radius:100px;display:flex;align-items:center;gap:4px}
+.ai-ctx .dot{width:5px;height:5px;border-radius:50%;background:var(--good)}
+.ai-input{display:flex;align-items:center;gap:8px;background:#fff;border-radius:14px;padding:10px 12px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid var(--border);position:relative}
+.ai-input input{flex:1;border:0;outline:0;font:inherit;font-size:13px;background:transparent}
+.ai-input input::placeholder{color:var(--muted)}
+.send-btn{width:32px;height:32px;border-radius:50%;border:0;cursor:pointer;background:linear-gradient(135deg,var(--b),var(--b2));color:#fff;display:grid;place-items:center;flex-shrink:0}
+.send-btn svg{width:14px;height:14px}
+.quickchips{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;position:relative}
+.quickchip{padding:6px 10px;border-radius:100px;font-size:11px;font-weight:600;background:rgba(255,255,255,.7);color:var(--b);border:1px solid rgba(88,101,242,.25);cursor:pointer}
+.catches-scroll{display:flex;gap:10px;margin:0 -16px;padding:2px 16px 4px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.catches-scroll::-webkit-scrollbar{display:none}
+.catch-card{flex:0 0 240px;scroll-snap-align:start;background:#fff;border-radius:18px;border:1px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.03);padding:12px;display:flex;gap:12px;align-items:center}
+.catch-thumb{width:56px;height:56px;border-radius:14px;flex-shrink:0;background:linear-gradient(135deg,#A8C0E0,#5865F2);display:grid;place-items:center;color:#fff;font-size:24px;box-shadow:0 4px 10px rgba(88,101,242,.2)}
+.catch-thumb.a1{background:linear-gradient(135deg,#FFE082,#FFB020)}
+.catch-thumb.a2{background:linear-gradient(135deg,#A5D6A7,#34C759)}
+.catch-info{flex:1;min-width:0}
+.catch-name{font-size:14px;font-weight:700;line-height:1.3}
+.catch-meta{font-size:11px;color:var(--muted);margin-top:3px}
+.catch-wt{font-size:14px;font-weight:800;color:var(--ink);letter-spacing:-.01em}
+.catch-wt small{font-size:10px;color:var(--muted);font-weight:500;margin-left:1px}
+.catch-time{font-size:10px;color:var(--muted);margin-top:2px}
+.catch-card.primary{flex:0 0 calc(100vw - 64px);max-width:361px;background:linear-gradient(140deg,#fff 0%,#F4F2FF 100%);border:1px solid rgba(139,92,246,.2);box-shadow:0 4px 16px rgba(139,92,246,.1)}
+.species-entry{background:linear-gradient(135deg,rgba(52,199,89,.08) 0%,rgba(88,101,242,.08) 100%);border:1px solid var(--border);border-radius:var(--rc);padding:18px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.species-entry::before{content:"";position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(closest-side,rgba(88,101,242,.2),transparent 70%);pointer-events:none}
+.species-icon{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--good),#1FA84A);display:grid;place-items:center;font-size:24px;box-shadow:0 4px 10px rgba(52,199,89,.25);flex-shrink:0}
+.species-body{flex:1;position:relative}
+.species-title{font-size:15px;font-weight:800;letter-spacing:-.01em}
+.species-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.species-sub b{color:var(--ink);font-weight:700}
+.species-arrow{color:var(--b);flex-shrink:0}
+.tabbar{position:absolute;bottom:0;left:0;right:0;height:96px;background:var(--glass);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-top:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-around;padding:10px 0 28px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:8px;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer}
+.tab.active{color:var(--b)}
+.tab svg{width:24px;height:24px}
+.fab-wrap{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);pointer-events:none}
+.fab{pointer-events:auto;width:64px;height:64px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--b),var(--b2));box-shadow:var(--sf);display:grid;place-items:center;color:#fff;position:relative}
+.fab svg{width:28px;height:28px}
+.fab::before{content:"";position:absolute;inset:-6px;border-radius:50%;background:radial-gradient(closest-side,rgba(139,92,246,.3),transparent 70%);z-index:-1}
+.fab .ring{position:absolute;inset:-10px;border-radius:50%;border:1.5px solid rgba(88,101,242,.3);animation:ripple 2.4s infinite}
+.fab .ring.d{animation-delay:1.2s}
+@keyframes ripple{0%{transform:scale(.92);opacity:.8}100%{transform:scale(1.5);opacity:0}}
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span style="display:flex;align-items:center;gap:6px">
+      <svg viewBox="0 0 18 12" fill="currentColor" style="width:18px;height:12px"><rect x="0" y="6" width="3" height="6" rx="1"/><rect x="5" y="3" width="3" height="9" rx="1"/><rect x="10" y="0" width="3" height="12" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></svg>
+      <svg viewBox="0 0 26 12" fill="none" style="width:26px;height:12px"><rect x=".5" y=".5" width="22" height="11" rx="2.5" stroke="currentColor"/><rect x="2" y="2" width="19" height="8" rx="1.5" fill="currentColor"/><rect x="23.5" y="3.5" width="1.5" height="5" rx=".75" fill="currentColor" opacity=".5"/></svg>
+    </span>
+  </div>
+
+  <div class="topnav">
+    <div class="location">
+      <span class="dot"></span>
+      <span>广州 · 天河</span>
+      <svg viewBox="0 0 12 12" width="10" height="10"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".5"/></svg>
+    </div>
+    <div class="icons">
+      <div class="iconbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3" stroke-linecap="round"/></svg></div>
+      <div class="iconbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M3 12h3M18 12h3" stroke-linecap="round"/></svg></div>
+    </div>
+  </div>
+
+  <div class="scroll">
+    <!-- ① Hero 天气+潮汐+简单建议 -->
+    <div class="hero">
+      <div class="hero-top">
+        <span class="hero-label">今日鱼情</span>
+        <div class="hero-chip"><span class="pulse"></span>可去</div>
+      </div>
+      <div class="hero-headline"><span class="hl">下午 2-5 点</span>是最佳窗口期</div>
+      <div class="hero-sub">气压 1012 hPa 稳定，浅水区鲫鱼活跃</div>
+      <div class="stats">
+        <div class="stat"><div class="v">28<small>°C</small></div><div class="l">气温</div></div>
+        <div class="stat"><div class="v">1012<small>hPa</small></div><div class="l">气压</div></div>
+        <div class="stat"><div class="v">↘2<small>级</small></div><div class="l">风力</div></div>
+        <div class="stat"><div class="v">涨<small>↑1.8</small></div><div class="l">潮汐</div></div>
+      </div>
+      <div class="tactic-row">
+        <span class="tactic-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+          推荐
+        </span>
+        <span class="tactic-chip">🎣 路亚 · 米诺</span>
+        <span class="tactic-chip b">🌽 玉米 · 红虫</span>
+        <span class="tactic-chip">⏰ 14-17 时段</span>
+      </div>
+      <div class="hero-cta">
+        <button class="btn btn-p">立即出发<span class="dist">距你 1.2km</span></button>
+        <button class="btn btn-s">详情</button>
+      </div>
+    </div>
+
+    <!-- ② AI 鱼小渔（基础版·公共数据） -->
+    <div class="sec-h"><span class="sec-title">问 AI 鱼小渔</span></div>
+    <div class="ai-ask">
+      <div class="ai-head">
+        <span class="ai-tag"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M6 0l1.5 4.5L12 6 7.5 7.5 6 12 4.5 7.5 0 6l4.5-1.5z"/></svg>鱼小渔</span>
+        <span class="ai-ctx"><span class="dot"></span>广州·天河 · 下午 · 气压 1012</span>
+      </div>
+      <div class="ai-input">
+        <span style="font-size:16px">💬</span>
+        <input type="text" placeholder="下午这个气压，路亚翘嘴能爆护吗？" readonly>
+        <button class="send-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h11M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <div class="quickchips">
+        <span class="quickchip">这个气压适合路亚吗？</span>
+        <span class="quickchip">鲫鱼用什么饵稳？</span>
+        <span class="quickchip">3 点去会不会空军？</span>
+      </div>
+    </div>
+
+    <!-- ③ 我最近的鱼获 -->
+    <div class="sec-h">
+      <span class="sec-title">我最近的钓获</span>
+      <span class="sec-action">查看全部<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 3l4 3-4 3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </div>
+    <div class="catches-scroll">
+      <div class="catch-card primary">
+        <div class="catch-thumb">🐟</div>
+        <div class="catch-info">
+          <div class="catch-name">鲫鱼</div>
+          <div class="catch-meta">老王钓位 · 台钓</div>
+          <div class="catch-time">今天 14:30</div>
+        </div>
+        <div class="catch-wt">320<small>g</small></div>
+      </div>
+      <div class="catch-card">
+        <div class="catch-thumb a1">🐠</div>
+        <div class="catch-info">
+          <div class="catch-name">鲤鱼</div>
+          <div class="catch-meta">老王钓位 · 台钓</div>
+          <div class="catch-time">今天 11:20</div>
+        </div>
+        <div class="catch-wt">1.2<small>kg</small></div>
+      </div>
+      <div class="catch-card">
+        <div class="catch-thumb a2">🎏</div>
+        <div class="catch-info">
+          <div class="catch-name">翘嘴</div>
+          <div class="catch-meta">千岛湖 · 路亚</div>
+          <div class="catch-time">昨天 16:40</div>
+        </div>
+        <div class="catch-wt">680<small>g</small></div>
+      </div>
+    </div>
+
+    <!-- ④ 鱼种图鉴入口 -->
+    <div class="sec-h"><span class="sec-title">鱼种图鉴</span></div>
+    <div class="species-entry">
+      <div class="species-icon">🐟</div>
+      <div class="species-body">
+        <div class="species-title">已解锁 <b>5</b> / 8 种</div>
+        <div class="species-sub">解锁鲫鱼/鲤鱼/草鱼/鲈鱼/翘嘴 · 还有 3 种待探索</div>
+      </div>
+      <svg class="species-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" width="20" height="20"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <div class="tab active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v18M3 12h18" stroke-linecap="round"/></svg>
+      今日
+    </div>
+    <div style="flex:1"></div>
+    <div class="tab" onclick="location.href='mine.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7" stroke-linecap="round"/></svg>
+      我的
+    </div>
+  </div>
+  <div class="fab-wrap">
+    <button class="fab" onclick="location.href='capture.html'">
+      <span class="ring"></span><span class="ring d"></span>
+      <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 8h3l1.5-2h9L20 8h3a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" stroke-linejoin="round"/><circle cx="14" cy="14" r="4.5"/></svg>
+    </button>
+  </div>
+</div>
+</body>
+</html>
