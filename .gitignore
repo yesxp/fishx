@@ -2,3 +2,8 @@ node_modules/
 dist/
 .DS_Store
 .env.local
+
+# 本地开发数据库（不 commit，clone 后用 schema.dev.sql + fish-species-seed.sql 重新生成）
+docs/dev.sqlite
+docs/dev.sqlite-journal
+docs/*.sqlite-journal
