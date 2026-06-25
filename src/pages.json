@@ -52,6 +52,12 @@
       }
     },
     {
+      "path": "pages/catch/list",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/map/detail",
       "style": {
         "navigationStyle": "custom"
