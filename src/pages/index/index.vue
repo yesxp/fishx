@@ -323,7 +323,8 @@ function onSpeciesEntry() {
   font-family: -apple-system, "PingFang SC", sans-serif;
   color: #1C1C1E;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* ====== Top Nav ====== */
@@ -381,6 +382,7 @@ function onSpeciesEntry() {
 .scroll-content {
   height: calc(100vh - 58px);
   padding: 0 16px;
+  overflow-x: hidden;
 }
 
 /* ====== Section Headers ====== */
@@ -715,10 +717,10 @@ function onSpeciesEntry() {
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 18px;
   box-shadow: 0 4px 16px rgba(139, 92, 246, 0.1);
-  padding: 14px;
+  padding: 14px 12px;
   display: flex;
   align-items: flex-start;
-  gap: 14px;
+  gap: 10px;
 }
 
 .catch-thumb-lg {
@@ -741,6 +743,7 @@ function onSpeciesEntry() {
 .catch-info {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .catch-top {
@@ -816,6 +819,7 @@ function onSpeciesEntry() {
   display: flex;
   gap: 10px;
   margin-top: 10px;
+  overflow: hidden;
 }
 
 .catch-sub {
