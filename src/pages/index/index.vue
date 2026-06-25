@@ -912,12 +912,12 @@ function onSpeciesEntry() {
   width: 48px;
   height: 48px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #34C759, #1FA84A);
+  background: linear-gradient(135deg, #5865F2, #8B5CF6);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(52, 199, 89, 0.25);
+  box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
 }
 
 .species-emoji {

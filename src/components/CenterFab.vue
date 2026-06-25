@@ -24,7 +24,7 @@ const onTap = () => {
 .fab-wrap {
   position: fixed;
   left: 50%;
-  bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
   pointer-events: none;
   z-index: 99;

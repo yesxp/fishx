@@ -407,6 +407,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
 /* ====== Scroll ====== */
 .scroll-content {
   height: calc(100vh - 380px - 72px);
+  overflow-x: hidden;
 }
 
 .body {
