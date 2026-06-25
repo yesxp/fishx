@@ -13,29 +13,9 @@
       }
     },
     {
-      "path": "pages/weather/index",
-      "style": {
-        "navigationBarTitleText": "天时",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/map/index",
-      "style": {
-        "navigationBarTitleText": "钓点",
-        "navigationStyle": "custom"
-      }
-    },
-    {
       "path": "pages/mine/index",
       "style": {
         "navigationBarTitleText": "我的",
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/login/index",
-      "style": {
         "navigationStyle": "custom"
       }
     },
@@ -53,18 +33,6 @@
     },
     {
       "path": "pages/catch/list",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/map/detail",
-      "style": {
-        "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/map/explore",
       "style": {
         "navigationStyle": "custom"
       }

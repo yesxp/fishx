@@ -12,29 +12,17 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    CatchCard: typeof import('./src/components/CatchCard.vue')['default']
     CenterFab: typeof import('./src/components/CenterFab.vue')['default']
-    FishBadge: typeof import('./src/components/FishBadge.vue')['default']
     LEchart: typeof import('./src/components/LEchart.vue')['default']
-    MapView: typeof import('./src/components/MapView.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SpotCard: typeof import('./src/components/SpotCard.vue')['default']
-    WeatherMini: typeof import('./src/components/WeatherMini.vue')['default']
-    WotTabBar: typeof import('./src/components/WotTabBar.vue')['default']
   }
 }
 
 // For TSX support
 declare global {
-  const CatchCard: typeof import('./src/components/CatchCard.vue')['default']
   const CenterFab: typeof import('./src/components/CenterFab.vue')['default']
-  const FishBadge: typeof import('./src/components/FishBadge.vue')['default']
   const LEchart: typeof import('./src/components/LEchart.vue')['default']
-  const MapView: typeof import('./src/components/MapView.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
-  const SpotCard: typeof import('./src/components/SpotCard.vue')['default']
-  const WeatherMini: typeof import('./src/components/WeatherMini.vue')['default']
-  const WotTabBar: typeof import('./src/components/WotTabBar.vue')['default']
 }
