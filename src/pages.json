@@ -96,21 +96,9 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "首页",
-        "iconPath": "static/tab/home.svg",
-        "selectedIconPath": "static/tab/home-active.svg"
-      },
-      {
-        "pagePath": "pages/weather/index",
-        "text": "天时",
-        "iconPath": "static/tab/weather.svg",
-        "selectedIconPath": "static/tab/weather-active.svg"
-      },
-      {
-        "pagePath": "pages/map/index",
-        "text": "钓点",
-        "iconPath": "static/tab/map.svg",
-        "selectedIconPath": "static/tab/map-active.svg"
+        "text": "今日",
+        "iconPath": "static/tab/today.svg",
+        "selectedIconPath": "static/tab/today-active.svg"
       },
       {
         "pagePath": "pages/mine/index",

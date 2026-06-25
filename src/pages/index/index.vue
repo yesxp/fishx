@@ -210,6 +210,7 @@
       <view style="height: 120px" />
     </scroll-view>
   </view>
+  <CenterFab />
 </template>
 
 <script setup lang="ts">

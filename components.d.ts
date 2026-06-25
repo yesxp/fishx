@@ -13,6 +13,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     CatchCard: typeof import('./src/components/CatchCard.vue')['default']
+    CenterFab: typeof import('./src/components/CenterFab.vue')['default']
     FishBadge: typeof import('./src/components/FishBadge.vue')['default']
     LEchart: typeof import('./src/components/LEchart.vue')['default']
     MapView: typeof import('./src/components/MapView.vue')['default']
@@ -27,6 +28,7 @@ declare module 'vue' {
 // For TSX support
 declare global {
   const CatchCard: typeof import('./src/components/CatchCard.vue')['default']
+  const CenterFab: typeof import('./src/components/CenterFab.vue')['default']
   const FishBadge: typeof import('./src/components/FishBadge.vue')['default']
   const LEchart: typeof import('./src/components/LEchart.vue')['default']
   const MapView: typeof import('./src/components/MapView.vue')['default']
