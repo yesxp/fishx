@@ -1,7 +1,5 @@
 <template>
   <view class="fab-area" @tap="onTap">
-    <!-- 装饰弧线：从 FAB 向下延伸到 tab 栏，模拟嵌入感 -->
-    <view class="fab-arc"></view>
     <view class="fab-ring"></view>
     <view class="fab-ring d"></view>
     <view class="fab">
@@ -26,23 +24,11 @@ const onTap = () => {
 .fab-area {
   position: fixed;
   left: 50%;
-  /* 下移：中心与 tabBar 重叠，凸起在上方 */
-  bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+  /* 原型：FAB 中心与 tab 栏顶部齐平，上半凸出 */
+  bottom: calc(17px + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
   pointer-events: none;
   z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-/* 装饰弧线：FAB 底部到 tabBar 的过渡 */
-.fab-arc {
-  width: 56px;
-  height: 16px;
-  margin-top: -2px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,0.95) 100%);
-  border-radius: 0 0 28px 28px;
-  pointer-events: none;
 }
 .fab {
   pointer-events: auto;
@@ -55,8 +41,6 @@ const onTap = () => {
   place-items: center;
   color: #fff;
   position: relative;
-  /* 微微向上凸起 */
-  margin-bottom: -8px;
 }
 .fab svg {
   width: 28px;
@@ -70,6 +54,7 @@ const onTap = () => {
   background: radial-gradient(closest-side, rgba(139, 92, 246, 0.3), transparent 70%);
   z-index: -1;
 }
+/* ripple 动画不用 scale，改用 opacity 避免触发溢出 */
 .fab-ring {
   position: absolute;
   top: -10px;
@@ -78,7 +63,7 @@ const onTap = () => {
   width: 84px;
   height: 84px;
   border-radius: 50%;
-  border: 1.5px solid rgba(88, 101, 242, 0.3);
+  border: 1.5px solid rgba(88, 101, 246, 0.3);
   animation: ripple 2.4s infinite;
   pointer-events: none;
 }
@@ -86,7 +71,7 @@ const onTap = () => {
   animation-delay: 1.2s;
 }
 @keyframes ripple {
-  0% { transform: translateX(-50%) scale(0.92); opacity: 0.8; }
-  100% { transform: translateX(-50%) scale(1.5); opacity: 0; }
+  0% { opacity: 0.8; }
+  100% { opacity: 0; }
 }
 </style>

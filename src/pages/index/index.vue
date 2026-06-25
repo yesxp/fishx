@@ -719,10 +719,11 @@ function onSpeciesEntry() {
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 18px;
   box-shadow: 0 4px 16px rgba(139, 92, 246, 0.1);
-  padding: 14px 12px;
+  padding: 14px 16px;
   display: flex;
   align-items: flex-start;
   gap: 10px;
+  overflow: hidden;
 }
 
 .catch-thumb-lg {

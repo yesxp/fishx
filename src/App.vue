@@ -78,15 +78,7 @@ uni-page-body {
   max-width: 100vw;
   width: 100%;
 }
-uni-page {
-  overflow-x: hidden;
-  max-width: 100vw;
-  width: 100%;
-}
-html, body {
-  overflow-x: hidden;
-  max-width: 100vw;
-}
+
 
 /* 去掉 button 默认边框 */
 button::after {
