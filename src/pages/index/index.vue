@@ -325,6 +325,8 @@ function onSpeciesEntry() {
   position: relative;
   overflow-x: hidden;
   width: 100%;
+  box-sizing: border-box;
+  max-width: 100vw;
 }
 
 /* ====== Top Nav ====== */

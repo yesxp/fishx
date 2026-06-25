@@ -26,8 +26,8 @@ const onTap = () => {
 .fab-area {
   position: fixed;
   left: 50%;
-  /* 贴在 tabBar 上方：tabBar 高 50px + safe-area */
-  bottom: calc(50px + env(safe-area-inset-bottom, 0px));
+  /* 下移：中心与 tabBar 重叠，凸起在上方 */
+  bottom: calc(30px + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
   pointer-events: none;
   z-index: 9999;
