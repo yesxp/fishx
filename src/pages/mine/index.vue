@@ -113,17 +113,26 @@
         <text class="sec-title">近期活动</text>
       </view>
       <view class="timeline">
-        <view
-          v-for="(item, i) in mockTimeline"
-          :key="i"
-          class="timeline-item"
-        >
-          <view class="timeline-dot" :class="{ 'timeline-dot--active': i === 0 }" />
-          <view class="timeline-content">
-            <text class="timeline-time">{{ item.time }}</text>
-            <text class="timeline-text">{{ item.text }}</text>
+        <template v-for="(group, gIdx) in timelineGroups" :key="gIdx">
+          <!-- 月份分组标题 -->
+          <view class="timeline-group-header">
+            <text class="timeline-group-title">{{ group.month }}</text>
+            <view class="timeline-group-line" />
+            <text class="timeline-group-count">{{ group.items.length }} 条</text>
           </view>
-        </view>
+          <!-- 该月的时间线项 -->
+          <view
+            v-for="(item, i) in group.items"
+            :key="`${gIdx}-${i}`"
+            class="timeline-item"
+          >
+            <view class="timeline-dot" :class="{ 'timeline-dot--active': gIdx === 0 && i === 0 }" />
+            <view class="timeline-content">
+              <text class="timeline-time">{{ item.time }}</text>
+              <text class="timeline-text">{{ item.text }}</text>
+            </view>
+          </view>
+        </template>
       </view>
 
       <!-- Bottom Safe Area -->
@@ -134,7 +143,8 @@
 </template>
 
 <script setup lang="ts">
-// ---- Mock Data ----
+import { computed } from 'vue'
+import { getLocalCatches } from '@/api/catch'
 const mockUser = {
   avatar: '🎣',
   name: '钓鱼人',
@@ -166,15 +176,69 @@ const mockTools: ToolItem[] = [
 interface TimelineItem {
   time: string
   text: string
+  date: Date
 }
 
-const mockTimeline: TimelineItem[] = [
-  { time: '今天 14:30', text: '钓到鲫鱼 320g' },
-  { time: '今天 11:20', text: '钓到鲤鱼 1.2kg' },
-  { time: '昨天 16:40', text: '钓到翘嘴 680g' },
-  { time: '3 天前', text: '解锁新鱼种：鲫鱼' },
-  { time: '1 周前', text: '完成首次破百钓' },
-]
+interface TimelineGroup {
+  month: string
+  items: TimelineItem[]
+}
+
+// ---- 鱼获 → 时间线（按月分组） ----
+const timelineGroups = computed<TimelineGroup[]>(() => {
+  // 1. 从 storage 读取鱼获
+  const catches = getLocalCatches()
+
+  // 2. 转换为时间线条目
+  const items: TimelineItem[] = catches.map((c: any) => {
+    const d = new Date(c.caught_at || c.created_at)
+    return {
+      time: formatTime(d),
+      text: `钓到${c.species_name} ${c.weight_g ? (c.weight_g / 500).toFixed(1) + '斤' : ''}`,
+      date: d,
+    }
+  })
+
+  // 3. 加上 mock 数据（开发期丰富展示）
+  const mockDates = [
+    { d: new Date(2026, 5, 25, 14, 30), text: '钓到翘嘴 680g' }, // 6月
+    { d: new Date(2026, 5, 20, 9, 15), text: '解锁新鱼种：翘嘴' },
+    { d: new Date(2026, 4, 28, 16, 40), text: '钓到草鱼 2.3kg' }, // 5月
+    { d: new Date(2026, 4, 10, 11, 0), text: '完成首次破百钓' },
+    { d: new Date(2026, 3, 15, 8, 30), text: '钓到鲫鱼 280g' }, // 4月
+  ]
+  mockDates.forEach(m => {
+    items.push({ time: formatTime(m.d), text: m.text, date: m.d })
+  })
+
+  // 4. 按月份分组
+  const groupMap = new Map<string, TimelineItem[]>()
+  items.sort((a, b) => b.date.getTime() - a.date.getTime()) // 倒序
+  items.forEach(item => {
+    const key = `${item.date.getFullYear()}年${item.date.getMonth() + 1}月`
+    if (!groupMap.has(key)) groupMap.set(key, [])
+    groupMap.get(key)!.push(item)
+  })
+
+  // 5. 转数组
+  return Array.from(groupMap.entries()).map(([month, items]) => ({ month, items }))
+})
+
+function formatTime(d: Date): string {
+  const now = new Date()
+  const diff = now.getTime() - d.getTime()
+  const day = 24 * 60 * 60 * 1000
+  if (diff < day) {
+    return `今天 ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
+  }
+  if (diff < 2 * day) {
+    return `昨天 ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
+  }
+  if (diff < 7 * day) {
+    return `${Math.floor(diff / day)} 天前`
+  }
+  return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
+}
 
 // ---- Actions ----
 function goSettings() {
@@ -567,11 +631,43 @@ function onExportData() {
 
 /* ====== Timeline ====== */
 .timeline {
-  background: #fff;
-  border: 1px solid rgba(60, 60, 67, 0.08);
-  border-radius: 20px;
-  padding: 16px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.03);
+  background: var(--card);
+  border-radius: var(--rc);
+  box-shadow: var(--sm);
+  padding: 20px 20px 20px 32px;
+  position: relative;
+}
+
+.timeline-group-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 12px;
+}
+
+.timeline-group-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--b);
+}
+
+.timeline-group-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--b) 0%, transparent 100%);
+  opacity: 0.2;
+}
+
+.timeline-group-count {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--bg);
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.timeline-group-header:first-child {
+  margin-top: 0;
 }
 
 .timeline-item {
@@ -583,21 +679,21 @@ function onExportData() {
 }
 
 .timeline-item + .timeline-item {
-  border-top: 1px solid rgba(60, 60, 67, 0.06);
+  border-top: 1px solid rgba(60, 60, 67, 0.04);
 }
 
 .timeline-dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: #C7C7CC;
+  background: rgba(88, 101, 242, 0.2);
+  margin-top: 6px;
   flex-shrink: 0;
-  margin-top: 5px;
 }
 
 .timeline-dot--active {
-  background: #5865F2;
-  box-shadow: 0 0 0 4px rgba(88, 101, 242, 0.18);
+  background: linear-gradient(135deg, var(--b), var(--b2));
+  box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.15);
 }
 
 .timeline-content {
@@ -606,16 +702,17 @@ function onExportData() {
 }
 
 .timeline-time {
-  font-size: 12px;
-  color: #8E8E93;
-  font-weight: 500;
+  font-size: 11px;
+  color: var(--muted);
   display: block;
   margin-bottom: 2px;
 }
 
 .timeline-text {
   font-size: 14px;
-  font-weight: 600;
-  color: #1C1C1E;
+  color: var(--ink);
+  font-weight: 500;
+  display: block;
+  line-height: 1.4;
 }
 </style>
