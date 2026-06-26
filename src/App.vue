@@ -32,6 +32,9 @@ onHide(() => {
 </script>
 
 <style>
+/* 全局 FishX 视觉规范 */
+@import './styles/tokens.scss';
+
 /* ===== Wot UI 主题覆盖 — Discord Light Mode ===== */
 page {
   --wot-color-primary: #5865F2;

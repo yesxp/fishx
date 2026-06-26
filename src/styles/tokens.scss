@@ -1,0 +1,109 @@
+// FishX 全局样式 Token
+// 统一规范：圆角 24/14、阴影 4 套、字体栈
+
+:root {
+  /* === 色彩 === */
+  --b: #5865F2;          /* 主色 蓝 */
+  --b2: #8B5CF6;         /* 辅色 紫 */
+  --ink: #1C1C1E;        /* 主文字 */
+  --ink2: #3C3C43;       /* 次文字 */
+  --muted: #8E8E93;      /* 弱文字 */
+  --bg: #F2F3F7;         /* 页面背景 */
+  --card: #FFFFFF;       /* 卡片背景 */
+  --good: #34C759;       /* 成功/绿 */
+  --warn: #FF9500;       /* 警告/橙 */
+  --bad: #FF3B30;        /* 错误/红 */
+  --gold: #FFD700;       /* 金 */
+  --glass: rgba(255, 255, 255, 0.72);
+
+  /* === 圆角 === */
+  --rc: 24px;            /* 卡片 24 */
+  --rb: 14px;            /* 按钮 14 */
+  --rs: 10px;            /* 小元素 10 */
+  --rc-chip: 100px;      /* chip 100 */
+
+  /* === 阴影 === */
+  --sm: 0 2px 6px rgba(0, 0, 0, .04), 0 8px 24px rgba(0, 0, 0, .06);
+  --sm-lite: 0 1px 2px rgba(0, 0, 0, .04), 0 2px 8px rgba(0, 0, 0, .03);
+  --sm-purple: 0 4px 16px rgba(139, 92, 246, .1);
+  --sm-deep: 0 4px 12px rgba(0, 0, 0, .08), 0 16px 32px rgba(0, 0, 0, .12);
+
+  /* === 字体 === */
+  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "SF Pro Display", "Helvetica Neue", "Noto Sans SC", sans-serif;
+
+  /* === 间距 === */
+  --gap-1: 4px;
+  --gap-2: 8px;
+  --gap-3: 12px;
+  --gap-4: 16px;
+  --gap-5: 20px;
+  --gap-6: 24px;
+}
+
+/* === 全局 box-sizing === */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* === 全局字体 === */
+view, text, input, textarea {
+  font-family: var(--font);
+}
+
+/* === 卡片统一圆角 + 阴影 === */
+.fishx-card {
+  background: var(--card);
+  border-radius: var(--rc);
+  box-shadow: var(--sm);
+}
+
+.fishx-card--lite {
+  background: var(--card);
+  border-radius: var(--rc);
+  box-shadow: var(--sm-lite);
+}
+
+.fishx-card--purple {
+  background: var(--card);
+  border-radius: var(--rc);
+  box-shadow: var(--sm-purple);
+}
+
+/* === 按钮统一 === */
+.fishx-btn {
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: var(--rb);
+  transition: all 0.2s;
+}
+
+.fishx-btn--primary {
+  background: linear-gradient(135deg, var(--b), var(--b2));
+  color: #fff;
+}
+
+.fishx-btn--secondary {
+  background: rgba(60, 60, 67, 0.06);
+  color: var(--ink);
+}
+
+/* === Chip 统一 === */
+.fishx-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--rc-chip);
+  background: var(--bg);
+  color: var(--ink2);
+}
+
+.fishx-chip--active {
+  background: rgba(88, 101, 242, 0.1);
+  color: var(--b);
+}
