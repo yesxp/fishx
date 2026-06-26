@@ -79,6 +79,21 @@ uni-page-body {
   width: 100%;
 }
 
+/* ===== 全局 view 元素 reset（修复"右侧未约束"） =====
+   框架 uvue.css 写了 `uni-app uni-view { box-sizing: border-box; min-width: 0; ... }`
+   但 H5 编译产物根元素是 #app / uni-page，不是 <uni-app>，整条 reset 匹配不到。
+   导致所有自定义 view 元素走 UA 默认值（min-width: auto），在 flex 父级里不收缩，
+   被 <input> 默认 min-width 撑大 → 整页右移 → 右侧未约束。
+   这里补上框架遗漏的 reset。 */
+uni-view, uni-text, uni-label,
+uni-scroll-view, uni-page-wrapper, uni-page-body {
+  box-sizing: border-box;
+  min-width: 0;
+}
+uni-input, uni-textarea {
+  min-width: 0;
+}
+
 
 /* 去掉 button 默认边框 */
 button::after {
