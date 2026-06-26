@@ -2,11 +2,27 @@
   <view class="page-capture">
     <!-- ========== 模式 A：拍照取景 ========== -->
     <template v-if="mode === 'camera'">
-      <!-- Camera background -->
-      <view class="camera-bg">
+      <!-- 真实摄像头预览 -->
+      <video
+        ref="videoEl"
+        class="camera-video"
+        autoplay
+        playsinline
+        muted
+      />
+      <!-- 摄像头错误时的降级背景 -->
+      <view v-if="cameraError" class="camera-fallback">
+        <text class="fallback-emoji">📷</text>
+        <text class="fallback-text">{{ cameraError }}</text>
+        <view class="fallback-btn" @tap="onAlbumPick">
+          <text>从相册选择</text>
+        </view>
+      </view>
+
+      <!-- 装饰覆盖层 -->
+      <view class="camera-bg" v-if="!cameraError">
         <view class="camera-glow camera-glow--1" />
         <view class="camera-glow camera-glow--2" />
-        <view class="fish-blob" />
       </view>
 
       <!-- Top bar -->
@@ -235,11 +251,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { identifyFish, type FishIdentifyResult } from '@/api/ai'
 import { readExif } from '@/utils/exif'
 import { saveCatch } from '@/api/catch'
 import { getCurrentLocation } from '@/lib/amap'
+import { filePathToBlob } from '@/utils/resource'
 
 type Mode = 'camera' | 'loading' | 'result' | 'edit'
 
@@ -247,6 +264,83 @@ const mode = ref<Mode>('camera')
 const categories = ['🐟 鱼种识别', '🦐 饵料识别', '🎣 环境识别']
 const activeCat = ref(0)
 const flashOn = ref(false)
+
+// ========== 摄像头 ==========
+const videoEl = ref<HTMLVideoElement | null>(null)
+const cameraError = ref<string>('')
+let mediaStream: MediaStream | null = null
+let facingMode: 'environment' | 'user' = 'environment'
+
+async function startCamera() {
+  // 检查浏览器支持
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    cameraError.value = '当前环境不支持摄像头'
+    return
+  }
+  try {
+    // 停掉旧的 stream
+    stopCamera()
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: facingMode },
+        width: { ideal: 1920 },
+        height: { ideal: 1080 },
+      },
+      audio: false,
+    })
+    await nextTick()
+    if (videoEl.value) {
+      videoEl.value.srcObject = mediaStream
+      cameraError.value = ''
+    }
+  } catch (err: any) {
+    console.error('[Camera] 启动失败:', err)
+    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+      cameraError.value = '摄像头权限被拒绝，请从相册选择'
+    } else if (err.name === 'NotFoundError') {
+      cameraError.value = '未找到摄像头设备'
+    } else if (err.name === 'NotReadableError') {
+      cameraError.value = '摄像头被其他程序占用'
+    } else {
+      cameraError.value = `摄像头启动失败：${err.message || err.name || '未知错误'}`
+    }
+  }
+}
+
+function stopCamera() {
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(t => t.stop())
+    mediaStream = null
+  }
+  if (videoEl.value) {
+    videoEl.value.srcObject = null
+  }
+}
+
+// 从 video 截帧为 Blob
+function captureFromVideo(): Promise<Blob | null> {
+  return new Promise((resolve) => {
+    const v = videoEl.value
+    if (!v || !v.videoWidth) {
+      resolve(null)
+      return
+    }
+    const canvas = document.createElement('canvas')
+    canvas.width = v.videoWidth
+    canvas.height = v.videoHeight
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      resolve(null)
+      return
+    }
+    ctx.drawImage(v, 0, 0)
+    canvas.toBlob(
+      blob => resolve(blob),
+      'image/jpeg',
+      0.85
+    )
+  })
+}
 
 // ========== 拍照/识别状态 ==========
 const previewImage = ref<string>('')
@@ -310,7 +404,13 @@ function onRecenter() {
 }
 
 function onFlipCamera() {
-  uni.showToast({ title: '切换摄像头', icon: 'none', duration: 800 })
+  facingMode = facingMode === 'environment' ? 'user' : 'environment'
+  startCamera()
+  uni.showToast({
+    title: facingMode === 'environment' ? '后置摄像头' : '前置摄像头',
+    icon: 'none',
+    duration: 600,
+  })
 }
 
 async function onPickSpot() {
@@ -324,13 +424,19 @@ async function onPickSpot() {
 }
 
 async function pickImage(sourceType: ('album' | 'camera')[]) {
-  return new Promise<string | null>((resolve) => {
+  return new Promise<{ path: string; blob: Blob | null } | null>((resolve) => {
     uni.chooseImage({
       count: 1,
       sizeType: ['compressed'],
       sourceType,
       success: async (res) => {
         const filePath = res.tempFilePaths[0]
+        let blob: Blob | null = null
+        try {
+          blob = await filePathToBlob(filePath)
+        } catch (e) {
+          console.warn('[Image] 转为 Blob 失败:', e)
+        }
         // EXIF 自动读 → 失败手动选点
         try {
           const exif = await readExif(filePath)
@@ -338,13 +444,10 @@ async function pickImage(sourceType: ('album' | 'camera')[]) {
             spotGeo.value = { lat: exif.lat, lng: exif.lng }
             spotName.value = `EXIF: ${exif.lat.toFixed(4)}, ${exif.lng.toFixed(4)}`
           }
-          if (exif.dateTime) {
-            // 用 EXIF 时间作为 caught_at
-          }
         } catch (e) {
-          // EXIF 读取失败，提示用户手动选点
+          // EXIF 读取失败
         }
-        resolve(filePath)
+        resolve({ path: filePath, blob })
       },
       fail: () => resolve(null),
     })
@@ -352,20 +455,35 @@ async function pickImage(sourceType: ('album' | 'camera')[]) {
 }
 
 async function onAlbumPick() {
-  const path = await pickImage(['album'])
-  if (path) startIdentify(path)
+  const res = await pickImage(['album'])
+  if (res) startIdentify(res.path, res.blob)
 }
 
 async function handleShutter() {
-  const path = await pickImage(['album', 'camera'])
-  if (path) startIdentify(path)
-  // 即使失败也走 mock 流程（开发期）
-  else startIdentify('')
+  // 1. 优先从摄像头 video 截帧
+  if (videoEl.value && videoEl.value.videoWidth > 0 && !cameraError.value) {
+    const blob = await captureFromVideo()
+    if (blob) {
+      // 转 objectURL 用于预览
+      const url = URL.createObjectURL(blob)
+      startIdentify(url, blob)
+      return
+    }
+  }
+  // 2. 降级：从相册/相机选择
+  const res = await pickImage(['album', 'camera'])
+  if (res) startIdentify(res.path, res.blob)
+  // 3. 兜底：mock 流程（开发期）
+  else startIdentify('', null)
 }
 
 // ========== 识别流程 ==========
-async function startIdentify(imagePath: string) {
+// 临时保存的 blob（识别后到保存之间用）
+const pendingBlob = ref<Blob | null>(null)
+
+async function startIdentify(imagePath: string, blob: Blob | null) {
   previewImage.value = imagePath
+  pendingBlob.value = blob
   mode.value = 'loading'
   progress.value = 0
   loadingHint.value = loadingHints[0]
@@ -435,7 +553,7 @@ async function onEditSave() {
     species_name: result.name,
     species_emoji: result.emoji,
     species_confidence: result.confidence,
-    photo_urls: previewImage.value ? [previewImage.value] : [],
+    photo_blobs: pendingBlob.value ? [pendingBlob.value] : [],
     primary_photo_index: 0,
     weight_estimated_g: estimatedWeight.value,
     weight_g: editForm.value.weight_g || null,
@@ -458,6 +576,21 @@ async function onEditSave() {
     uni.showToast({ title: '保存失败', icon: 'none' })
   }
 }
+
+// ========== 生命周期 ==========
+onMounted(() => {
+  // 启动摄像头
+  startCamera()
+})
+
+onUnmounted(() => {
+  // 释放摄像头
+  stopCamera()
+  // 释放 objectURL
+  if (previewImage.value && previewImage.value.startsWith('blob:')) {
+    URL.revokeObjectURL(previewImage.value)
+  }
+})
 </script>
 
 <style scoped lang="scss">
@@ -493,6 +626,58 @@ async function onEditSave() {
     radial-gradient(ellipse at 30% 20%, #3D5A4A 0%, #1A2A22 50%, #0A1410 100%),
     #0A1410;
   background-blend-mode: multiply;
+  z-index: 0;
+}
+
+/* 真实摄像头视频流 */
+.camera-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  background: #000;
+}
+
+/* 摄像头错误降级 */
+.camera-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 30% 20%, #3D5A4A 0%, #1A2A22 50%, #0A1410 100%),
+    #0A1410;
+  color: #fff;
+  text-align: center;
+  padding: 40px;
+}
+
+.fallback-emoji {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.fallback-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.fallback-btn {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #5865F2, #8B5CF6);
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(88, 101, 242, 0.4);
 }
 
 .camera-glow {
