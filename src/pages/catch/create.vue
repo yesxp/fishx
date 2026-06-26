@@ -1,104 +1,297 @@
 <template>
   <view class="page-capture">
-    <!-- Camera background -->
-    <view class="camera-bg">
-      <view class="camera-glow camera-glow--1" />
-      <view class="camera-glow camera-glow--2" />
-      <view class="fish-blob" />
-    </view>
+    <!-- ========== 模式 A：拍照取景 ========== -->
+    <template v-if="mode === 'camera'">
+      <!-- Camera background -->
+      <view class="camera-bg">
+        <view class="camera-glow camera-glow--1" />
+        <view class="camera-glow camera-glow--2" />
+        <view class="fish-blob" />
+      </view>
 
-    <!-- Top bar -->
-    <view class="topbar">
-      <view class="iconbtn" @tap="goBack">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" width="18" height="18">
-          <path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </view>
-      <view class="topbar-title">
-        <view class="topbar-dot" />
-        <text>GPS · 西湖支流</text>
-      </view>
-      <view class="iconbtn" @tap="onFlashToggle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-          <path d="M12 2v3M12 19v3M5 12H2M22 12h-3M6.3 6.3l-2.1-2.1M19.8 19.8l-2.1-2.1M6.3 17.7l-2.1 2.1M19.8 4.2l-2.1 2.1" stroke-linecap="round" />
-          <circle cx="12" cy="12" r="4" />
-        </svg>
-      </view>
-    </view>
-
-    <!-- Category switcher -->
-    <view class="cat-switch">
-      <view
-        v-for="(cat, idx) in categories"
-        :key="idx"
-        class="cat-pill"
-        :class="{ 'cat-pill--active': activeCat === idx }"
-        @tap="activeCat = idx"
-      >
-        <text>{{ cat }}</text>
-      </view>
-    </view>
-
-    <!-- Viewfinder overlay -->
-    <view class="viewfinder">
-      <view class="vf-box">
-        <view class="scan-line" />
-        <!-- Corner brackets via view elements -->
-        <view class="vf-corner vf-corner--tl" />
-        <view class="vf-corner vf-corner--tr" />
-        <view class="vf-corner vf-corner--bl" />
-        <view class="vf-corner vf-corner--br" />
-      </view>
-      <view class="vf-hint">
-        <text>将鱼放入取景框 · 自动识别</text>
-      </view>
-    </view>
-
-    <!-- Recenter button -->
-    <view class="recenter-btn" @tap="onRecenter">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-        <circle cx="12" cy="12" r="3" />
-        <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke-linecap="round" />
-      </svg>
-    </view>
-
-    <!-- Bottom panel -->
-    <view class="bottom-panel">
-      <!-- Shutter row -->
-      <view class="shutter-row">
-        <view class="album-btn" @tap="onAlbumPick">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
-            <rect x="3" y="5" width="18" height="14" rx="3" />
-            <circle cx="9" cy="11" r="2" />
-            <path d="M21 17l-5-5-9 9" stroke-linejoin="round" />
+      <!-- Top bar -->
+      <view class="topbar">
+        <view class="iconbtn" @tap="goBack">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" width="18" height="18">
+            <path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </view>
+        <view class="topbar-title" @tap="onPickSpot">
+          <view class="topbar-dot" />
+          <text>{{ spotName || '选择钓点' }}</text>
+        </view>
+        <view class="iconbtn" @tap="onFlashToggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <path d="M12 2v3M12 19v3M5 12H2M22 12h-3M6.3 6.3l-2.1-2.1M19.8 19.8l-2.1-2.1M6.3 17.7l-2.1 2.1M19.8 4.2l-2.1 2.1" stroke-linecap="round" />
+            <circle cx="12" cy="12" r="4" />
+          </svg>
+        </view>
+      </view>
 
-        <view class="shutter-wrap" @tap="handleShutter">
-          <view class="shutter-ripple" />
-          <view class="shutter-btn">
-            <view class="shutter-inner" />
+      <!-- Category switcher -->
+      <view class="cat-switch">
+        <view
+          v-for="(cat, idx) in categories"
+          :key="idx"
+          class="cat-pill"
+          :class="{ 'cat-pill--active': activeCat === idx }"
+          @tap="activeCat = idx"
+        >
+          <text>{{ cat }}</text>
+        </view>
+      </view>
+
+      <!-- Viewfinder overlay -->
+      <view class="viewfinder">
+        <view class="vf-box">
+          <view class="scan-line" />
+          <view class="vf-corner vf-corner--tl" />
+          <view class="vf-corner vf-corner--tr" />
+          <view class="vf-corner vf-corner--bl" />
+          <view class="vf-corner vf-corner--br" />
+        </view>
+        <view class="vf-hint">
+          <text>将鱼放入取景框 · 自动识别</text>
+        </view>
+      </view>
+
+      <!-- Recenter button -->
+      <view class="recenter-btn" @tap="onRecenter">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke-linecap="round" />
+        </svg>
+      </view>
+
+      <!-- Bottom panel -->
+      <view class="bottom-panel">
+        <view class="shutter-row">
+          <view class="album-btn" @tap="onAlbumPick">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+              <rect x="3" y="5" width="18" height="14" rx="3" />
+              <circle cx="9" cy="11" r="2" />
+              <path d="M21 17l-5-5-9 9" stroke-linejoin="round" />
+            </svg>
+          </view>
+
+          <view class="shutter-wrap" @tap="handleShutter">
+            <view class="shutter-ripple" />
+            <view class="shutter-btn">
+              <view class="shutter-inner" />
+            </view>
+          </view>
+
+          <view class="flip-btn" @tap="onFlipCamera">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+              <path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke-linejoin="round" />
+              <path d="M9 14a3 3 0 1 0 6 0 3 3 0 0 0-6 0z" />
+            </svg>
           </view>
         </view>
+      </view>
+    </template>
 
-        <view class="flip-btn" @tap="onFlipCamera">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
-            <path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke-linejoin="round" />
-            <path d="M9 14a3 3 0 1 0 6 0 3 3 0 0 0-6 0z" />
-          </svg>
+    <!-- ========== 模式 B：Loading（同页面）========== -->
+    <template v-else-if="mode === 'loading'">
+      <view class="loading-page">
+        <view class="loading-bg" />
+        <view class="loading-card">
+          <view class="loading-preview" :style="previewImage ? `background-image: url(${previewImage})` : ''" />
+          <view class="loading-progress">
+            <view class="loading-bar" :style="{ width: progress + '%' }" />
+          </view>
+          <view class="loading-percent">{{ progress }}%</view>
+          <view class="loading-hint">{{ loadingHint }}</view>
         </view>
       </view>
-    </view>
+    </template>
+
+    <!-- ========== 模式 C：结果弹层（同页面）========== -->
+    <template v-else-if="mode === 'result'">
+      <view class="result-page">
+        <view class="result-bg" />
+        <view class="result-card">
+          <view class="result-photo" :style="previewImage ? `background-image: url(${previewImage})` : ''" />
+          <view class="result-body">
+            <view class="result-title">识别完成</view>
+            <view class="result-sub">点击下方选项确认或修改</view>
+
+            <view class="result-list">
+              <view
+                v-for="(r, idx) in identifyResults"
+                :key="idx"
+                class="result-row"
+                :class="{ 'result-row--active': idx === selectedResultIdx }"
+                @tap="selectedResultIdx = idx"
+              >
+                <text class="result-emoji">{{ r.emoji }}</text>
+                <view class="result-meta">
+                  <view class="result-name">{{ r.name }}</view>
+                  <view class="result-conf">可信度 {{ Math.round(r.confidence * 100) }}%</view>
+                </view>
+                <view v-if="idx === selectedResultIdx" class="result-check">✓</view>
+              </view>
+            </view>
+
+            <view class="result-actions">
+              <view class="btn btn--secondary" @tap="onResultCancel">重新拍照</view>
+              <view class="btn btn--primary" @tap="onResultConfirm">确认 · 补字段</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </template>
+
+    <!-- ========== 模式 D：补字段抽屉（同页面）========== -->
+    <template v-else-if="mode === 'edit'">
+      <view class="edit-page">
+        <view class="edit-bg" />
+        <view class="edit-card">
+          <view class="edit-handle" />
+          <view class="edit-header">
+            <view class="edit-title">补全鱼获信息</view>
+            <view class="edit-close" @tap="onEditClose">×</view>
+          </view>
+
+          <view class="edit-body">
+            <view class="edit-photo" :style="previewImage ? `background-image: url(${previewImage})` : ''" />
+
+            <view class="edit-section">
+              <view class="edit-label">鱼种</view>
+              <view class="edit-species">
+                <text class="edit-species-emoji">{{ currentResult?.emoji }}</text>
+                <text class="edit-species-name">{{ currentResult?.name }}</text>
+              </view>
+            </view>
+
+            <view class="edit-section">
+              <view class="edit-label">重量 <text class="edit-label-sub">（选填 · AI 估算 {{ estimatedWeight }}g）</text></view>
+              <input
+                v-model.number="editForm.weight_g"
+                class="edit-input"
+                type="number"
+                placeholder="确认或修改重量（克）"
+              />
+            </view>
+
+            <view class="edit-section">
+              <view class="edit-label">钓法</view>
+              <view class="edit-tags">
+                <view
+                  v-for="m in methods"
+                  :key="m"
+                  class="edit-tag"
+                  :class="{ 'edit-tag--active': editForm.method === m }"
+                  @tap="editForm.method = m"
+                >{{ m }}</view>
+              </view>
+            </view>
+
+            <view class="edit-section">
+              <view class="edit-label">饵料（可多选）</view>
+              <view class="edit-tags">
+                <view
+                  v-for="b in baits"
+                  :key="b"
+                  class="edit-tag"
+                  :class="{ 'edit-tag--active': editForm.bait.includes(b) }"
+                  @tap="toggleBait(b)"
+                >{{ b }}</view>
+              </view>
+            </view>
+
+            <view class="edit-section">
+              <view class="edit-label">心情</view>
+              <view class="edit-tags">
+                <view
+                  v-for="m in moods"
+                  :key="m"
+                  class="edit-tag"
+                  :class="{ 'edit-tag--active': editForm.mood_tags.includes(m) }"
+                  @tap="toggleMood(m)"
+                >{{ m }}</view>
+              </view>
+            </view>
+
+            <view class="edit-section">
+              <view class="edit-label">备注</view>
+              <textarea
+                v-model="editForm.note"
+                class="edit-textarea"
+                placeholder="说点什么...（200 字内）"
+                maxlength="200"
+              />
+            </view>
+          </view>
+
+          <view class="edit-footer">
+            <view class="btn btn--secondary" @tap="onEditClose">取消</view>
+            <view class="btn btn--primary" @tap="onEditSave">保存鱼获</view>
+          </view>
+        </view>
+      </view>
+    </template>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { identifyFish, type FishIdentifyResult } from '@/api/ai'
+import { readExif } from '@/utils/exif'
+import { saveCatch } from '@/api/catch'
+import { getCurrentLocation } from '@/lib/amap'
 
+type Mode = 'camera' | 'loading' | 'result' | 'edit'
+
+const mode = ref<Mode>('camera')
 const categories = ['🐟 鱼种识别', '🦐 饵料识别', '🎣 环境识别']
 const activeCat = ref(0)
 const flashOn = ref(false)
 
+// ========== 拍照/识别状态 ==========
+const previewImage = ref<string>('')
+const progress = ref(0)
+const loadingHint = ref('正在识别鱼种...')
+const loadingHints = [
+  '正在识别鱼种...',
+  '比对 8 种常见鱼特征...',
+  '分析鱼体形态与色斑...',
+  '匹配度 92% · 出结果中...',
+]
+const identifyResults = ref<FishIdentifyResult[]>([])
+const selectedResultIdx = ref(0)
+const estimatedWeight = ref(0)
+const spotName = ref('选择钓点')
+const spotGeo = ref<{ lat: number; lng: number } | null>(null)
+
+const currentResult = computed(() => identifyResults.value[selectedResultIdx.value])
+
+// ========== 编辑表单 ==========
+const editForm = ref({
+  weight_g: 0 as number,
+  method: '台钓' as string,
+  bait: [] as string[],
+  mood_tags: [] as string[],
+  note: '' as string,
+})
+
+const methods = ['台钓', '路亚', '矶钓', '筏钓', '传统钓']
+const baits = ['蚯蚓', '商品饵', '红虫', '玉米', '麦子', '拉饵', '拟饵']
+const moods = ['得意', '谦虚', '惊喜', '兴奋', '感恩', '平静']
+
+function toggleBait(b: string) {
+  const idx = editForm.value.bait.indexOf(b)
+  if (idx >= 0) editForm.value.bait.splice(idx, 1)
+  else editForm.value.bait.push(b)
+}
+
+function toggleMood(m: string) {
+  const idx = editForm.value.mood_tags.indexOf(m)
+  if (idx >= 0) editForm.value.mood_tags.splice(idx, 1)
+  else editForm.value.mood_tags.push(m)
+}
+
+// ========== Actions ==========
 function goBack() {
   uni.navigateBack()
 }
@@ -116,45 +309,173 @@ function onRecenter() {
   uni.showToast({ title: '已重置取景', icon: 'none', duration: 600 })
 }
 
-function onAlbumPick() {
-  uni.chooseImage({
-    count: 1,
-    sizeType: ['compressed'],
-    sourceType: ['album'],
-    success: (res) => {
-      uni.navigateTo({
-        url: '/pages/capture/index?from=create',
-      })
-    },
-  })
-}
-
 function onFlipCamera() {
   uni.showToast({ title: '切换摄像头', icon: 'none', duration: 800 })
 }
 
-async function handleShutter() {
-  uni.chooseImage({
-    count: 1,
-    sizeType: ['compressed'],
-    sourceType: ['album', 'camera'],
-    success: (res) => {
-      uni.navigateTo({
-        url: '/pages/capture/index?from=create',
-      })
-    },
-    fail: () => {
-      // User cancelled or chooseImage not supported — fallback mock
-      uni.navigateTo({
-        url: '/pages/capture/index?from=create',
-      })
-    },
+async function onPickSpot() {
+  try {
+    const loc = await getCurrentLocation()
+    spotGeo.value = { lat: loc.latitude, lng: loc.longitude }
+    spotName.value = loc.name || `${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}`
+  } catch (e) {
+    uni.showToast({ title: '定位失败，请手动选点', icon: 'none' })
+  }
+}
+
+async function pickImage(sourceType: ('album' | 'camera')[]) {
+  return new Promise<string | null>((resolve) => {
+    uni.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType,
+      success: async (res) => {
+        const filePath = res.tempFilePaths[0]
+        // EXIF 自动读 → 失败手动选点
+        try {
+          const exif = await readExif(filePath)
+          if (exif.lat && exif.lng) {
+            spotGeo.value = { lat: exif.lat, lng: exif.lng }
+            spotName.value = `EXIF: ${exif.lat.toFixed(4)}, ${exif.lng.toFixed(4)}`
+          }
+          if (exif.dateTime) {
+            // 用 EXIF 时间作为 caught_at
+          }
+        } catch (e) {
+          // EXIF 读取失败，提示用户手动选点
+        }
+        resolve(filePath)
+      },
+      fail: () => resolve(null),
+    })
   })
+}
+
+async function onAlbumPick() {
+  const path = await pickImage(['album'])
+  if (path) startIdentify(path)
+}
+
+async function handleShutter() {
+  const path = await pickImage(['album', 'camera'])
+  if (path) startIdentify(path)
+  // 即使失败也走 mock 流程（开发期）
+  else startIdentify('')
+}
+
+// ========== 识别流程 ==========
+async function startIdentify(imagePath: string) {
+  previewImage.value = imagePath
+  mode.value = 'loading'
+  progress.value = 0
+  loadingHint.value = loadingHints[0]
+
+  // 进度条动画
+  const timer = setInterval(() => {
+    progress.value = Math.min(progress.value + Math.random() * 4 + 1, 95)
+    const idx = Math.min(Math.floor(progress.value / 25), loadingHints.length - 1)
+    loadingHint.value = loadingHints[idx]
+  }, 100)
+
+  try {
+    const results = await identifyFish(imagePath)
+    clearInterval(timer)
+    progress.value = 100
+    identifyResults.value = results
+    selectedResultIdx.value = 0
+    // mock 估算重量
+    estimatedWeight.value = 200 + Math.floor(Math.random() * 800)
+    editForm.value.weight_g = estimatedWeight.value
+    // 延迟 300ms 让用户看到 100%
+    setTimeout(() => {
+      mode.value = 'result'
+    }, 300)
+  } catch (e) {
+    clearInterval(timer)
+    mode.value = 'camera'
+    uni.showToast({ title: '识别失败，请重试', icon: 'none' })
+  }
+}
+
+function onResultCancel() {
+  mode.value = 'camera'
+  previewImage.value = ''
+}
+
+function onResultConfirm() {
+  mode.value = 'edit'
+}
+
+function onEditClose() {
+  mode.value = 'camera'
+  previewImage.value = ''
+  // 重置表单
+  editForm.value = {
+    weight_g: 0,
+    method: '台钓',
+    bait: [],
+    mood_tags: [],
+    note: '',
+  }
+}
+
+async function onEditSave() {
+  // spot_geo 必填检查
+  if (!spotGeo.value) {
+    uni.showToast({ title: '请先选择钓点', icon: 'none' })
+    return
+  }
+  const result = currentResult.value
+  if (!result) {
+    uni.showToast({ title: '请先识别鱼种', icon: 'none' })
+    return
+  }
+
+  const payload = {
+    species_name: result.name,
+    species_emoji: result.emoji,
+    species_confidence: result.confidence,
+    photo_urls: previewImage.value ? [previewImage.value] : [],
+    primary_photo_index: 0,
+    weight_estimated_g: estimatedWeight.value,
+    weight_g: editForm.value.weight_g || null,
+    weight_confirmed: editForm.value.weight_g > 0 ? 1 : 0,
+    spot_geo_lat: spotGeo.value.lat,
+    spot_geo_lng: spotGeo.value.lng,
+    spot_name: spotName.value,
+    method: editForm.value.method,
+    bait: editForm.value.bait,
+    mood_tags: editForm.value.mood_tags,
+    note: editForm.value.note,
+  }
+  try {
+    await saveCatch(payload)
+    uni.showToast({ title: '已保存 🎣', icon: 'success' })
+    setTimeout(() => {
+      uni.navigateBack()
+    }, 800)
+  } catch (e) {
+    uni.showToast({ title: '保存失败', icon: 'none' })
+  }
 }
 </script>
 
 <style scoped lang="scss">
-/* ====== Page ====== */
+/* ====== Common ====== */
+:root {
+  --b: #5865F2;
+  --b2: #8B5CF6;
+  --ink: #1C1C1E;
+  --ink2: #3C3C43;
+  --muted: #8E8E93;
+  --bg: #F2F3F7;
+  --card: #FFFFFF;
+  --rc: 24px;
+  --rb: 14px;
+  --sm: 0 2px 6px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+}
+
+/* ====== 模式 A：拍照取景 ====== */
 .page-capture {
   position: relative;
   width: 100%;
@@ -165,7 +486,6 @@ async function handleShutter() {
   color: #fff;
 }
 
-/* ====== Camera background ====== */
 .camera-bg {
   position: absolute;
   inset: 0;
@@ -189,7 +509,6 @@ async function handleShutter() {
   background: radial-gradient(circle at 80% 30%, rgba(100, 180, 220, 0.08) 0%, transparent 40%);
 }
 
-/* Fish-like floating blob */
 .fish-blob {
   position: absolute;
   top: 38%;
@@ -207,7 +526,6 @@ async function handleShutter() {
   50% { transform: translate(20px, -10px); }
 }
 
-/* ====== Top Bar ====== */
 .topbar {
   position: relative;
   z-index: 10;
@@ -260,7 +578,6 @@ async function handleShutter() {
   50% { opacity: 0.5; }
 }
 
-/* ====== Category Switcher ====== */
 .cat-switch {
   position: absolute;
   top: 130px;
@@ -290,7 +607,6 @@ async function handleShutter() {
   border-color: transparent;
 }
 
-/* ====== Viewfinder ====== */
 .viewfinder {
   position: absolute;
   inset: 0;
@@ -308,7 +624,6 @@ async function handleShutter() {
   height: 260px;
 }
 
-/* Corner brackets */
 .vf-corner {
   position: absolute;
   width: 36px;
@@ -316,38 +631,33 @@ async function handleShutter() {
 }
 
 .vf-corner--tl {
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
   border-top: 3px solid #fff;
   border-left: 3px solid #fff;
   border-top-left-radius: 16px;
 }
 
 .vf-corner--tr {
-  top: 0;
-  right: 0;
+  top: 0; right: 0;
   border-top: 3px solid #fff;
   border-right: 3px solid #fff;
   border-top-right-radius: 16px;
 }
 
 .vf-corner--bl {
-  bottom: 0;
-  left: 0;
+  bottom: 0; left: 0;
   border-bottom: 3px solid #fff;
   border-left: 3px solid #fff;
   border-bottom-left-radius: 16px;
 }
 
 .vf-corner--br {
-  bottom: 0;
-  right: 0;
+  bottom: 0; right: 0;
   border-bottom: 3px solid #fff;
   border-right: 3px solid #fff;
   border-bottom-right-radius: 16px;
 }
 
-/* Scanning line */
 .scan-line {
   position: absolute;
   left: 8px;
@@ -373,7 +683,6 @@ async function handleShutter() {
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
-/* ====== Recenter Button ====== */
 .recenter-btn {
   position: absolute;
   right: 20px;
@@ -392,7 +701,6 @@ async function handleShutter() {
   justify-content: center;
 }
 
-/* ====== Bottom Panel ====== */
 .bottom-panel {
   position: absolute;
   left: 0;
@@ -409,7 +717,6 @@ async function handleShutter() {
   padding: 60px 24px 40px;
 }
 
-/* Album button (left) */
 .album-btn {
   width: 48px;
   height: 48px;
@@ -424,7 +731,6 @@ async function handleShutter() {
   color: #fff;
 }
 
-/* Shutter button (center) */
 .shutter-wrap {
   position: relative;
   width: 78px;
@@ -469,7 +775,6 @@ async function handleShutter() {
   border: 2px solid #1C1C1E;
 }
 
-/* Flip button (right) */
 .flip-btn {
   width: 48px;
   height: 48px;
@@ -482,5 +787,385 @@ async function handleShutter() {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* ====== 模式 B：Loading ====== */
+.loading-page {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: #0A1410;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.loading-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(88, 101, 242, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 70% 70%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+}
+
+.loading-card {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  background: rgba(20, 20, 30, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--rc);
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.loading-preview {
+  width: 100%;
+  aspect-ratio: 1;
+  background: rgba(0, 0, 0, 0.5) center/cover no-repeat;
+  border-radius: 18px;
+  margin-bottom: 20px;
+}
+
+.loading-progress {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.loading-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--b), var(--b2));
+  border-radius: 3px;
+  transition: width 0.2s ease;
+}
+
+.loading-percent {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 12px;
+}
+
+.loading-hint {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+/* ====== 模式 C：结果弹层 ====== */
+.result-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 54px 20px 40px;
+}
+
+.result-bg {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, #F2F3F7 0%, #E8EAF2 100%);
+  z-index: -1;
+}
+
+.result-card {
+  background: #fff;
+  border-radius: var(--rc);
+  box-shadow: var(--sm);
+  overflow: hidden;
+}
+
+.result-photo {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #1C1C1E center/cover no-repeat;
+}
+
+.result-body {
+  padding: 20px;
+}
+
+.result-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.result-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.result-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1.5px solid transparent;
+  background: var(--bg);
+  transition: all 0.2s;
+}
+
+.result-row--active {
+  border-color: var(--b);
+  background: rgba(88, 101, 242, 0.05);
+}
+
+.result-emoji {
+  font-size: 28px;
+}
+
+.result-meta {
+  flex: 1;
+}
+
+.result-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.result-conf {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.result-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--b), var(--b2));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.result-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ====== 模式 D：补字段抽屉 ====== */
+.edit-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.edit-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+}
+
+.edit-card {
+  background: #fff;
+  border-radius: var(--rc) var(--rc) 0 0;
+  margin-top: 54px;
+  min-height: calc(100vh - 54px);
+  padding-bottom: 100px;
+  animation: slide-up 0.3s ease;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.edit-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.15);
+  margin: 8px auto;
+}
+
+.edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 20px 16px;
+}
+
+.edit-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.edit-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: var(--muted);
+}
+
+.edit-body {
+  padding: 0 20px;
+}
+
+.edit-photo {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #1C1C1E center/cover no-repeat;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.edit-section {
+  margin-bottom: 20px;
+}
+
+.edit-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.edit-label-sub {
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.edit-species {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: rgba(88, 101, 242, 0.08);
+  border-radius: var(--rb);
+}
+
+.edit-species-emoji {
+  font-size: 22px;
+}
+
+.edit-species-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--b);
+}
+
+.edit-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  background: var(--bg);
+  border-radius: var(--rb);
+  font-size: 15px;
+  color: var(--ink);
+  border: 1.5px solid transparent;
+  box-sizing: border-box;
+}
+
+.edit-input:focus {
+  border-color: var(--b);
+  background: #fff;
+}
+
+.edit-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.edit-tag {
+  padding: 8px 14px;
+  background: var(--bg);
+  border-radius: 100px;
+  font-size: 13px;
+  color: var(--ink2);
+  border: 1.5px solid transparent;
+  transition: all 0.2s;
+}
+
+.edit-tag--active {
+  background: rgba(88, 101, 242, 0.1);
+  color: var(--b);
+  border-color: var(--b);
+}
+
+.edit-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border-radius: var(--rb);
+  font-size: 14px;
+  color: var(--ink);
+  border: 1.5px solid transparent;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.edit-textarea:focus {
+  border-color: var(--b);
+  background: #fff;
+}
+
+.edit-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* ====== Buttons ====== */
+.btn {
+  flex: 1;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: var(--rb);
+  transition: all 0.2s;
+}
+
+.btn--primary {
+  background: linear-gradient(135deg, var(--b), var(--b2));
+  color: #fff;
+}
+
+.btn--secondary {
+  background: rgba(60, 60, 67, 0.06);
+  color: var(--ink);
 }
 </style>

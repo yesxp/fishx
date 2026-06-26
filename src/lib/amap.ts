@@ -236,8 +236,34 @@ function toRad(deg: number): number {
   return deg * Math.PI / 180
 }
 
+/**
+ * 简化版定位接口（兼容 create.vue 用法）
+ * 返回带 name 字段的位置信息
+ */
+export async function getCurrentLocation(): Promise<{ latitude: number; longitude: number; name?: string; address?: string }> {
+  try {
+    const loc = await getLocation(true)
+    return {
+      latitude: loc.latitude,
+      longitude: loc.longitude,
+      name: loc.street || loc.district || loc.city,
+      address: loc.address,
+    }
+  } catch (e) {
+    // 降级：返回默认位置
+    const def = getDefaultLocation()
+    return {
+      latitude: def.latitude,
+      longitude: def.longitude,
+      name: def.city,
+      address: def.address,
+    }
+  }
+}
+
 export default {
   getLocation,
+  getCurrentLocation,
   getAddress,
   getCoordinates,
   calculateDistance,
