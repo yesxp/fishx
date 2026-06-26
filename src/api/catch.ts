@@ -1,6 +1,7 @@
 // 渔获相关 API
-// 开发期：本地 SQLite / LocalStorage
-// 生产期：TCB MongoDB
+// 底层：storage 抽象层（开发期 LocalStorage / 生产期可替换 SQLite/TCB）
+
+import { catchStore } from '@/utils/storage'
 
 export interface CatchRecord {
   id: string
@@ -34,7 +35,7 @@ export interface CatchPayload {
   note: string
 }
 
-// 创建渔获记录
+// 创建渔获记录（旧接口，向后兼容）
 export async function createCatch(data: Partial<CatchRecord>) {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -52,13 +53,10 @@ export async function createCatch(data: Partial<CatchRecord>) {
 
 /**
  * 保存鱼获（新接口，匹配 schema.dev.sql）
- * 开发期：写入 LocalStorage（待 SQLite 接入后改为 SQLite）
- * 生产期：POST 到 TCB MongoDB
  */
 export async function saveCatch(payload: CatchPayload): Promise<{ id: string }> {
   return new Promise((resolve, reject) => {
     try {
-      const records = JSON.parse(localStorage.getItem('fishx_catches') || '[]')
       const newRecord = {
         id: 'catch_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
         user_id: 'dev_user',
@@ -68,8 +66,7 @@ export async function saveCatch(payload: CatchPayload): Promise<{ id: string }> 
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }
-      records.unshift(newRecord)
-      localStorage.setItem('fishx_catches', JSON.stringify(records))
+      catchStore.save(newRecord)
       // 模拟网络延迟
       setTimeout(() => resolve({ id: newRecord.id }), 200)
     } catch (e) {
@@ -78,13 +75,12 @@ export async function saveCatch(payload: CatchPayload): Promise<{ id: string }> 
   })
 }
 
-// 获取渔获列表
+// 获取渔获列表（mock，保留旧接口）
 export async function getCatchList(params?: {
   page?: number
   pageSize?: number
   userId?: string
 }) {
-  // 模拟数据
   const mockList: CatchRecord[] = [
     {
       id: '1',
@@ -126,20 +122,17 @@ export async function getCatchList(params?: {
 }
 
 /**
- * 从 LocalStorage 获取所有鱼获
+ * 从 storage 获取所有鱼获
  */
 export function getLocalCatches(): any[] {
-  try {
-    return JSON.parse(localStorage.getItem('fishx_catches') || '[]')
-  } catch {
-    return []
-  }
+  return catchStore.list()
 }
 
 // 删除渔获
 export async function deleteCatch(id: string) {
   return new Promise((resolve) => {
     setTimeout(() => {
+      catchStore.remove(id)
       resolve({ code: 0, message: '删除成功' })
     }, 300)
   })
