@@ -75,7 +75,7 @@ page {
 /* 全局禁止水平滚动 */
 uni-page-body {
   overflow-x: hidden;
-  max-width: 100vw;
+  max-width: 100%;
   width: 100%;
 }
 
