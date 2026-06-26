@@ -193,9 +193,6 @@
 
     <!-- 底部 CTA 固定栏 -->
     <view class="cta-bar">
-      <view class="cta-btn cta-btn--secondary" @tap="onMyRecord">
-        <text class="cta-btn-text">📋 我的战绩</text>
-      </view>
       <view class="cta-btn cta-btn--primary" @tap="onGenerate">
         <text class="cta-btn-text cta-btn-text--white">✨ 用此鱼种生成文案</text>
       </view>
@@ -204,65 +201,67 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-
-// ---- 类型 ----
-interface SpeciesData {
-  id: string
-  zh_name: string
-  emoji: string
-  scientific_name: string
-  family: string
-  difficulty: string
-  water_layer: string
-  feeding: string
-  season: string[]
-  weight_range: string
-  distribution: string
-  subtitle: string
-  description: string
-  one_fish_one_name: string
-  fun_facts: string
-  taste: string
-  tactics: string
-  related_species: string[]
-}
+import { ref, onMounted } from 'vue'
+import { getSpeciesById, getRelatedByFamily, initSpeciesData, type SpeciesData } from '@/utils/fish-species-data'
 
 interface RelatedFish {
+  id: string
   name: string
   emoji: string
   family: string
 }
 
-// ---- Mock 数据 ----
+// 初始化鱼种数据
+initSpeciesData()
+
+// 鱼种数据
 const species = ref<SpeciesData>({
   id: 'sp-001',
   zh_name: '鲫鱼',
   emoji: '🐟',
-  scientific_name: 'Carassius auratus',
-  family: '鲤科 Cyprinidae · 鲫属 Carassius',
+  common_names: [],
+  scientific_name: '',
+  family: '',
   difficulty: '易',
   water_layer: '底层',
   feeding: '杂食',
-  season: ['春', '夏', '秋', '冬'],
-  weight_range: '0.2-1.0kg',
-  distribution: '全国淡水水域',
-  subtitle: '为什么北方钓友管它叫"鲫瓜子"？',
-  description: '我国最常见、分布最广的淡水鱼之一。适应力极强，号称"淡水小强"。群居、杂食偏植物，从南到北四季可钓。',
-  one_fish_one_name: '因体侧扁、背隆起、形似瓜子而得名"鲫瓜子"。古书写作"鲒鱼"（鳞大而少）。南方俗称"河鲫"、"月鲫"。',
-  fun_facts: '🌿 耐低氧极强，新手第一条鱼多是它\n🍃 冬季其他鱼不咬钩时它仍咬\n🎣 "鲫鱼"是钓鱼的入门老师',
-  taste: '"春吃鲫夏吃鲤"。春季最肥美，炖汤奶白鲜甜，传统食疗圣品。刺多但肉嫩。',
-  tactics: '台钓万能组合：商品饵+蚯蚓双钩，一荤一素。夏秋早晚最佳；冬季红虫/蚯蚓深水钓底。',
-  related_species: ['sp-002', 'sp-003', 'sp-008'],
+  season: [],
+  weight_range: '',
+  distribution: '',
+  subtitle: '',
+  description: '',
+  one_fish_one_name: '',
+  fun_facts: '',
+  taste: '',
+  tactics: '',
+  copywriting_seeds: {},
+  related_species: [],
 })
 
-// ---- 同科鱼 mock ----
-const relatedFish = ref<RelatedFish[]>([
-  { name: '鲤鱼', emoji: '🐠', family: '鲤科' },
-  { name: '草鱼', emoji: '🐡', family: '鲤科' },
-  { name: '鳊鱼', emoji: '🐟', family: '鲤科' },
-  { name: '翘嘴', emoji: '🎏', family: '鲤科' },
-])
+// 同科鱼（动态计算）
+const relatedFish = ref<RelatedFish[]>([])
+
+// 页面加载
+onMounted(() => {
+  // 1. 从路由参数获取 id
+  const pages = getCurrentPages()
+  const current = pages[pages.length - 1] as any
+  const id = current?.options?.id || 'sp-001'
+
+  // 2. 加载鱼种数据
+  const data = getSpeciesById(id)
+  if (data) {
+    species.value = data
+    // 3. 动态计算同科鱼
+    const sameFamily = getRelatedByFamily(data)
+    relatedFish.value = sameFamily.map(s => ({
+      id: s.id,
+      name: s.zh_name,
+      emoji: s.emoji,
+      family: s.family,
+    }))
+  }
+})
 
 // ---- 操作 ----
 function goBack() {
@@ -270,7 +269,7 @@ function goBack() {
 }
 
 function onMyRecord() {
-  uni.showToast({ title: '战绩功能开发中', icon: 'none' })
+  // 移除：战绩功能在"我的"页面，不在鱼种页
 }
 
 function onGenerate() {
