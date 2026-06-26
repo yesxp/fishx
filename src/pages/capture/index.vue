@@ -94,8 +94,7 @@ onUnmounted(() => {
   justify-content: flex-start;
   padding-top: 200rpx;
   background: #000;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC',
-    'Helvetica Neue', sans-serif;
+  font-family: var(--font);
   color: #fff;
 }
 

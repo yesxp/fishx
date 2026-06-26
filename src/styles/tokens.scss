@@ -30,7 +30,10 @@
   --sm-deep: 0 4px 12px rgba(0, 0, 0, .08), 0 16px 32px rgba(0, 0, 0, .12);
 
   /* === 字体 === */
-  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "SF Pro Display", "Helvetica Neue", "Noto Sans SC", sans-serif;
+  /* 顺序：系统字体 → SF Pro → PingFang → 中文字体 → emoji → 兜底 */
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC",
+          "Helvetica Neue", "Segoe UI", Roboto, "Noto Sans SC", sans-serif,
+          "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla";
 
   /* === 间距 === */
   --gap-1: 4px;

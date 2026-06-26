@@ -684,7 +684,7 @@ onUnmounted(() => {
   height: 100vh;
   overflow: hidden;
   background: #000;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Helvetica Neue', sans-serif;
+  font-family: var(--font);
   color: #fff;
 }
 

@@ -297,7 +297,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
 .page {
   height: 100vh;
   background: #F2F3F7;
-  font-family: -apple-system, 'PingFang SC', sans-serif;
+  font-family: var(--font);
   color: $ink;
   position: relative;
   overflow: hidden;

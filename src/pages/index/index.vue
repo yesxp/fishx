@@ -320,7 +320,7 @@ function onSpeciesEntry() {
 .page {
   min-height: 100vh;
   background: #F2F3F7;
-  font-family: -apple-system, "PingFang SC", sans-serif;
+  font-family: var(--font);
   color: #1C1C1E;
   position: relative;
   overflow-x: hidden;

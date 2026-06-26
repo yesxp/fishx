@@ -66,12 +66,13 @@ page {
   --wot-loading-text-color: #80848E;
   /* Page */
   background-color: #F2F3F5;
-  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font);
   font-size: 28rpx;
   color: #060607;
-  line-height: 1.4;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
