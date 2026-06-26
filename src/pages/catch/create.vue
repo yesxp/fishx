@@ -3,8 +3,10 @@
     <!-- ========== 模式 A：拍照取景 ========== -->
     <template v-if="mode === 'camera'">
       <!-- 真实摄像头预览 -->
+      <!-- 不用 ref（uni-app H5 编译器 ref 绑的不是原生 HTMLVideoElement），
+           用 id + document.getElementById 直接拿 DOM -->
       <video
-        ref="videoEl"
+        id="cameraVideoEl"
         class="camera-video"
         autoplay
         playsinline
@@ -276,7 +278,8 @@ const activeCat = ref(0)
 const flashOn = ref(false)
 
 // ========== 摄像头 ==========
-const videoEl = ref<HTMLVideoElement | null>(null)
+// 注意：不用 Vue ref 拿 video 元素，uni-app H5 编译器返回的不是原生 HTMLVideoElement
+// 改用 document.getElementById('cameraVideoEl') 直接拿 DOM
 const cameraError = ref<string>('')
 const cameraStarted = ref(false)  // 摄像头是否已成功启动
 let mediaStream: MediaStream | null = null
@@ -321,16 +324,19 @@ async function doStartCamera() {
       },
       audio: false,
     })
-    // 等待 DOM 更新 + video 元素就绪
+    // 等 DOM 就绪后用 id 拿 video 元素（绕过 uni-app H5 的 ref 代理问题）
     await nextTick()
-    // 轮询直到 video 元素可用（iOS uni-app H5 异步渲染）
-    let video: HTMLVideoElement | null = videoEl.value as HTMLVideoElement | null
-    for (let i = 0; i < 20 && (!video || typeof video.setAttribute !== 'function'); i++) {
+    let video: HTMLVideoElement | null = null
+    for (let i = 0; i < 30; i++) {
+      const el = document.getElementById('cameraVideoEl')
+      if (el && el instanceof HTMLVideoElement) {
+        video = el as HTMLVideoElement
+        break
+      }
       await new Promise(r => setTimeout(r, 50))
-      video = videoEl.value as HTMLVideoElement | null
     }
-    if (video && typeof video.setAttribute === 'function') {
-      // playsinline 已在 template 属性中，无需 setAttribute
+    if (video) {
+      // playsinline 已在 template 属性中
       video.muted = true
       video.srcObject = mediaStream
       // 显式调用 play()（iOS Safari 必须）
@@ -368,8 +374,9 @@ function stopCamera() {
     mediaStream.getTracks().forEach(t => t.stop())
     mediaStream = null
   }
-  if (videoEl.value) {
-    videoEl.value.srcObject = null
+  const v = document.getElementById('cameraVideoEl') as HTMLVideoElement | null
+  if (v) {
+    v.srcObject = null
   }
   cameraStarted.value = false
 }
@@ -377,7 +384,7 @@ function stopCamera() {
 // 从 video 截帧为 Blob
 function captureFromVideo(): Promise<Blob | null> {
   return new Promise((resolve) => {
-    const v = videoEl.value
+    const v = document.getElementById('cameraVideoEl') as HTMLVideoElement | null
     if (!v || !v.videoWidth) {
       resolve(null)
       return
@@ -518,7 +525,8 @@ async function onAlbumPick() {
 
 async function handleShutter() {
   // 1. 优先从摄像头 video 截帧
-  if (videoEl.value && videoEl.value.videoWidth > 0 && !cameraError.value) {
+  const v = document.getElementById('cameraVideoEl') as HTMLVideoElement | null
+  if (v && v.videoWidth > 0 && !cameraError.value) {
     const blob = await captureFromVideo()
     if (blob) {
       // 转 objectURL 用于预览
