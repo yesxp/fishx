@@ -457,7 +457,7 @@ function onSpeciesEntry() {
   align-items: center;
   gap: 4px;
   padding: 4px 10px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   background: var(--gs);
 }
 
@@ -569,7 +569,7 @@ function onSpeciesEntry() {
 
 .tactic-chip {
   padding: 4px 8px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   font-size: 10.5px;
   font-weight: 600;
   background: #fff;
@@ -591,7 +591,7 @@ function onSpeciesEntry() {
   border: 1.5px dashed rgba(88, 101, 242, 0.5);
   border-radius: 24px;
   padding: 16px;
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.1);
+  box-shadow: var(--sm-purple);
   position: relative;
   overflow: hidden;
 }
@@ -620,7 +620,7 @@ function onSpeciesEntry() {
   align-items: center;
   gap: 5px;
   padding: 4px 10px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   border: 1px dashed rgba(88, 101, 242, 0.45);
   background: linear-gradient(135deg, rgba(88, 101, 242, 0.06), rgba(139, 92, 246, 0.06));
 }
@@ -637,7 +637,7 @@ function onSpeciesEntry() {
   gap: 4px;
   background: rgba(255, 255, 255, 0.5);
   padding: 3px 8px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
 }
 
 .ai-ctx-dot {
@@ -658,7 +658,7 @@ function onSpeciesEntry() {
   align-items: center;
   gap: 8px;
   background: #fff;
-  border-radius: 14px;
+  border-radius: var(--rb);
   padding: 10px 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(60, 60, 67, 0.08);
@@ -705,7 +705,7 @@ function onSpeciesEntry() {
 
 .quickchip {
   padding: 6px 10px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   font-size: 11px;
   font-weight: 600;
   background: rgba(255, 255, 255, 0.7);
@@ -717,8 +717,8 @@ function onSpeciesEntry() {
 .catch-main {
   background: linear-gradient(140deg, #fff 0%, #F4F2FF 100%);
   border: 1px solid rgba(139, 92, 246, 0.2);
-  border-radius: 18px;
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.1);
+  border-radius: var(--rc-md);
+  box-shadow: var(--sm-purple);
   padding: 14px 16px;
   display: flex;
   align-items: flex-start;
@@ -783,7 +783,7 @@ function onSpeciesEntry() {
 
 .catch-tag {
   padding: 3px 7px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   font-size: 10px;
   font-weight: 600;
   background: rgba(88, 101, 242, 0.06);
@@ -829,7 +829,7 @@ function onSpeciesEntry() {
   flex: 1;
   background: #fff;
   border: 1px solid rgba(60, 60, 67, 0.08);
-  border-radius: 14px;
+  border-radius: var(--rb);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.03);
   padding: 12px;
   display: flex;
@@ -918,7 +918,7 @@ function onSpeciesEntry() {
 .species-icon {
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: var(--rb);
   background: linear-gradient(135deg, #5865F2, #8B5CF6);
   display: flex;
   align-items: center;

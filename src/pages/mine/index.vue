@@ -411,7 +411,7 @@ function onExportData() {
   align-items: center;
   gap: 3px;
   padding: 3px 8px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   font-size: 11px;
   font-weight: 700;
   color: #7A4F00;
@@ -614,7 +614,7 @@ function onExportData() {
 
 .share-btn {
   padding: 8px 16px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   background: linear-gradient(135deg, #5865F2, #8B5CF6);
   flex-shrink: 0;
 }
@@ -663,7 +663,7 @@ function onExportData() {
   color: var(--muted);
   background: var(--bg);
   padding: 2px 8px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
 }
 
 .timeline-group-header:first-child {

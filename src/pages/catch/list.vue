@@ -271,7 +271,7 @@ function goDetail(id: string) {
 .filter-pill {
   display: inline-flex;
   padding: 7px 14px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   font-size: 12px;
   font-weight: 600;
   background: rgba(60, 60, 67, 0.06);
@@ -311,7 +311,7 @@ function goDetail(id: string) {
 .catch-row {
   background: #fff;
   border: 1px solid rgba(60, 60, 67, 0.08);
-  border-radius: 18px;
+  border-radius: var(--rc-md);
   padding: 12px;
   display: flex;
   gap: 12px;
@@ -323,7 +323,7 @@ function goDetail(id: string) {
 .catch-thumb {
   width: 54px;
   height: 54px;
-  border-radius: 14px;
+  border-radius: var(--rb);
   flex-shrink: 0;
   display: flex;
   align-items: center;

@@ -384,7 +384,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
   background: rgba(52, 199, 89, 0.95);
   color: #fff;
   padding: 5px 12px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   font-size: 11px;
   font-weight: 700;
   display: flex;
@@ -464,7 +464,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
 
 .m-chip {
   padding: 6px 12px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   font-size: 11px;
   font-weight: 600;
 }
@@ -545,7 +545,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
 .tactic-card {
   background: #fff;
   border: 1px solid $border;
-  border-radius: 14px;
+  border-radius: var(--rb);
   padding: 12px;
 }
 
@@ -570,7 +570,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
 .encyclopedia-card {
   background: #fff;
   border: 1px solid $border;
-  border-radius: 14px;
+  border-radius: var(--rb);
   padding: 14px 16px;
 }
 
@@ -619,7 +619,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
   flex: 0 0 130px;
   background: #fff;
   border: 1px solid $border;
-  border-radius: 14px;
+  border-radius: var(--rb);
   padding: 10px;
   text-align: center;
 }

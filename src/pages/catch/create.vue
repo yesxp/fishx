@@ -788,7 +788,7 @@ onUnmounted(() => {
 .fallback-btn {
   padding: 12px 28px;
   background: linear-gradient(135deg, #5865F2, #8B5CF6);
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   font-size: 14px;
   font-weight: 600;
   color: #fff;
@@ -800,7 +800,7 @@ onUnmounted(() => {
   padding: 10px 20px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   font-size: 13px;
   color: rgba(255, 255, 255, 0.85);
 }
@@ -864,7 +864,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   background: rgba(20, 20, 30, 0.40);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -901,7 +901,7 @@ onUnmounted(() => {
 
 .cat-pill {
   padding: 8px 14px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   font-size: 12px;
   font-weight: 600;
   background: rgba(20, 20, 30, 0.40);
@@ -1030,7 +1030,7 @@ onUnmounted(() => {
 .album-btn {
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: var(--rb);
   border: 1.5px solid rgba(255, 255, 255, 0.4);
   background: rgba(20, 20, 30, 0.40);
   backdrop-filter: blur(12px);
@@ -1135,7 +1135,7 @@ onUnmounted(() => {
   width: 100%;
   aspect-ratio: 1;
   background: rgba(0, 0, 0, 0.5) center/cover no-repeat;
-  border-radius: 18px;
+  border-radius: var(--rc-md);
   margin-bottom: 20px;
 }
 
@@ -1411,7 +1411,7 @@ onUnmounted(() => {
 .edit-tag {
   padding: 8px 14px;
   background: var(--bg);
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   font-size: 13px;
   color: var(--ink2);
   border: 1.5px solid transparent;

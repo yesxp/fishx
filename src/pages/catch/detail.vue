@@ -463,10 +463,10 @@ function onRegenerate() {
 /* ====== Species Card ====== */
 .species-card {
   background: linear-gradient(140deg, #fff 0%, #F4F2FF 100%);
-  border-radius: 18px;
+  border-radius: var(--rc-md);
   padding: 16px;
   border: 1px solid rgba(139, 92, 246, 0.2);
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.1);
+  box-shadow: var(--sm-purple);
   margin: -30px 16px 0;
   position: relative;
   z-index: 3;
@@ -520,7 +520,7 @@ function onRegenerate() {
 
 .sp-chip {
   padding: 3px 8px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   font-size: 10px;
   font-weight: 600;
   background: rgba(88, 101, 242, 0.1);
@@ -582,7 +582,7 @@ function onRegenerate() {
 /* ====== Info Card ====== */
 .info-card {
   background: #fff;
-  border-radius: 18px;
+  border-radius: var(--rc-md);
   padding: 16px;
   border: 1px solid rgba(60, 60, 67, 0.08);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.03);
@@ -630,7 +630,7 @@ function onRegenerate() {
 
 .btn {
   padding: 12px 14px;
-  border-radius: 14px;
+  border-radius: var(--rb);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -677,7 +677,7 @@ function onRegenerate() {
 
 .copy-card {
   background: #fff;
-  border-radius: 18px;
+  border-radius: var(--rc-md);
   border: 1px solid rgba(60, 60, 67, 0.08);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.03);
   padding: 14px;
@@ -693,7 +693,7 @@ function onRegenerate() {
 .copy-tag {
   display: inline-flex;
   padding: 3px 8px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   font-size: 10px;
   font-weight: 700;
 }
@@ -747,7 +747,7 @@ function onRegenerate() {
 
 .copy-btn {
   padding: 6px 12px;
-  border-radius: 100px;
+  border-radius: var(--rc-chip);
   background: rgba(88, 101, 242, 0.08);
   display: inline-flex;
   align-items: center;
@@ -763,7 +763,7 @@ function onRegenerate() {
 .regen-btn {
   margin: 4px 16px 0;
   padding: 14px;
-  border-radius: 14px;
+  border-radius: var(--rb);
   background: rgba(88, 101, 242, 0.08);
   display: flex;
   align-items: center;
