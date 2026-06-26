@@ -149,7 +149,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { polishAllStyles, type CopywritingContext } from '@/api/llm'
+import { ALL_SPECIES } from '@/utils/fish-species-data'
 
 // ---- 类型 ----
 interface Photo {
@@ -211,39 +213,54 @@ const infoGrid: InfoItem[] = [
   { emoji: '💬', label: '心情', value: '得意' },
 ]
 
-// ---- 5 风格文案 ----
-const styles: StyleItem[] = [
-  {
-    key: 'proud',
-    emoji: '🏆',
-    name: '得意',
-    text: '今天老王钓位爆护了！320g 鲫鱼一尾，下午 2-5 点气压稳，鲫鱼咬钩勤。一竿一尾，爽！',
-  },
-  {
-    key: 'modest',
-    emoji: '🙏',
-    name: '谦虚',
-    text: '运气不错，下午在老王钓位碰到一条 320g 鲫鱼。新手第一次单独上这么大的，开心。',
-  },
-  {
-    key: 'artistic',
-    emoji: '🎨',
-    name: '文艺',
-    text: '下午的光线打在水面，鲫鱼跃出的一瞬，时间仿佛静止。320g，是自然的礼物。',
-  },
-  {
-    key: 'funny',
-    emoji: '😂',
-    name: '搞笑',
-    text: '鲫鱼：我只是想透个气。钓者：我只是想吃你。320g 上岸，钓鱼人的日常迷惑行为。',
-  },
-  {
-    key: 'minimal',
-    emoji: '⚡',
-    name: '简约',
-    text: '鲫鱼 · 320g · 老王钓位 · 台钓 · 今天 14:30。',
-  },
-]
+// ---- 5 风格文案（从 copywriting_seeds + LLM 润色）----
+const STYLE_META: Record<string, { emoji: string; name: string }> = {
+  proud: { emoji: '🏆', name: '得意' },
+  modest: { emoji: '🙏', name: '谦虚' },
+  funny: { emoji: '😂', name: '搞笑' },
+  artistic: { emoji: '🎨', name: '文艺' },
+  minimal: { emoji: '⚡', name: '简约' },
+}
+
+const styles = ref<StyleItem[]>([])
+const regenerating = ref(false)
+
+// 文案润色函数（mock + LLM 接口）
+async function generateCopywriting() {
+  regenerating.value = true
+  try {
+    // 1. 找鱼种
+    const speciesName = detail.fishName
+    const allSpecies = ALL_SPECIES
+    const target = allSpecies.find(s => s.zh_name === speciesName)
+
+    // 2. 构建上下文
+    const ctx: CopywritingContext = {
+      species_name: speciesName,
+      weight_g: 320, // TODO: 从 infoGrid 提取
+      spot_name: '老王钓位',
+      method: '台钓',
+    }
+
+    // 3. 调 LLM 批量润色
+    const polished = await polishAllStyles(ctx)
+
+    // 4. 渲染
+    styles.value = polished.map(p => ({
+      key: p.style,
+      emoji: STYLE_META[p.style]?.emoji || '✒️',
+      name: STYLE_META[p.style]?.name || p.style,
+      text: p.text,
+    }))
+  } finally {
+    regenerating.value = false
+  }
+}
+
+// 页面加载时生成一次
+onMounted(() => {
+  generateCopywriting()
+})
 
 // ---- 操作 ----
 function goBack() {
@@ -291,7 +308,7 @@ function onDelete() {
 }
 
 function onRegenerate() {
-  uni.showToast({ title: 'AI 重新生成中...', icon: 'none', duration: 2000 })
+  generateCopywriting()
 }
 </script>
 
