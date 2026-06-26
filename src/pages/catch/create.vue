@@ -281,6 +281,7 @@ const cameraError = ref<string>('')
 const cameraStarted = ref(false)  // 摄像头是否已成功启动
 let mediaStream: MediaStream | null = null
 let facingMode: 'environment' | 'user' = 'environment'
+let startingPromise: Promise<void> | null = null  // 防止重复启动
 
 /**
  * 用户点击"开启摄像头"按钮（用户手势触发，避开 iOS autoplay 限制）
@@ -290,6 +291,19 @@ async function onStartCamera() {
 }
 
 async function startCamera() {
+  // 防止重复启动（onMounted 自动调用 + 用户手动点击重试）
+  if (startingPromise) return startingPromise
+  startingPromise = (async () => {
+    await doStartCamera()
+  })()
+  try {
+    await startingPromise
+  } finally {
+    startingPromise = null
+  }
+}
+
+async function doStartCamera() {
   cameraError.value = ''
   // 检查浏览器支持
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -309,18 +323,19 @@ async function startCamera() {
     })
     // 等待 DOM 更新 + video 元素就绪
     await nextTick()
-    // 再次检查 video 元素（兜底）
-    if (!videoEl.value) {
-      await new Promise(r => setTimeout(r, 100))
+    // 轮询直到 video 元素可用（iOS uni-app H5 异步渲染）
+    let video: HTMLVideoElement | null = videoEl.value as HTMLVideoElement | null
+    for (let i = 0; i < 20 && (!video || typeof video.setAttribute !== 'function'); i++) {
+      await new Promise(r => setTimeout(r, 50))
+      video = videoEl.value as HTMLVideoElement | null
     }
-    if (videoEl.value) {
-      videoEl.value.srcObject = mediaStream
-      videoEl.value.setAttribute('playsinline', 'true')
-      videoEl.value.setAttribute('webkit-playsinline', 'true')
-      videoEl.value.muted = true
+    if (video && typeof video.setAttribute === 'function') {
+      // playsinline 已在 template 属性中，无需 setAttribute
+      video.muted = true
+      video.srcObject = mediaStream
       // 显式调用 play()（iOS Safari 必须）
       try {
-        await videoEl.value.play()
+        await video.play()
         cameraStarted.value = true
         console.log('[Camera] 启动并播放成功')
       } catch (playErr: any) {
@@ -620,8 +635,15 @@ async function onEditSave() {
 }
 
 // ========== 生命周期 ==========
-// 注意：不自动启动摄像头，让用户点击"开启摄像头"按钮
-// （iOS Safari autoplay 策略要求用户手势）
+// 进入页面直接请求摄像头权限（更直接的体验）
+// iOS Safari: getUserMedia 会自动触发权限弹窗，授权后视频可正常播放
+// 如果 iOS 拒绝/失败，自动降级显示"点击开启"按钮
+onMounted(() => {
+  // 延迟一点确保 DOM 渲染完毕（v-if="mode === 'camera'"）
+  nextTick(() => {
+    startCamera()
+  })
+})
 onUnmounted(() => {
   // 释放摄像头
   stopCamera()
