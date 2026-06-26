@@ -317,7 +317,7 @@ function onExportData() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 54px 20px 14px;
+  padding: 54px var(--gap-5) 14px;
   position: relative;
   z-index: 2;
 }
@@ -335,7 +335,7 @@ function onExportData() {
 
 .iconbtn {
   width: 36px;
-  height: 36px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(20px);
@@ -349,7 +349,7 @@ function onExportData() {
 
 /* ====== User Info ====== */
 .user {
-  padding: 8px 20px 0;
+  padding: var(--gap-2) var(--gap-5)0;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -382,7 +382,7 @@ function onExportData() {
   bottom: -2px;
   right: -2px;
   width: 18px;
-  height: 18px;
+  height: 44px;
   border-radius: 50%;
   background: #34C759;
   border: 3px solid #fff;
@@ -410,7 +410,7 @@ function onExportData() {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  padding: 3px 8px;
+  padding: 3px var(--gap-2);
   border-radius: var(--rc-chip);
   font-size: 11px;
   font-weight: 700;
@@ -427,13 +427,13 @@ function onExportData() {
 .user-desc {
   font-size: 12px;
   color: #8E8E93;
-  margin-top: 4px;
+  margin-top: var(--gap-1);
   line-height: 1.4;
 }
 
 /* ====== Stats Card ====== */
 .stats-card {
-  margin: 16px 16px 0;
+  margin: var(--gap-4) var(--gap-4)0;
   background: #fff;
   border-radius: 24px;
   padding: 18px;
@@ -494,7 +494,7 @@ function onExportData() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 4px 10px;
+  padding: 18px var(--gap-1) 10px;
 }
 
 .sec-title {
@@ -516,7 +516,7 @@ function onExportData() {
   background: #fff;
   border: 1px solid rgba(60, 60, 67, 0.08);
   border-radius: 20px;
-  padding: 16px;
+  padding: var(--gap-4);
   position: relative;
   overflow: hidden;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.03);
@@ -528,7 +528,7 @@ function onExportData() {
 
 .tool-icon {
   width: 40px;
-  height: 40px;
+  height: 44px;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -576,7 +576,7 @@ function onExportData() {
   background: #fff;
   border: 1px solid rgba(60, 60, 67, 0.08);
   border-radius: 20px;
-  padding: 14px 16px;
+  padding: 14px var(--gap-4);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -585,7 +585,7 @@ function onExportData() {
 
 .share-icon {
   width: 40px;
-  height: 40px;
+  height: 44px;
   border-radius: 10px;
   background: rgba(88, 101, 242, 0.1);
   display: flex;
@@ -613,7 +613,7 @@ function onExportData() {
 }
 
 .share-btn {
-  padding: 8px 16px;
+  padding: var(--gap-2) var(--gap-4);
   border-radius: var(--rc-chip);
   background: linear-gradient(135deg, #5865F2, #8B5CF6);
   flex-shrink: 0;
@@ -634,7 +634,7 @@ function onExportData() {
   background: var(--card);
   border-radius: var(--rc);
   box-shadow: var(--sm);
-  padding: 20px 20px 20px 32px;
+  padding: var(--gap-5) var(--gap-5) var(--gap-5) 32px;
   position: relative;
 }
 
@@ -642,7 +642,7 @@ function onExportData() {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 16px 0 12px;
+  margin: var(--gap-4)0 12px;
 }
 
 .timeline-group-title {
@@ -662,7 +662,7 @@ function onExportData() {
   font-size: 11px;
   color: var(--muted);
   background: var(--bg);
-  padding: 2px 8px;
+  padding: 2px var(--gap-2);
   border-radius: var(--rc-chip);
 }
 
@@ -674,7 +674,7 @@ function onExportData() {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 10px 0;
+  padding: 10px0;
   position: relative;
 }
 

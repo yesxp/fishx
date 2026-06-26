@@ -219,7 +219,7 @@ function goDetail(id: string) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 54px 20px 12px;
+  padding: 54px var(--gap-5) var(--gap-3);
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -228,7 +228,7 @@ function goDetail(id: string) {
 
 .topbar-left {
   width: 36px;
-  height: 36px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -244,7 +244,7 @@ function goDetail(id: string) {
 
 .topbar-right {
   width: 36px;
-  height: 36px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(20px);
@@ -265,7 +265,7 @@ function goDetail(id: string) {
 /* ====== Filter ====== */
 .filter-row {
   white-space: nowrap;
-  padding: 10px 4px 4px;
+  padding: 10px var(--gap-1) var(--gap-1);
 }
 
 .filter-pill {
@@ -276,7 +276,7 @@ function goDetail(id: string) {
   font-weight: 600;
   background: rgba(60, 60, 67, 0.06);
   color: #3C3C43;
-  margin-right: 8px;
+  margin-right: var(--gap-2);
   flex-shrink: 0;
 }
 
@@ -291,7 +291,7 @@ function goDetail(id: string) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 4px 10px;
+  padding: 18px var(--gap-1) 10px;
 }
 
 .month-h-m {
@@ -312,12 +312,12 @@ function goDetail(id: string) {
   background: #fff;
   border: 1px solid rgba(60, 60, 67, 0.08);
   border-radius: var(--rc-md);
-  padding: 12px;
+  padding: var(--gap-3);
   display: flex;
   gap: 12px;
   align-items: center;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.03);
-  margin-bottom: 8px;
+  margin-bottom: var(--gap-2);
 }
 
 .catch-thumb {
@@ -430,7 +430,7 @@ function goDetail(id: string) {
 /* ====== Empty ====== */
 .empty {
   text-align: center;
-  padding: 60px 20px;
+  padding: 60px var(--gap-5);
   color: #8E8E93;
 }
 
@@ -438,7 +438,7 @@ function goDetail(id: string) {
   font-size: 48px;
   opacity: 0.5;
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: var(--gap-3);
 }
 
 .empty-title {
@@ -446,7 +446,7 @@ function goDetail(id: string) {
   font-weight: 700;
   color: #3C3C43;
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: var(--gap-1);
 }
 
 .empty-sub {

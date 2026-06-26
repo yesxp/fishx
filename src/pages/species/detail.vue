@@ -318,7 +318,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 28px 0;
+  padding: 18px 28px0;
 }
 
 .sb-time {
@@ -342,12 +342,12 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 20px 14px;
+  padding: var(--gap-2) var(--gap-5) 14px;
 }
 
 .topbar-circle {
   width: 36px;
-  height: 36px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(20px);
@@ -383,7 +383,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
   left: 20px;
   background: rgba(52, 199, 89, 0.95);
   color: #fff;
-  padding: 5px 12px;
+  padding: 5px var(--gap-3);
   border-radius: var(--rc-chip);
   font-size: 11px;
   font-weight: 700;
@@ -410,7 +410,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
 .body {
-  padding: 18px 18px 0;
+  padding: 18px 18px0;
 }
 
 /* ====== Season Row ====== */
@@ -449,7 +449,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
   font-size: 14px;
   color: $blue;
   font-weight: 600;
-  margin-top: 4px;
+  margin-top: var(--gap-1);
   line-height: 1.4;
   display: block;
 }
@@ -458,12 +458,12 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
 .meta-chips {
   display: flex;
   gap: 6px;
-  margin-top: 12px;
+  margin-top: var(--gap-3);
   flex-wrap: wrap;
 }
 
 .m-chip {
-  padding: 6px 12px;
+  padding: 6px var(--gap-3);
   border-radius: var(--rc-chip);
   font-size: 11px;
   font-weight: 600;
@@ -491,7 +491,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
 
 /* ====== Section ====== */
 .sec {
-  margin-top: 24px;
+  margin-top: var(--gap-6);
 }
 
 .sec-header {
@@ -522,7 +522,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
 .fun-fact {
   background: linear-gradient(135deg, rgba(255, 149, 0, 0.06) 0%, rgba(255, 107, 107, 0.04) 100%);
   border-left: 3px solid $warn;
-  padding: 12px 14px;
+  padding: var(--gap-3) 14px;
   border-radius: 0 12px 12px 0;
   margin-top: 6px;
 }
@@ -546,7 +546,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
   background: #fff;
   border: 1px solid $border;
   border-radius: var(--rb);
-  padding: 12px;
+  padding: var(--gap-3);
 }
 
 .tactic-label {
@@ -555,7 +555,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: 4px;
+  margin-bottom: var(--gap-1);
   display: block;
 }
 
@@ -571,14 +571,14 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
   background: #fff;
   border: 1px solid $border;
   border-radius: var(--rb);
-  padding: 14px 16px;
+  padding: 14px var(--gap-4);
 }
 
 .ency-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 0;
+  padding: var(--gap-2)0;
 }
 
 .ency-label {
@@ -654,7 +654,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 12px 16px 28px;
+  padding: var(--gap-3) var(--gap-4) 28px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -665,7 +665,7 @@ $sm: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
 
 .cta-btn {
   flex: 1;
-  padding: 13px 16px;
+  padding: 13px var(--gap-4);
   border-radius: $rb;
   display: flex;
   align-items: center;

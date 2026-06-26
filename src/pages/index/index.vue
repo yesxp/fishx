@@ -334,7 +334,7 @@ function onSpeciesEntry() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 20px 14px;
+  padding: var(--gap-2) var(--gap-5) 14px;
 }
 
 .location {
@@ -368,7 +368,7 @@ function onSpeciesEntry() {
 
 .iconbtn {
   width: 36px;
-  height: 36px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(20px);
@@ -392,7 +392,7 @@ function onSpeciesEntry() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 4px 10px;
+  padding: 18px var(--gap-1) 10px;
 }
 
 .sec-title {
@@ -419,12 +419,12 @@ function onSpeciesEntry() {
 .hero {
   background: linear-gradient(140deg, #fff 0%, #F8F9FF 100%);
   border-radius: 24px;
-  padding: 20px 22px 18px;
+  padding: var(--gap-5) 22px 18px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(60, 60, 67, 0.08);
   position: relative;
   overflow: hidden;
-  margin-top: 8px;
+  margin-top: var(--gap-2);
 }
 
 .hero-glow {
@@ -456,7 +456,7 @@ function onSpeciesEntry() {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 10px;
+  padding: var(--gap-1) 10px;
   border-radius: var(--rc-chip);
   background: var(--gs);
 }
@@ -486,7 +486,7 @@ function onSpeciesEntry() {
   line-height: 1.3;
   letter-spacing: -0.02em;
   position: relative;
-  margin: 14px 0 6px;
+  margin: 14px0 6px;
 }
 
 .hl {
@@ -506,7 +506,7 @@ function onSpeciesEntry() {
 /* Stats Grid */
 .stats {
   display: flex;
-  margin-top: 16px;
+  margin-top: var(--gap-4);
   padding-top: 14px;
   border-top: 1px solid rgba(60, 60, 67, 0.06);
   position: relative;
@@ -546,7 +546,7 @@ function onSpeciesEntry() {
   display: flex;
   gap: 5px;
   margin-top: 14px;
-  padding: 8px 10px;
+  padding: var(--gap-2) 10px;
   background: rgba(88, 101, 242, 0.05);
   border-radius: 12px;
   align-items: center;
@@ -568,7 +568,7 @@ function onSpeciesEntry() {
 }
 
 .tactic-chip {
-  padding: 4px 8px;
+  padding: var(--gap-1) var(--gap-2);
   border-radius: var(--rc-chip);
   font-size: 10.5px;
   font-weight: 600;
@@ -590,7 +590,7 @@ function onSpeciesEntry() {
   background: linear-gradient(135deg, rgba(88, 101, 242, 0.1) 0%, rgba(139, 92, 246, 0.12) 100%);
   border: 1.5px dashed rgba(88, 101, 242, 0.5);
   border-radius: 24px;
-  padding: 16px;
+  padding: var(--gap-4);
   box-shadow: var(--sm-purple);
   position: relative;
   overflow: hidden;
@@ -611,7 +611,7 @@ function onSpeciesEntry() {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: var(--gap-3);
   position: relative;
 }
 
@@ -619,7 +619,7 @@ function onSpeciesEntry() {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 10px;
+  padding: var(--gap-1) 10px;
   border-radius: var(--rc-chip);
   border: 1px dashed rgba(88, 101, 242, 0.45);
   background: linear-gradient(135deg, rgba(88, 101, 242, 0.06), rgba(139, 92, 246, 0.06));
@@ -636,7 +636,7 @@ function onSpeciesEntry() {
   align-items: center;
   gap: 4px;
   background: rgba(255, 255, 255, 0.5);
-  padding: 3px 8px;
+  padding: 3px var(--gap-2);
   border-radius: var(--rc-chip);
 }
 
@@ -659,7 +659,7 @@ function onSpeciesEntry() {
   gap: 8px;
   background: #fff;
   border-radius: var(--rb);
-  padding: 10px 12px;
+  padding: 10px var(--gap-3);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(60, 60, 67, 0.08);
   position: relative;
@@ -685,7 +685,7 @@ function onSpeciesEntry() {
 
 .send-btn {
   width: 32px;
-  height: 32px;
+  height: 44px;
   border-radius: 50%;
   background: linear-gradient(135deg, #5865F2, #8B5CF6);
   color: #fff;
@@ -719,7 +719,7 @@ function onSpeciesEntry() {
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: var(--rc-md);
   box-shadow: var(--sm-purple);
-  padding: 14px 16px;
+  padding: 14px var(--gap-4);
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -777,7 +777,7 @@ function onSpeciesEntry() {
 .catch-tags {
   display: flex;
   gap: 5px;
-  margin-top: 8px;
+  margin-top: var(--gap-2);
   flex-wrap: wrap;
 }
 
@@ -831,7 +831,7 @@ function onSpeciesEntry() {
   border: 1px solid rgba(60, 60, 67, 0.08);
   border-radius: var(--rb);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.03);
-  padding: 12px;
+  padding: var(--gap-3);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -839,7 +839,7 @@ function onSpeciesEntry() {
 
 .catch-thumb-sm {
   width: 40px;
-  height: 40px;
+  height: 44px;
   border-radius: 12px;
   flex-shrink: 0;
   display: flex;

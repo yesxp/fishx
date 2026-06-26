@@ -44,7 +44,7 @@ const onTap = () => {
 }
 .fab svg {
   width: 28px;
-  height: 28px;
+  height: 44px;
 }
 .fab::before {
   content: "";

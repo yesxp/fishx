@@ -331,7 +331,7 @@ function onRegenerate() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 54px 20px 12px;
+  padding: 54px var(--gap-5) var(--gap-3);
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -340,7 +340,7 @@ function onRegenerate() {
 
 .topbar-left {
   width: 36px;
-  height: 36px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -355,7 +355,7 @@ function onRegenerate() {
 
 .topbar-right {
   width: 36px;
-  height: 36px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(20px);
@@ -464,7 +464,7 @@ function onRegenerate() {
 .species-card {
   background: linear-gradient(140deg, #fff 0%, #F4F2FF 100%);
   border-radius: var(--rc-md);
-  padding: 16px;
+  padding: var(--gap-4);
   border: 1px solid rgba(139, 92, 246, 0.2);
   box-shadow: var(--sm-purple);
   margin: -30px 16px 0;
@@ -519,7 +519,7 @@ function onRegenerate() {
 }
 
 .sp-chip {
-  padding: 3px 8px;
+  padding: 3px var(--gap-2);
   border-radius: var(--rc-chip);
   font-size: 10px;
   font-weight: 600;
@@ -534,8 +534,8 @@ function onRegenerate() {
 
 /* ====== Bio Section ====== */
 .sp-bio {
-  margin-top: 12px;
-  padding-top: 12px;
+  margin-top: var(--gap-3);
+  padding-top: var(--gap-3);
   border-top: 1px solid rgba(60, 60, 67, 0.06);
 }
 
@@ -544,7 +544,7 @@ function onRegenerate() {
   font-weight: 700;
   color: #8B5CF6;
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: var(--gap-1);
 }
 
 .sp-bio-text {
@@ -569,7 +569,7 @@ function onRegenerate() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 20px 10px;
+  padding: 18px var(--gap-5) 10px;
 }
 
 .sec-title {
@@ -583,7 +583,7 @@ function onRegenerate() {
 .info-card {
   background: #fff;
   border-radius: var(--rc-md);
-  padding: 16px;
+  padding: var(--gap-4);
   border: 1px solid rgba(60, 60, 67, 0.08);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.03);
   margin: 0 16px;
@@ -625,11 +625,11 @@ function onRegenerate() {
   display: grid;
   grid-template-columns: 1fr 1.4fr 1.4fr;
   gap: 8px;
-  margin: 18px 16px 0;
+  margin: 18px var(--gap-4)0;
 }
 
 .btn {
-  padding: 12px 14px;
+  padding: var(--gap-3) 14px;
   border-radius: var(--rb);
   display: flex;
   align-items: center;
@@ -687,12 +687,12 @@ function onRegenerate() {
 }
 
 .copy-card-head {
-  margin-bottom: 8px;
+  margin-bottom: var(--gap-2);
 }
 
 .copy-tag {
   display: inline-flex;
-  padding: 3px 8px;
+  padding: 3px var(--gap-2);
   border-radius: var(--rc-chip);
   font-size: 10px;
   font-weight: 700;
@@ -746,7 +746,7 @@ function onRegenerate() {
 }
 
 .copy-btn {
-  padding: 6px 12px;
+  padding: 6px var(--gap-3);
   border-radius: var(--rc-chip);
   background: rgba(88, 101, 242, 0.08);
   display: inline-flex;
@@ -761,7 +761,7 @@ function onRegenerate() {
 
 /* ====== Regenerate Button ====== */
 .regen-btn {
-  margin: 4px 16px 0;
+  margin: var(--gap-1) var(--gap-4)0;
   padding: 14px;
   border-radius: var(--rb);
   background: rgba(88, 101, 242, 0.08);
@@ -778,6 +778,6 @@ function onRegenerate() {
 
 /* ====== Safe Bottom ====== */
 .safe-bottom {
-  height: 34px;
+  height: 44px;
 }
 </style>
