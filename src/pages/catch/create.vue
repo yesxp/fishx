@@ -8,8 +8,15 @@
         class="camera-video"
         autoplay
         playsinline
+        webkit-playsinline="true"
         muted
       />
+      <!-- 启动提示（iOS Safari 策略要求用户手势）-->
+      <view v-if="!cameraStarted && !cameraError" class="camera-start" @tap="onStartCamera">
+        <view class="start-emoji">🎥</view>
+        <view class="start-text">点击开启摄像头</view>
+        <view class="start-sub">iOS Safari 需要您的授权</view>
+      </view>
       <!-- 摄像头错误时的降级背景 -->
       <view v-if="cameraError" class="camera-fallback">
         <text class="fallback-emoji">📷</text>
@@ -17,10 +24,13 @@
         <view class="fallback-btn" @tap="onAlbumPick">
           <text>从相册选择</text>
         </view>
+        <view class="fallback-retry" @tap="onStartCamera">
+          <text>↻ 重试开启摄像头</text>
+        </view>
       </view>
 
       <!-- 装饰覆盖层 -->
-      <view class="camera-bg" v-if="!cameraError">
+      <view class="camera-bg" v-if="cameraStarted && !cameraError">
         <view class="camera-glow camera-glow--1" />
         <view class="camera-glow camera-glow--2" />
       </view>
@@ -268,10 +278,19 @@ const flashOn = ref(false)
 // ========== 摄像头 ==========
 const videoEl = ref<HTMLVideoElement | null>(null)
 const cameraError = ref<string>('')
+const cameraStarted = ref(false)  // 摄像头是否已成功启动
 let mediaStream: MediaStream | null = null
 let facingMode: 'environment' | 'user' = 'environment'
 
+/**
+ * 用户点击"开启摄像头"按钮（用户手势触发，避开 iOS autoplay 限制）
+ */
+async function onStartCamera() {
+  await startCamera()
+}
+
 async function startCamera() {
+  cameraError.value = ''
   // 检查浏览器支持
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     cameraError.value = '当前环境不支持摄像头'
@@ -288,22 +307,44 @@ async function startCamera() {
       },
       audio: false,
     })
+    // 等待 DOM 更新 + video 元素就绪
     await nextTick()
+    // 再次检查 video 元素（兜底）
+    if (!videoEl.value) {
+      await new Promise(r => setTimeout(r, 100))
+    }
     if (videoEl.value) {
       videoEl.value.srcObject = mediaStream
-      cameraError.value = ''
+      videoEl.value.setAttribute('playsinline', 'true')
+      videoEl.value.setAttribute('webkit-playsinline', 'true')
+      videoEl.value.muted = true
+      // 显式调用 play()（iOS Safari 必须）
+      try {
+        await videoEl.value.play()
+        cameraStarted.value = true
+        console.log('[Camera] 启动并播放成功')
+      } catch (playErr: any) {
+        console.warn('[Camera] play() 失败:', playErr)
+        // 即使 play 失败，stream 已绑定，让用户看到
+        cameraStarted.value = true
+      }
+    } else {
+      cameraError.value = 'video 元素未就绪，请重试'
     }
   } catch (err: any) {
     console.error('[Camera] 启动失败:', err)
     if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-      cameraError.value = '摄像头权限被拒绝，请从相册选择'
+      cameraError.value = '摄像头权限被拒绝，请到设置中开启或从相册选择'
     } else if (err.name === 'NotFoundError') {
       cameraError.value = '未找到摄像头设备'
     } else if (err.name === 'NotReadableError') {
       cameraError.value = '摄像头被其他程序占用'
+    } else if (err.name === 'OverconstrainedError') {
+      cameraError.value = '摄像头参数不支持'
     } else {
       cameraError.value = `摄像头启动失败：${err.message || err.name || '未知错误'}`
     }
+    cameraStarted.value = false
   }
 }
 
@@ -315,6 +356,7 @@ function stopCamera() {
   if (videoEl.value) {
     videoEl.value.srcObject = null
   }
+  cameraStarted.value = false
 }
 
 // 从 video 截帧为 Blob
@@ -578,11 +620,8 @@ async function onEditSave() {
 }
 
 // ========== 生命周期 ==========
-onMounted(() => {
-  // 启动摄像头
-  startCamera()
-})
-
+// 注意：不自动启动摄像头，让用户点击"开启摄像头"按钮
+// （iOS Safari autoplay 策略要求用户手势）
 onUnmounted(() => {
   // 释放摄像头
   stopCamera()
@@ -635,9 +674,55 @@ onUnmounted(() => {
   inset: 0;
   width: 100%;
   height: 100%;
+  min-width: 100%;
+  min-height: 100%;
   object-fit: cover;
   z-index: 0;
   background: #000;
+  /* iOS Safari 兼容 */
+  -webkit-playsinline: true;
+  playsinline: true;
+}
+
+/* 点击开启摄像头提示（iOS Safari 策略）*/
+.camera-start {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 30% 20%, #3D5A4A 0%, #1A2A22 50%, #0A1410 100%),
+    #0A1410;
+  color: #fff;
+  text-align: center;
+  padding: 40px;
+  cursor: pointer;
+}
+
+.start-emoji {
+  font-size: 72px;
+  margin-bottom: 20px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.start-text {
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.start-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
 }
 
 /* 摄像头错误降级 */
@@ -678,6 +763,16 @@ onUnmounted(() => {
   font-weight: 600;
   color: #fff;
   box-shadow: 0 4px 16px rgba(88, 101, 242, 0.4);
+  margin-bottom: 12px;
+}
+
+.fallback-retry {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 100px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .camera-glow {
